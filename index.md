@@ -10,28 +10,12 @@ ABST injects uncertainty into the armor system by turning a character's percenta
 
 Finally, a combat log entry is generated showing the resolution of the formula alongside vanilla combat log entries. This is there for presentation and clarity's sake, but it's of particular importance with this mechanic. RNG already has a tendancy to leave players feeling disempowered. Giving them 'perfect information' ensures that both sides are playing fairly.
 
-Another important factor with RNG is to ensure that players have opportunities to bend the numbers in their favor; to say yes, god laughs when you make plans, but with enough cunning you can still pull this off. Initially, this was done with minor innate bonuses from stats and abilities; Wits, Constitution, and Perseverance would contribute to your saving throws, while Retribution would contribute to your status attempts. These stats were chosen to encourage build diversity, because they were usually less-than-optimal picks in the base game.
+Another important factor with RNG is to ensure that players have opportunities to bend the numbers in their favor; to say yes, god laughs when you make plans, but with enough cunning you can still pull this off. Initially, this was done with minor innate bonuses from stats and abilities; Wits, Constitution, and Perseverance would contribute to your saving throws, while Retribution would contribute to your status attempts. These stats were chosen to encourage build diversity, because they were usually less-than-optimal picks in the base game. Bless and Curse were later altered to grant advantage or disadvantage on saving throws (roll twice and pick the highest or lowest, respectively), taking a dynamic that already existed in the base game (two diametrically opposed super-statuses) and building upon it.
 
-When Larian opened up D:OS 2's localization files to modders this opened the floodgates to allow players even more RNG manipulation. By scripting in extra events based on players talents, and altering talent descriptions, you could effectively alter these hard-coded perks to tie them into the saving throw formula.
+When Larian opened up D:OS 2's localization files to modders this opened the floodgates to allow players even more RNG manipulation. By scripting in extra events based on players talents, and altering talent descriptions, you could effectively alter these hard-coded perks to burnish less-than-stellar Talents by tying them into the saving throw formula.
 
 ![Image](https://i.imgur.com/7rhxZ48.jpg)
 ![Image](https://i.imgur.com/0UVQHHi.jpg)
 ![Image](https://i.imgur.com/xn2iCVZ.jpg)
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
+A player who can emerge from smoke, pop Adrenaline, make two basick attacks and finish with a Chicken Touch that gets +10 to apply (Sword Dancer) and an extra roll (Guerrilla) is a player who really relishes that succesful Chickening.
