@@ -17,6 +17,6 @@ When Larian enabled the modding of D:OS 2's localization files, this opened the 
 ![Image](https://i.imgur.com/0UVQHHi.jpg)
 ![Image](https://i.imgur.com/xn2iCVZ.jpg)
 
-A player who can emerge from Smoke, pop Adrenaline, Backlash into position, use Flurry, and finish with a Chicken Touch that gets +10 to apply (Sword Dancer) and an extra roll (Guerrilla) is a player who really relishes that succesful Chickening.
+A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (advantage from Guerrilla), pop Adrenaline, Backlash into position (+5 from Sword Dancer), use Flurry (+5 from Sword Dancer), and finish with an enhanced Chicken Touch attempt (an extra roll from Guerilla, +10 from Sword Dancer) is a player who used their cunning to skew the numbers in their favor, and might relishes that succesful Chickening all the more for it.
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
