@@ -2,7 +2,7 @@
 
 Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of making a low-chance roll to save a party member, the bitter sting of getting hit by someone's hail mary 5%-to-hit spell.
 
-Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Early-access forum posts proposed classic saving throws that were fully stat-based, but that would ditch what was great about the armor system--how it allows the player to point to a unit and know exactly how close they are to being disabled. I hoped a hybrid approach could provide the best of both worlds. 
+Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Early-access forum posts proposed classic saving throws that were fully stat-based, but that would ditch what was great about the armor system--how it allows the player to point to a unit and know exactly how close they are to being disabled. I hoped a hybrid approach could retain what was great about the armor system. 
 
 ABST injects uncertainty into the armor system by turning a character's percentage of armor remaining into their chance to resist physical or magic debuffs. This is accomplished with scripting, by altering instances of the event FetchCharacterApplyStatusData, which filters incoming status effects before they're resolved on targets. Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
 
