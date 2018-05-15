@@ -21,7 +21,7 @@ A player who fails a flat 50% roll to set Chicken Form may come away resenting w
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
 
-### Using story code and adaptive repurposing to introduce new Talents
+### Using story code to introduce custom Talents
 
 Here's how I use story scripting to implement custom talents for a talent pack I created with another member of the D:OS 2 modding communitiy, getting around hardcoded limitations to open up new options for character builds. (Said pack has yet to be released. As of this writing, we are still squishing bugs.)
 
