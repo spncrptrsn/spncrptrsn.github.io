@@ -36,5 +36,5 @@ There were however three underutilized armor slots that didn't show up on the ch
 
 If polymorph skills were decoupled from their armor effects entirely, it would open these slots up as nodes for custom talents, attached to players via invisible 'items.' To preserve the visual transformation of Polymorph skills, you could use the Transform call to have them trigger the visual transformation of these talent-granting 'items,' which would revert to invisibility at the end of the effect. Using this method you could implement new talents with the following limitations, which we considered pretty reasonable:
 
- * These talents would have to be selected from a dialogue menu, as we were still prevented from making them show up as selectable options on the character sheet.
- * Players could choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots.
+ * These talents would have to be selected from a dialogue menu, as we were still prevented from making them show up as selectable before they were granted.
+ * Players could choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots we had to work with.
