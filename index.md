@@ -2,9 +2,9 @@
 
 Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of succeeding on a 20% attempt to petrify some monstrosity bearing down on you, the bitter sting of getting hit by a hail mary 5% charm arrow.
 
-Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Early-access forum posts proposed classic saving throws that were fully stat-based, but that would ditch what was great about the armor system--how it allows the player to point to a unit and know exactly how close they are to being disabled. I hoped a hybrid approach could retain what was great about the armor system. 
+Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Implementing a fully stat-based saving throw system would have thrown out what was great about 'health bar' armor: how it allows the player to point to a unit and know exactly how vulnerable it was; how it makes the player have to work for debuffs by softening up target. ABST retains these strengths, making a unit's percentage of armor remaining into their chance to resist physical or magic debuffs. 
 
-ABST injects uncertainty into the armor system by turning a character's percentage of armor remaining into their chance to resist physical or magic debuffs. This is accomplished with scripting, by altering instances of the event FetchCharacterApplyStatusData, which filters incoming status effects before they're resolved on targets. Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
+This is accomplished with scripting, by altering instances of the event FetchCharacterApplyStatusData, which filters incoming status effects before they're resolved on targets. Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
 
 ![Image](https://i.imgur.com/LREhPza.jpg)
 
