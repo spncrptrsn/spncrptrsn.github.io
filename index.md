@@ -12,7 +12,7 @@ ABST injects uncertainty into the armor system by turning a character's percenta
    
 set by skills with 'trigger' statuses. Unlike, say, Chicken Form, which is fully blocked by physical armor in the base game, and ha
 
-![Image](https://i.imgur.com/rdCr7Yp.jpg)
+![Image](https://i.imgur.com/LREhPza.jpg)
 
 ```markdown
 Syntax highlighted code block
