@@ -20,3 +20,5 @@ When Larian enabled the modding of D:OS 2's localization files, this opened the 
 A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), pop Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a Chicken Touch attempt (advantage, +10 bonus) is a player who used their cunning to rig the numbers in their favor, who just might relish that succesful Chickening all the more for it.
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
+
+### Using story code and creative repurposing to pierce the Talent barrier
