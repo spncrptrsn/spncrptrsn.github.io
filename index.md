@@ -14,8 +14,9 @@ Another important factor with RNG is to ensure that players have opportunities t
 
 When Larian opened up D:OS 2's localization files to modders this opened the floodgates to allow players even more RNG manipulation. By scripting in extra events based on players talents, and altering talent descriptions, you could effectively alter these hard-coded perks to burnish less-than-stellar Talents by tying them into the saving throw formula.
 
-![Image](https://i.imgur.com/7rhxZ48.jpg)
 ![Image](https://i.imgur.com/0UVQHHi.jpg)
 ![Image](https://i.imgur.com/xn2iCVZ.jpg)
 
-A player who can emerge from smoke, pop Adrenaline, make two basick attacks and finish with a Chicken Touch that gets +10 to apply (Sword Dancer) and an extra roll (Guerrilla) is a player who really relishes that succesful Chickening.
+A player who can emerge from Smoke, pop Adrenaline, Backlash into position, use Flurry, and finish with a Chicken Touch that gets +10 to apply (Sword Dancer) and an extra roll (Guerrilla) is a player who really relishes that succesful Chickening.
+
+![Image](https://i.imgur.com/5u0llvb.jpg)
