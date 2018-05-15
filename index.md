@@ -1,12 +1,47 @@
 ### Armor-Based Saving Throws
 
-Divinity: Original Sin II ditches the D&D-inspired saving throw system for resisting ill effects you'll find in most CRPGs for a much simplified, easier to master armor system. Instead of a character rolling a d20 and adding their will modifier to resist confusion, they simply resist confusion if they have any magic armor left.
+Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, but that simplification did away with some of the excitement that can come from uncertainty: the elation of making a low-chance roll to save a party member, the bitter sting of getting hit by someone's hail mary 5%-to-hit spell.
 
-This has a plus side of being much clearer to users than Divinity: Original Sin's system, where a unit's Willpower or Bodybuilding score would determine their chance to resist a physical or magic effect. But one downside of this system is it reduces some of the excitement that comes from an RNG-based system: the high of making a low-chance roll to save a party member, the personal affront of getting hit by someone's 5% hail mary skill.
+Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing amd XCOM-style risk-taking/risk-mitigation into D:OS 2. Early-access forum posts proposed classic stat-based saving throws, but that would ditch what was great about the armor system--the ease with which you could point at a unit and know how close you were to pulling off a disable (without having to right-click, hit 'examine' and tally its Willpower score). I hoped a hybrid approach could provide the best of both worlds. 
 
-Armor-Based Saving Throws is my attempt to inject a little bit of XCOM into D:OS II. In forum posts during early access, a number of ideas were floated about what an RNG-based saving throw system might look like. While the traditionalists put forth one based on stat scores, like in the old D&D model, this would have thrown the baby out with the bathwater re: the game's current armor system. Not only would it have turned armor into a layer of abstraction on top of health, it would have added an unintuitive and clunky layer to combat, where users would have to right-click on units and view their stats to calculate a skill's chance to hit.
+This is accomplished with the script event FetchCharacterApplyStatusData, which the game uses to filter statuses launched by casters before they're resolved on targets, replacing them as needed when a launched status interacts with a target status to create a different result (i.e. Shocked upgrading to Stunned when applied to a Wet character).
 
-My solution was to turn a unit's percentage of remaining armor into their percentage chance to save against an ill-effect. Though adding in preview tooltips seemed beyond the possibilities of the editor...
+```EVENT CharacterSetShocked
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON 
+	FetchCharacterApplyStatusData(_Character, SHOCKED)
+ACTIONS
+	Set(_Result,SHOCKED)
+	Set(_Turns,null)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character, MAGIC_SHELL)
+	THEN
+		ListAdd(_RemoveList, MAGIC_SHELL)	
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character, STUNNED)
+	THEN
+		ListAdd(_RemoveList, SHOCKED)	
+		Set(_Result,null)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, SHOCKED)
+		CharacterHasStatus(_Character, WET)
+	THEN
+		ListAdd(_RemoveList, SHOCKED)	
+		Set(_Result,STUNNED)
+		Set(_Turns,1)
+	ENDIF
+	ListAdd(_RemoveList, INVISIBLE)
+	ListAdd(_RemoveList, SLEEPING)
+	RETURN(_RemoveList,_Result,_Turns)```
+
+
+set by skills with 'trigger' statuses. Unlike, say, Chicken Form, which is fully blocked by physical armor in the base game, and ha
 
 ![Image](http://i.jeuxactus.com/datas/jeux/x/c/xcom-2/xl/xcom-2-56b1196908306.jpg)
 
