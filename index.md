@@ -23,7 +23,7 @@ A player who fails a flat 50% roll to set Chicken Form may come away resenting w
 
 ### Using story code and adaptive repurposing to introduce new Talents
 
-Hardcoding is a necessary evil for developers and a bane for modders. Here's how I use story scripting to implement custom talents for a talent pack I created with another member of the D:OS 2 modding communitiy, getting around hardcoded limitations to open up new character build options. (Said pack has yet to be released. As of this writing, we are still squishing bugs.)
+Here's how I use story scripting to implement custom talents for a talent pack I created with another member of the D:OS 2 modding communitiy, getting around hardcoded limitations to open up new character build options. (Said pack has yet to be released. As of this writing, we are still squishing bugs.)
 
 Though the Divinity Engine doesn't offer any options for creating new talents, the modding community took early notice of a few hopeful quirks:
  * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but many of them aren't fully functional, and cannot be viewed by players in their character sheets under normal conditions.
