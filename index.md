@@ -1,4 +1,4 @@
-### The ideas behind Armor-Based Saving Throws
+### Design decisions behind Armor-Based Saving Throws
 
 Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of succeeding on a last-ditch 20% attempt to petrify some monstrosity bearing down on you, the affront of having your next turn stolen by a Hail Mary 5% charm arrow.
 
