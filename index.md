@@ -17,11 +17,11 @@ When Larian enabled the modding of D:OS 2's localization files, this opened the 
 ![Image](https://i.imgur.com/0UVQHHi.jpg)
 ![Image](https://i.imgur.com/xn2iCVZ.jpg)
 
-A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), pop Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a juiced-up Chicken Touch attempt (with advantage and a +10 bonus) is a player who was empowered to rig the numbers in their favor, who just might relish that succesful chickening all the more for it.
+A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), trigger Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a juiced-up Chicken Touch attempt (with advantage and a +10 bonus) is a player who was empowered to rig the numbers in their favor, who just might relish that succesful chickening all the more for it.
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
 
-### Using story code and creative repurposing to get around Talent limitations
+### Using story code and adaptive repurposing to introduce new Talents
 
 Hardcoding a necessary evil for developers and a bane for modders. Here's how I use story scripting to implement new talents for a Talent pack I'm working on with another member of the D:OS 2 modding communitiy. (Said pack has yet to be released as of this writing, as we are still squishing bugs.)
 
