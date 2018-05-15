@@ -1,6 +1,6 @@
 ### Armor-Based Saving Throws
 
-Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of making a low-chance roll to save a party member, the bitter sting of getting hit by someone's hail mary 5%-to-hit spell.
+Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of succeeding on a 20% attempt to petrify some monstrosity bearing down on you, the bitter sting of getting hit by a hail mary 5% charm arrow.
 
 Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Early-access forum posts proposed classic saving throws that were fully stat-based, but that would ditch what was great about the armor system--how it allows the player to point to a unit and know exactly how close they are to being disabled. I hoped a hybrid approach could retain what was great about the armor system. 
 
