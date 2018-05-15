@@ -5,8 +5,7 @@ Divinity: Original Sin 2's armor system took the guess-work out of setting statu
 Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing amd XCOM-style risk-taking/risk-mitigation into D:OS 2. Early-access forum posts proposed classic stat-based saving throws, but that would ditch what was great about the armor system--the ease with which you could point at a unit and know how close you were to pulling off a disable (without having to right-click, hit 'examine' and tally its Willpower score). I hoped a hybrid approach could provide the best of both worlds. 
 
 This is accomplished with the script event FetchCharacterApplyStatusData, which the game uses to filter statuses launched by casters before they're resolved on targets, replacing them as needed when a launched status interacts with a target status to create a different result (i.e. Shocked upgrading to Stunned when applied to a Wet character).
-```markdown
-EVENT CharacterSetShocked
+`EVENT CharacterSetShocked
 VARS
 	CHARACTER:_Character
 	LIST<STATUS>:_RemoveList
@@ -18,7 +17,7 @@ ACTIONS
 	Set(_Result,SHOCKED)
 	Set(_Turns,null)
 	ListClear(_RemoveList)
-	**CallFunction("MagicArmorTally"))**
+	CallFunction("MagicArmorTally"))
 	IF "c1"
 		IsEqual(%Saved,1)
 	THEN
@@ -43,8 +42,8 @@ ACTIONS
 	ENDIF
 	ListAdd(_RemoveList, INVISIBLE)
 	ListAdd(_RemoveList, SLEEPING)
-	RETURN(_RemoveList,_Result,_Turns)
-```
+	RETURN(_RemoveList,_Result,_Turns)`
+
 set by skills with 'trigger' statuses. Unlike, say, Chicken Form, which is fully blocked by physical armor in the base game, and ha
 
 ![Image](http://i.jeuxactus.com/datas/jeux/x/c/xcom-2/xl/xcom-2-56b1196908306.jpg)
