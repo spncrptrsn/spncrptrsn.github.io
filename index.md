@@ -17,8 +17,24 @@ When Larian enabled the modding of D:OS 2's localization files, this opened the 
 ![Image](https://i.imgur.com/0UVQHHi.jpg)
 ![Image](https://i.imgur.com/xn2iCVZ.jpg)
 
-A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), pop Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a Chicken Touch attempt (advantage, +10 bonus) is a player who used their cunning to rig the numbers in their favor, who just might relish that succesful Chickening all the more for it.
+A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), pop Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a juiced-up Chicken Touch attempt (with advantage and a +10 bonus) is a player who was empowered to rig the numbers in their favor, who just might relish that succesful chickening all the more for it.
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
 
-### Using story code and creative repurposing to pierce the Talent barrier
+### Using story code and creative repurposing to get around Talent limitations
+
+Hardcoding a necessary evil for developers and a bane for modders. Here's how I use story scripting to implement new talents for a Talent pack I'm working on with another member of the D:OS 2 modding communitiy. (Said pack has yet to be released as of this writing, as we are still squishing bugs.)
+
+Though the Divinity Engine doesn't offer any options for creating new talents, the modding community took early notice of a few hopeful quirks:
+ * A long list of unimplemented and leftover talents from D:OS 1 can be added to characters via scripting, but most of them don't work, and cannot be viewed by players in their character sheets under normal conditions.
+ * However, these deprecated talents can be succesfully attached to armor pieces, which will make them visible on the character sheet until the armor piece is removed.
+Once Larian enabled the modding of D:OS 2 localization files, that was a hopeful development for modders interested in creating new talents. In Armor-Based Saving Throws it allowed my to change talent names, and alter their descriptions to note new effects I could script onto them.
+
+Theoretically it would be possible to take a deprecated talent with no discernable working functions, script new effects, change it's name and description, and attach it to an armor piece, but it was still just a talent hopelessly attached to a breastplate or a pair of trousers. 
+
+There were however three underutilized armor slots that didn't show up on the character sheet, used for temporary effects granted by spells that the engine considered equipped items: the Wings slot, for Polymorph effects that would show up on a units back; the Horns slot, for Polymorph effects that would show up on the character's head; and the Overhead slot, for the floating 'Inner Demon' visual effect. These slots weren't filled nearly as much as a players Weapon, Helmet, or Ring slots, but they were still necessary for a number of common skills, at least as they were originally coded.
+
+I turned this problem over in my head before considering the Transform call, which could be used to change the appearance of equipped items. Suppose that polymorph skills were decoupled from their armor effects entirely, and instead just prompted the transformation of items that the character already equipped? If every player was automatically equipped with three blank placeholder items, these could be transformed (stats only) to award repurposed deptracted talents (to a maxmium of three), and later temporarily transformed (visuals only) when polymorph skills are used.
+
+
+ 
