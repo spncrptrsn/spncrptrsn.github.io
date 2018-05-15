@@ -18,7 +18,12 @@ ACTIONS
 	Set(_Result,SHOCKED)
 	Set(_Turns,null)
 	ListClear(_RemoveList)
+	**CallFunction("MagicArmorTally")
 	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,null)**
+	ELIF "c1"
 		CharacterHasStatus(_Character, MAGIC_SHELL)
 	THEN
 		ListAdd(_RemoveList, MAGIC_SHELL)	
@@ -39,61 +44,6 @@ ACTIONS
 	ListAdd(_RemoveList, INVISIBLE)
 	ListAdd(_RemoveList, SLEEPING)
 	RETURN(_RemoveList,_Result,_Turns)
-```
-Here's what it looks like:
-```
-EVENT ABSTCharacterSetShocked
-VARS
-	CHARACTER:_Character
-	LIST<STATUS>:_RemoveList
-	STATUS:_Result
-	INT:_Turns
-ON
-	FetchCharacterApplyStatusData(_Character, OVR_SHOCKED)
-ACTIONS
-	ListClear(_RemoveList)
-	IF "c1|c2"
-		CharacterHasStatus(_Character, STUNNED)
-		CharacterHasStatus(_Character, PETRIFIED)
-	THEN
-		Set(_Result,null)
-	ELIF "c1|c2"
-		CharacterHasStatus(_Character, SHOCKED)
-		CharacterHasStatus(_Character,OVR_SHOCKED)
-	THEN
-		Set(_Result,OVR_STUNNED)
-		Set(_Turns,1)
-	ELSE
-		Print(%StatusString,"<font color='#7d71d9'>Shocked</font>")
-		Print(%StatusString2," was [1]", %StatusString)
-		Set(_Result,OVR_SHOCKED)
-		Set(_Turns,null)
-		Set(%Char,_Character)
-		IF "c1"
-			CharacterHasStatus(_Character, MAGIC_SHELL)
-		THEN
-			Set(%StatusString2,"'s <font color='#4197e2'>Magic Shell</font> was purged")
-		ENDIF
-		CallFunction("MagicArmorTally")
-		IF "c1"
-			IsEqual(%Saved,1)
-		THEN
-			Set(_Result,DEF_SHOCKED)
-		ELIF "c1"
-			CharacterHasStatus(_Character, MAGIC_SHELL)
-		THEN
-			ListAdd(_RemoveList, MAGIC_SHELL)
-			Set(_Result,ABST_LOG)
-		ELIF "c1"
-			CharacterHasStatus(_Character, WET)
-		THEN
-			Set(_Result,OVR_STUNNED)
-			Set(_Turns,1)
-		ENDIF
-	ENDIF
-	Set(%Surface,0)
-	Set(%DuckFlag,0)
-	RETURN(_RemoveList,_Result,null)
 ```
 set by skills with 'trigger' statuses. Unlike, say, Chicken Form, which is fully blocked by physical armor in the base game, and ha
 
