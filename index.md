@@ -18,11 +18,11 @@ ACTIONS
 	Set(_Result,SHOCKED)
 	Set(_Turns,null)
 	ListClear(_RemoveList)
-	**CallFunction("MagicArmorTally")
+	**CallFunction("MagicArmorTally"))**
 	IF "c1"
 		IsEqual(%Saved,1)
 	THEN
-		Set(_Result,null)**
+		Set(_Result,null
 	ELIF "c1"
 		CharacterHasStatus(_Character, MAGIC_SHELL)
 	THEN
