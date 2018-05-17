@@ -1,0 +1,156 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF 
+CharacterCharacterEvent((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker,"ChanceToHitMeleeEvent")
+THEN
+CharacterAttack((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker);
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"BackstabTimer")
+THEN
+DB_MT_Backstab_Switcher(_Char);
+TimerLaunch("BackstabTicker",500);
+
+IF
+TimerFinished("BackstabTicker")
+AND
+DB_MT_Backstab_Switcher(_Char)
+THEN
+SetStoryEvent((CHARACTERGUID)_Char,"BackstabEvent");
+
+//===========================================================//
+//                      Generous Host                       *//
+//===========================================================//
+
+IF
+	CharacterStatusApplied(_Summon, "SUMMONING_ABILITY", _)
+AND
+	CharacterIsSummon(_Summon, 1)
+AND
+	CharacterGetOwner(_Summon, _Owner)
+AND
+	CharacterHasTalent(_Owner, "Charm", 1)
+THEN
+	CharacterStatusText(_Summon, "Summon");
+	CharacterStatusText(_Owner, "Owner");
+	PROC_MT_SummonSpawnControl(_Owner);
+	PROC_MT_ApplySummonStatus(_Owner);
+
+PROC
+	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	IntegerSum(_Number, 1, _Sum)
+THEN
+	NOT DB_MT_MaxSummonControl(_Owner, _Number);
+	DB_MT_MaxSummonControl(_Owner, _Sum);
+
+PROC
+	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+AND
+	NOT DB_MT_MaxSummonControl(_Owner, _)
+THEN
+	DB_MT_MaxSummonControl(_Owner, 1);
+
+IF
+	CharacterDied(_Summon)
+AND
+	CharacterIsSummon(_Summon, 1)
+AND
+	CharacterGetOwner(_Summon, _Owner)
+AND
+	CharacterHasTalent(_Owner, "Charm", 1)
+THEN
+	CharacterStatusText(_Summon, "Summon");
+	CharacterStatusText(_Owner, "Owner");
+	PROC_MT_SummonDieControl(_Owner);
+	PROC_MT_ApplySummonStatus(_Owner);
+
+PROC
+	PROC_MT_SummonDieControl((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	IntegerSubtract(_Number, 1, _Sum)
+THEN
+	NOT DB_MT_MaxSummonControl(_Owner, _Number);
+	DB_MT_MaxSummonControl(_Owner, _Sum);
+
+PROC
+	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	_Number >= 2
+AND
+	HasActiveStatus(_Owner, "BURNING", 0)
+THEN
+	ApplyStatus(_Owner, "BURNING", -1.0, 1);
+
+PROC
+	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	_Number < 2
+AND
+	HasActiveStatus(_Owner, "BURNING", 1)
+THEN
+	RemoveStatus(_Owner, "BURNING");
+
+//===========================================================//
+//                      Unruly Visitors                     *//
+//===========================================================//
+
+IF
+CharacterStatusApplied(_Char,"SUMMONING_ABILITY",_)
+AND
+CharacterGetOwner(_Char,_Owner)
+AND
+CharacterHasTalent(_Owner,"Beastmaster",1)
+THEN
+DB_MT_Beastmaster_Summon(_Char);
+TimerLaunch("BeastmasterTicker",100);
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"BeastmasterReapply")	
+AND
+CharacterGetOwner(_Char,_Owner)
+AND
+CharacterHasTalent(_Owner,"Beastmaster",1)
+THEN
+DB_MT_Beastmaster_Summon(_Char);
+TimerLaunch("BeastmasterTicker",100);			
+
+IF
+TimerFinished("BeastmasterTicker")
+AND
+DB_MT_Beastmaster_Summon(_Char)
+AND
+CharacterGetOwner(_Char,_Owner)
+THEN
+SetVarObject(_Char,"BeastmasterLeader",_Owner);
+SetStoryEvent(_Char,"BeastmasterSummoned");
+NOT DB_MT_Beastmaster_Summon(_Char);
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"BeastmasterLossTurn")	
+THEN
+DB_MT_Beastmaster_SummonTurn(_Char);
+TimerLaunch("BeastmasterTurnTicker",2000);			
+
+IF
+TimerFinished("BeastmasterTurnTicker")
+AND
+DB_MT_Beastmaster_SummonTurn(_Char)
+THEN
+SetStoryEvent(_Char,"BeastmasterTurnMadness");
+NOT DB_MT_Beastmaster_SummonTurn(_Char);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "MoreTalents"

@@ -1,0 +1,113 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//DB_MT_PolyStatuses((STRING)_Slot, (STRING)_Status, (STRING)_Template);
+//Wings Statuses
+DB_MT_PolyStatuses("Wings", "WINGS", "EQ_Avatar_Wings_a71d1908-7499-42c2-8c6b-a2173be582dc");
+DB_MT_PolyStatuses("Wings", "SPIDER_LEGS", "EQ_Avatar_SpiderLegs_9fba908e-9a00-4f34-99a3-fcda201c6e19");
+
+// Horns Statuses
+DB_MT_PolyStatuses("Horns", "HORNS", "EQ_Avatar_Horns_4b2df862-edb1-4718-96ae-d13940f4928f");
+DB_MT_PolyStatuses("Horns", "MEDUSA_HEAD", "EQ_Avatar_MedusaHair_00868f19-d443-4d26-8029-808112dd9b7f");
+
+// Overhead Statuses
+DB_MT_PolyStatuses("Overhead", "INNER_DEMON", "EQ_Avatar_InnerDemon_9f3e4838-ae2b-4770-b2ff-96936c98c878");
+
+KBSECTION
+// The statuses applied by Poly skills no longer cause you to auto-equip the associated armor pieces. Now we merely mimic them, which doesn't mess with any functions...
+// ... as far as I can tell. The complication with poly skill is thinking about the enemy versions. If we could give all enemies the placeholder items then they...
+//... could use these same scripts to mimic the visuals just like players do. But one problem is that some enemies start with a permanent Wings status. One possible...
+//... solution that might remind you of ABST is giving enemies (or players, ideally) a custom version (OVR_WINGS). I haven't done this yet because WINGS is tied to...
+//... the custom walking animation provided by wings. So ideally we need to apply this to OVR_WINGS before we try to implement a custom version.
+
+//===========================================================//
+//                   Poly Statuses Applied                  *//
+//===========================================================//
+IF
+	CharacterStatusApplied(_Char, _Status, _)
+AND
+	DB_MT_PolyStatuses(_Slot, _Status, _Template)
+THEN
+	PROC_MT_ItemToApplyTransform(_Char, _Status, _Slot, _Template);
+
+PROC
+	PROC_MT_ItemToApplyTransform((CHARACTERGUID)_Char, (STRING)_Status, (STRING)_Slot, (STRING)_Template)
+AND
+	_Slot == "Wings"
+AND
+	DB_MT_Equipped_Wings(_Char, _Item, _ItemTimer)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+	CharacterUnequipItem(_Char, (ITEMGUID)_Item);
+	TimerLaunch(_ItemTimer, 250);
+
+PROC
+	PROC_MT_ItemToApplyTransform((CHARACTERGUID)_Char, (STRING)_Status, (STRING)_Slot, (STRING)_Template)
+AND
+	_Slot == "Horns"
+AND
+	DB_MT_Equipped_Horns(_Char, _Item, _ItemTimer)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+	CharacterUnequipItem(_Char, (ITEMGUID)_Item);
+	TimerLaunch(_ItemTimer, 250);
+
+PROC
+	PROC_MT_ItemToApplyTransform((CHARACTERGUID)_Char, (STRING)_Status, (STRING)_Slot, (STRING)_Template)
+AND
+	_Slot == "Overhead"
+AND
+	DB_MT_Equipped_Overhead(_Char, _Item, _ItemTimer)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+	CharacterUnequipItem(_Char, (ITEMGUID)_Item);
+	TimerLaunch(_ItemTimer, 250);
+
+
+//===========================================================//
+//                   Poly Statuses Removed                  *//
+//===========================================================//
+
+IF
+	CharacterStatusRemoved(_Char, _Status, _)
+AND
+	DB_MT_PolyStatuses(_Slot, _Status, _)
+THEN
+	PROC_MT_ItemApplyTransformationBack(_Char, _Slot);
+
+PROC
+	PROC_MT_ItemApplyTransformationBack((CHARACTERGUID)_Char, (STRING)_Slot)
+AND
+	_Slot == "Wings"
+AND
+	DB_MT_BlankItems(_Slot, _Template)
+AND
+	DB_MT_Equipped_Wings(_Char, _Item, _)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+
+PROC
+	PROC_MT_ItemApplyTransformationBack((CHARACTERGUID)_Char, (STRING)_Slot)
+AND
+	_Slot == "Horns"
+AND
+	DB_MT_BlankItems(_Slot, _Template)
+AND
+	DB_MT_Equipped_Horns(_Char, _Item, _)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+
+PROC
+	PROC_MT_ItemApplyTransformationBack((CHARACTERGUID)_Char, (STRING)_Slot)
+AND
+	_Slot == "Overhead"
+AND
+	DB_MT_BlankItems(_Slot, _Template)
+AND
+	DB_MT_Equipped_Overhead(_Char, _Item, _)
+THEN
+	Transform(_Item, _Template, 0, 1, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "MoreTalents"

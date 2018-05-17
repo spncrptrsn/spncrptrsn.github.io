@@ -1,0 +1,4164 @@
+INIT
+CHARACTER:%Char
+STATUS:%RemovedStatus
+INT:%Saved
+INT:%Surface=0
+INT:%Regen=0
+INT:%ResolveLevel=2
+INT:%DuckFlag=0
+INT:%PictureFlag=0
+INT:%LivingFlag=0
+INT:%MorningFlag=0
+INT:%MnemonicFlag=0
+INT:%PreviewFlag=0
+INT:%TorturerFlag=0
+INT:%UnstableFlag=0
+INT:%SavageFlag=0
+STRING:%StatusString
+STRING:%StatusString2=null
+EVENTS
+
+//===========================================================//
+//                  Tally & Print Functions                 *//
+//===========================================================//
+
+EVENT PhysicalArmorTally
+VARS
+CHARACTER:_Caster
+CHARACTER:_Leader
+INT:_PersInt
+INT:_ArmorInt
+INT:_RetInt
+INT:_StatInt
+INT:_DeflectInt
+INT:_CasterBonus
+INT:_CharBonus
+INT:_Roll
+INT:_Roll2
+INT:_PrintRoll
+INT:_PrintRoll2
+INT:_CasterAdv
+INT:_CharAdv
+INT:_FinalRoll
+INT:_Parry
+INT:_Unstable
+INT:_HighestRoll
+INT:_WeaponStatus
+INT:_Resolve
+FLOAT:_StatFloat
+FLOAT:_ArmorFloat
+FLOAT:_Distance
+FLOAT:_Vitality
+STRING:_A
+STRING:_B
+STRING:_C
+STRING:_D
+STRING:_E
+STRING:_F
+STRING:_G
+STRING:_H
+STRING:_I
+STRING:_J
+STRING:_K
+STRING:_L
+STRING:_M
+STRING:_CharColor
+STRING:_CasterColor
+STRING:_CasterAdvText
+STRING:_CharAdvText
+STRING:_CharTalents
+STRING:_CasterTalents
+FIXEDSTRING:_CombatLogFixedString
+ON
+	OnFunction("PhysArmorTally")
+ACTIONS
+	Set(_DeflectInt,0)
+	Set(_RetInt,0)
+	Set(_CasterBonus,0)
+	Set(_CharBonus,0)
+	Set(%Saved,0)
+	Set(_CasterAdv,0)
+	Set(_CharAdv,0)
+	IF "c1&c2&c3&c4"
+		CharacterGetStat(_ArmorFloat,%Char,PhysicalArmor)
+		CharacterGetStat(_StatFloat,%Char,Constitution)
+		CharacterGetAbility(_PersInt,%Char,Perseverance)
+		GetVar(_WeaponStatus,%Char,"WeaponStatus")
+	THEN
+		IF "c1"
+			IsEqual(%Surface,1)
+		THEN
+			IF "c1"
+				CharacterGetStatusSourceCharacter(%Char,CASTER_SURFACE,_Caster)
+			THEN
+			ENDIF
+		ELIF "c1"
+			CharacterGetStatusSourceCharacter(%Char,CASTER_NONSURFACE,_Caster)
+		THEN
+		ENDIF
+	ENDIF
+	IF "c1"
+		CharacterIsInParty(_Caster)
+	THEN
+		Print(_CasterColor,"<font color='#188ede'>")
+	ELIF "c1"
+		CharacterIsAlly(_Caster,%Char)
+	THEN
+		Print(_CasterColor,"<font color='#40b606'>")
+	ELSE
+		Print(_CasterColor,"<font color='#c80030'>")
+	ENDIF
+	IF "c1"
+		CharacterIsInParty(%Char)
+	THEN
+		Print(_CharColor,"<font color='#188ede'>")
+	ELIF "c1"
+		CharacterIsAlly(%Char,_Caster)
+	THEN
+		Print(_CharColor,"<font color='#40b606'>")
+	ELSE
+		Print(_CharColor,"<font color='#c80030'>")
+	ENDIF
+//-----------Char-Bonuses-----------//
+	IF "c1"
+		CharacterHasTalent(%Char,Escapist)
+	THEN
+		IF "c1&c2"
+			CharacterHasStatus(%Char,ADRENALINE)
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CharBonus,5)
+			Print(_A," + 5 [1]field tactician</font>", _CharColor)
+		ELIF "c1"
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CharBonus,3)
+			Print(_A," + 3 [1]field tactician</font>", _CharColor)
+		ELSE
+			Print(_A,"")
+		ENDIF
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,WarriorLoreNaturalHealth)
+	THEN
+		Add(_CharBonus,8)
+		Print(_B," + 8 [1]picture of health</font>", _CharColor)
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,WalkItOff)
+	THEN
+		Add(_CharBonus,5)
+		Print(_C," + 5 [1]walk it off</font>", _CharColor)
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		IsGreaterThen(_PersInt,0)
+	THEN
+		Print(_D," + [1] [2]pers.</font>", _PersInt, _CharColor)
+	ELSE
+		Print(_D, "")
+	ENDIF
+	IF "c1"
+		IsGreaterThen(%ResolveLevel,0)
+	THEN
+		IF "!c1&c2"
+			CharacterIsInParty(%Char)
+			IsHardcore()
+		THEN
+			Set(_Resolve,%ResolveLevel)
+			Multiply(_Resolve,5)
+			Add(_CharBonus,_Resolve)
+			Print(_E," + [2] [1]resolve</font>", _CharColor, _Resolve)
+		ELSE
+			Print(_E, "")
+		ENDIF
+	ELSE
+		Print(_E, "")
+	ENDIF
+	Print(_CharTalents, "[1][2][3][4][5]", _A, _B, _C, _D, _E)
+	Add(_CharBonus,_PersInt)
+//-----------Char-Advantage-----------//
+	IF "c1"
+		CharacterHasStatus(%Char,BLESSED)
+	THEN
+		Add(_CharAdv,1)
+		Print(_A," | <font color='#46b195'>blessed</font>")
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		IsTagged(%Char,"ABST_BOSS")
+	THEN
+		IF "c1&!c2"
+			IsHardcore()
+			HasGlobalFlag("ABST_NoBossBoost")
+		THEN
+			Add(_CharAdv,1)
+			Print(_B," | [1]advantageous</font>", _CharColor)
+		ELSE
+			Print(_B,"")
+		ENDIF
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%DuckFlag,1)
+	THEN
+		Add(_CharAdv,1)
+		Print(_C," | [1]duck duck goose</font>", _CharColor)
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,Escapist)
+	THEN
+		IF "c1"
+			CharacterHasStatus(%Char,FLANKED)
+		THEN
+			Add(_CharAdv,1)
+			Print(_D," | [1]field tactician</font>", _CharColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,ABST_FSD)
+	THEN
+		Add(_CharAdv,1)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_FSD)
+			SetVar(%Char,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(%Char,"CharacterRemoveStatus")
+		ENDIF
+		Print(_E," | [1]five star diner</font>", _CharColor)
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,LEADERSHIP)
+	THEN
+		IF "c1&c2&c3&!c4"
+			CharacterGetStatusSourceCharacter(%Char,LEADERSHIP,_Leader)
+			CharacterGetAbility(_StatInt,_Leader,Leadership)
+			CharacterIsAlly(_Leader,%Char)
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Multiply(_StatInt,4)
+			GetRandomBetween(_Roll,1,100)
+			IF "c1"
+				IsLessThen(_Roll,_StatInt)
+			THEN
+				Add(_CharAdv,1)
+				Print(_F," | [1]leadership</font>", _CharColor)
+			ELSE
+				Print(_F,"")
+			ENDIF
+		ELSE
+			Print(_F,"")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,ABST_LEECH)
+	THEN
+		Add(_CharAdv,1)
+		Print(_G," | [1]leech</font>", _CharColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_LEECH)
+			SetVar(%Char,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(%Char,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%MnemonicFlag,1)
+	THEN
+		Add(_CharAdv,1)
+		Print(_H," | [1]mnemonic</font>", _CharColor)
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%MorningFlag,1)
+	THEN
+		IF "c1"
+			CharacterHasStatus(%Char,ABST_AEGIS)
+		THEN
+			Add(_CharAdv,1)
+			Print(_I," | [1]field tactician</font>", _CharColor)
+			IF "!c1"
+				IsEqual(%PreviewFlag,1)
+			THEN
+			CharacterRemoveStatus(%Char,ABST_AEGIS,null,0)
+			ENDIF
+			Print(_J,"")
+		ELSE
+			Add(_CharAdv,1)
+			Print(_I,"")
+			Print(_J," | [1]morning person</font>", _CharColor)
+			IF "!c1"
+				IsEqual(%PreviewFlag,1)
+			THEN
+				CharacterRemoveStatus(%Char,ABST_MORNING,null,0)
+			ENDIF	
+		ENDIF
+	ELSE
+		Print(_J,"")
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%PictureFlag,1)
+	THEN
+		Add(_CharAdv,1)
+		Print(_K," | [1]picture of health</font>", _CharColor)
+	ELSE
+		Print(_K,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,CURSED)
+	THEN
+		Subtract(_CharAdv,1)
+		Print(_L," | <font color='#d040d0'>cursed</font>")
+	ELSE
+		Print(_L,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,ABST_FLURRY)
+	THEN
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_FLURRY)
+			SetVar(%Char,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(%Char,"CharacterRemoveStatus")
+		ENDIF	
+		Subtract(_CharAdv,1)
+		Print(_M," | <font color='#d040d0'>martial focus</font>")
+	ELSE
+		Print(_M,"")
+	ENDIF
+	Print(_CharAdvText,"[1][2][3][4][5][6][7][8][9][10][11][12][13]", _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M)
+//-----------Caster-Bonuses-----------//
+	IF "c1"
+		CharacterHasTalent(_Caster,Ambidextrous)
+	THEN
+		IF "c1"
+			CharacterHasSkill(_Caster,Target_SingleHandedAttack)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_A," + 5 [1]ambidextrous</font>", _CasterColor)
+		ELSE
+			Print(_A,"")
+		ENDIF
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ARROW_CHECK_PHYS)
+	THEN
+		Add(_CasterBonus,5)
+		Print(_B," + 5 [1]arrow recovery</font>", _CasterColor)
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,FaroutDude)
+	THEN
+		IF "c1&(c2|c3|c4|c5)"
+			IsEqual(_WeaponStatus,1)
+			CharacterHasWeaponType(_Caster,Bow,1)
+			CharacterHasWeaponType(_Caster,Wand,1)
+			CharacterHasWeaponType(_Caster,Crossbow,1)
+			CharacterHasWeaponType(_Caster,Staff,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_C," + 5 [1]far out man</font>", _CasterColor)
+		ELSE
+			Print(_C,"")
+		ENDIF
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Perfectionist)
+	THEN
+		IF "c1&c2"
+			CharacterGetStat(_Vitality,_Caster,Vitality)
+			IsEqual(_Vitality,1.0)
+		THEN
+			Add(_CasterBonus,3)
+			Print(_D," + 3 [1]hothead</font>", _CasterColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,AttackOfOpportunity)
+	THEN
+		IF "c1&!c2&!c3&!c4&c5"
+			CharacterHasWeaponType(_Caster,Bow,1)
+			CharacterHasWeaponType(_Caster,Wand,1)
+			CharacterHasWeaponType(_Caster,Crossbow,1)
+			CharacterHasWeaponType(_Caster,Staff,1)
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_E," + 5 [1]opportunist</font>", _CasterColor)
+		ELSE
+			Print(_E,"")
+		ENDIF
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,WarriorLoreGrenadeRange)
+	THEN
+		IF "c1&c2"
+			CharacterHasStatus(_Caster,ADRENALINE)
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_F," + 5 [1]martial focus</font>", _CasterColor)
+		ELIF "c1"
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,3)
+			Print(_F," + 3 [1]martial focus</font>", _CasterColor)
+		ELSE
+			Print(_F,"")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,DualWieldingDodging)
+	THEN
+		IF "c1&c2&c3"
+			CharacterHasSkill(_Caster,Target_DualWieldingAttack)
+			GetVar(_Parry,_Caster,"DualCounter")
+			IsGreaterThen(_Parry,0)
+		THEN
+			Multiply(_Parry,5)
+			Add(_CasterBonus,_Parry)
+			Print(_G," + [2] [1]sword dancer</font>", _CasterColor, _Parry)
+		ELSE
+			Print(_G,"")
+		ENDIF
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,GRENADE_CHECK_PHYS)
+	THEN
+		IF "!c1"
+			CharacterIsAlly(%Char,_Caster)
+		THEN
+			Add(_CasterBonus,10)
+			Print(_H," + 10 [1]martial focus</font>", _CasterColor)
+		ELSE
+			Subtract(_CasterBonus,10)
+			Print(_H," - 10 [1]martial focus</font>", _CasterColor)
+		ENDIF
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Torturer)
+	THEN
+		IF "c1"
+			IsEqual(%TorturerFlag,1)
+		THEN
+			Add(_CasterBonus,10)
+			Print(_I," + 10 [1]torturer</font>", _CasterColor)
+		ELSE
+			Print(_I,"")
+		ENDIF
+	ELSE
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Unstable)
+	THEN
+		IF "c1"
+			IsEqual(%UnstableFlag,1)
+		THEN
+			IF "c1&c2"
+				GetVar(_Unstable,%Char,"UnstableCounter")
+				IsGreaterThen(_Unstable,0)
+			THEN
+				Multiply(_Unstable,10)
+				Add(_Unstable,10)
+			ELSE
+				Set(_Unstable,10)
+			ENDIF
+				Add(_CasterBonus,_Unstable)
+			Print(_J," + [2] [1]vindictive</font>", _CasterColor, _Unstable)
+		ELSE
+			Print(_J,"")
+		ENDIF
+	ELSE
+		Print(_J,"")
+	ENDIF
+	IF "c1"
+		CharacterGetAbility(_RetInt,_Caster,Reflection)
+	THEN
+		IF "c1"
+			IsGreaterThen(_RetInt,0)
+		THEN
+			Print(_K," + [1] [2]ret.</font>", _RetInt, _CasterColor)
+		ELSE
+			Print(_K, "")
+		ENDIF
+	ENDIF
+	Print(_CasterTalents,"[1][2][3][4][5][6][7][8][9][10][11]", _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K)
+	Add(_CasterBonus,_RetInt)
+//-----------Caster-Advantage-------//
+	IF "c1"
+		CharacterHasStatus(_Caster,BLESSED)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_A," | <font color='#46b195'>blessed</font>")
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		IsTagged(%Char,"ABST_BOSS")
+	THEN
+		IF "c1&!c2"
+			IsHardcore()
+			HasGlobalFlag("ABST_NoBossBoost")
+		THEN
+			Add(_CharAdv,1)
+			Print(_B," | [1]advantageous</font>", _CharColor)
+		ELSE
+			Print(_B,"")
+		ENDIF
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Demon)
+	THEN
+		IF "c1"
+			IsEqual(%Surface,1)
+		THEN
+			Add(_CasterAdv,1)
+			Print(_C," | [1]demon</font>", _CasterColor)
+		ELSE
+			Print(_C,"")
+		ENDIF
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster, ElementalRanger)
+	THEN
+		IF "c1&(c2|c3)"
+			IsEqual(_WeaponStatus,1)
+			CharacterHasWeaponType(_Caster, Bow)
+			CharacterHasWeaponType(_Caster, Crossbow)
+		THEN
+			Add(_CasterAdv,1)
+			Print(_D," | [1]elemental ranger</font>", _CasterColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_EXEC)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_E," | [1]executioner</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_EXEC)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_GUERILLA)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_F," | [1]guerrilla</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_GUERILLA)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,LEADERSHIP)
+	THEN
+		IF "c1&c2&c3&c4&!c5"
+			CharacterGetStatusSourceCharacter(%Char,LEADERSHIP,_Leader)
+			CharacterGetAbility(_StatInt,_Leader,Leadership)
+			CharacterIsAlly(_Leader,%Char)
+			CharacterHasTalent(_Leader,Escapist)
+			IsEqual(%PreviewFlag,1)			
+		THEN
+			Multiply(_StatInt,4)
+			GetRandomBetween(_Roll,1,100)
+			IF "c1"
+				IsLessThen(_Roll,_StatInt)
+			THEN
+				Add(_CharAdv,1)
+				Print(_G," | [1]leadership</font>", _CharColor)
+			ELSE
+				Print(_G,"")
+			ENDIF
+		ELSE
+			Print(_G,"")
+		ENDIF
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_LEECH)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_H," | [1]leech</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_LEECH)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_RUSH)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_I," | [1]what a rush</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_RUSH)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,CURSED)
+	THEN
+		Subtract(_CasterAdv,1)
+		Print(_J," | <font color='#d040d0'>cursed</font>")
+	ELSE
+		Print(_J,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_ALLIN)
+	THEN
+		Subtract(_CasterAdv,1)
+		Print(_K," | <font color='#d040d0'>martial focus</font>")
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_ALLIN)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_K,"")
+	ENDIF
+	Print(_CasterAdvText,"[1][2][3][4][5][6][7][8][9][10][11]", _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K)
+//-----------Home-Stretch-----------//
+	IF "!c1&c2"
+		CharacterHasTalent(%Char,Raistlin)
+		IsGreaterThen(_ArmorFloat,.005)
+	THEN
+		Multiply(_ArmorFloat,100)
+		Cast(_ArmorInt,_ArmorFloat)
+		Print(_A, "[1]% <font color='#c1c1c1' size='14'>physical armor</font> + ", _ArmorInt)
+	ELSE
+		Print(_A, "")
+		Set(_ArmorInt,0)
+	ENDIF
+	IF "c1&!c2"
+		GetVar(_HighestRoll,%Char,"HighestRoll")
+		IsEqual(_WeaponStatus,1)
+	THEN
+		Set(_HighestRoll,100)
+	ENDIF
+	Multiply(_StatFloat,.5)
+	Cast(_StatInt,_StatFloat)
+	Add(_CharBonus,_StatInt)
+	Add(_DeflectInt,_ArmorInt)
+	Add(_DeflectInt,_CharBonus)
+	SetVar(%Char,"DeflectInt",_DeflectInt)
+	GetRandomBetween(_Roll,1,_HighestRoll)
+	Set(_PrintRoll,_Roll)
+	Add(_Roll,_CasterBonus)
+	GetRandomBetween(_Roll2,1,_HighestRoll)
+	Set(_PrintRoll2,_Roll2)
+	Add(_Roll2,_CasterBonus)
+	IF "c1"
+		IsGreaterThen(_CasterAdv,_CharAdv)
+	THEN
+		Print(_B, " with advantage")
+		IF "(c1|c2)&(c3|c4)"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+			IsLessThen(_Roll2,_DeflectInt)
+			IsEqual(_Roll2,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+//------------------//
+		IF "c1"
+			IsLessThen(_PrintRoll,_PrintRoll2)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll, _PrintRoll2)
+			Set(_FinalRoll,_Roll2)
+		ELIF "c1"
+			IsGreaterThen(_PrintRoll,_PrintRoll2)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ELSE
+			Print(_C, "[1], [2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ENDIF
+//------------------//
+	ELIF "c1"
+		IsGreaterThen(_CharAdv,_CasterAdv)
+	THEN
+		Print(_B, " with disadvantage")
+		IF "(c1|c2)|(c3|c4)"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+			IsLessThen(_Roll2,_DeflectInt)
+			IsEqual(_Roll2,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+//------------------//
+		IF "c1"
+			IsLessThen(_PrintRoll2,_PrintRoll)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll, _PrintRoll2)
+			Set(_FinalRoll,_Roll2)
+		ELIF "c1"
+			IsGreaterThen(_PrintRoll2,_PrintRoll)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ELSE
+			Print(_C, "[1], [2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ENDIF
+//------------------//
+	ELSE
+		Print(_B, "")
+		Set(_FinalRoll,_Roll)
+		Print(_C, "[1]", _PrintRoll)
+		IF "c1|c2"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+	ENDIF
+	IF "c1&c2"
+		GetVar(_D,%Char,"NameString")
+		GetVar(_E,_Caster,"NameString")
+	THEN
+	ENDIF
+	IF "c1"
+		IsEqual(%PreviewFlag,1)
+	THEN
+		Print(_F, "[1][2]</font> has resist score of [6] against a physical effect from [4][5]</font>:<font size='14'><br>     [1]{ </font>[8][9] [1]con. bonus</font>[10][11]<br>     [4]{ </font>1-100 rolled [13][14][15]</font>", _CharColor, _D, %StatusString, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ELIF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Print(_F, "[1][2]</font> resisted [4][5]</font>'s [3] attempt:<font size='14'> [6] to resist &gt; [7] to apply<br>     [1]{ </font>[8][9] [1]con. bonus</font>[10][11]<br>     [4]{ </font>[12] rolled (out of [16])[13][14][15]</font>", _CharColor, _D, %StatusString, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ELSE
+		Print(_F, "[1][2]</font>[3] by [4][5]</font>:<font size='14'> [6] to resist &lt; [7] to apply<br>     [1]{ </font>[8][9] [1]con. bonus</font>[10][11]<br>     [4]{ </font>[12] rolled (out of [16])[13][14][15]</font>", _CharColor, _D, %StatusString2, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ENDIF
+	IF "!c1&!c2"
+		IsEqual(_D,"NULL")
+		IsEqual(_E,"NULL")
+	THEN
+		SetVar(%Char,"CombatLogString",_F)
+	ELSE
+		SetVar(%Char,"CombatLogString",_D)
+	ENDIF
+	Set(_HighestRoll,100)
+	SetVar(%Char,"HighestRoll",_HighestRoll)
+	Set(_HighestRoll,0)
+	SetVar(%Char,"WeaponStatus",_HighestRoll)
+
+EVENT MagicArmorTally
+VARS
+CHARACTER:_Caster
+CHARACTER:_Leader
+INT:_PersInt
+INT:_ArmorInt
+INT:_RetInt
+INT:_StatInt
+INT:_DeflectInt
+INT:_CasterBonus
+INT:_CharBonus
+INT:_Roll
+INT:_Roll2
+INT:_PrintRoll
+INT:_PrintRoll2
+INT:_CasterAdv
+INT:_CharAdv
+INT:_FinalRoll
+INT:_Unstable
+INT:_HighestRoll
+INT:_WeaponStatus
+INT:_Resolve
+INT:_Parry
+FLOAT:_StatFloat
+FLOAT:_ArmorFloat
+FLOAT:_Distance
+FLOAT:_Vitality
+STRING:_A
+STRING:_B
+STRING:_C
+STRING:_D
+STRING:_E
+STRING:_F
+STRING:_G
+STRING:_H
+STRING:_I
+STRING:_J
+STRING:_K
+STRING:_L
+STRING:_CharColor
+STRING:_CasterColor
+STRING:_CasterAdvText
+STRING:_CharAdvText
+STRING:_CharTalents
+STRING:_CasterTalents
+FIXEDSTRING:_CombatLogFixedString
+ON
+	OnFunction("MagicArmorTally")
+ACTIONS
+	Set(_DeflectInt,0)
+	Set(_RetInt,0)
+	Set(_CasterBonus,0)
+	Set(_CharBonus,0)
+	Set(%Saved,0)
+	Set(_CasterAdv,0)
+	Set(_CharAdv,0)
+	IF "c1&c2&c3&c4"
+		CharacterGetStat(_ArmorFloat,%Char,MagicArmor)
+		CharacterGetStat(_StatFloat,%Char,Wits)
+		CharacterGetAbility(_PersInt,%Char,Perseverance)
+		GetVar(_WeaponStatus,%Char,"WeaponStatus")
+	THEN
+		IF "c1"
+			IsEqual(%Surface,1)
+		THEN
+			IF "c1"
+				CharacterGetStatusSourceCharacter(%Char,CASTER_SURFACE,_Caster)
+			THEN
+			ENDIF
+		ELIF "c1"
+			CharacterGetStatusSourceCharacter(%Char,CASTER_NONSURFACE,_Caster)
+		THEN
+		ENDIF
+	ENDIF
+	IF "c1"
+		CharacterIsInParty(_Caster)
+	THEN
+		Print(_CasterColor,"<font color='#188ede'>")
+	ELIF "c1"
+		CharacterIsAlly(_Caster,%Char)
+	THEN
+		Print(_CasterColor,"<font color='#40b606'>")
+	ELSE
+		Print(_CasterColor,"<font color='#c80030'>")
+	ENDIF
+	IF "c1"
+		CharacterIsInParty(%Char)
+	THEN
+		Print(_CharColor,"<font color='#188ede'>")
+	ELIF "c1"
+		CharacterIsAlly(%Char,_Caster)
+	THEN
+		Print(_CharColor,"<font color='#40b606'>")
+	ELSE
+		Print(_CharColor,"<font color='#c80030'>")
+	ENDIF
+//------------Char-Bonuses------------//
+	IF "c1"
+		CharacterHasTalent(%Char,Escapist)
+	THEN
+		IF "c1&c2"
+			CharacterHasStatus(%Char,ADRENALINE)
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CharBonus,5)
+			Print(_A," + 5 [1]field tactician</font>", _CharColor)
+		ELIF "c1"
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CharBonus,3)
+			Print(_A," + 3 [1]field tactician</font>", _CharColor)
+		ELSE
+			Print(_A,"")
+		ENDIF
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,LivingArmor)
+	THEN
+		Add(_CharBonus,8)
+		Print(_B," + 8[1] living armour</font>", _CharColor)
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,WalkItOff)
+	THEN
+		Add(_CharBonus,5)
+		Print(_C," + 5[1] walk it off</font>", _CharColor)
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		IsGreaterThen(_PersInt,0)
+	THEN
+		Print(_D," + [1][2] pers.</font>", _PersInt, _CharColor)
+	ELSE
+		Print(_D, "")
+	ENDIF
+	IF "c1"
+		IsGreaterThen(%ResolveLevel,0)
+	THEN
+		IF "!c1&c2"
+			CharacterIsInParty(%Char)
+			IsHardcore()
+		THEN
+			Set(_Resolve,%ResolveLevel)
+			Multiply(_Resolve,5)
+			Add(_CharBonus,_Resolve)
+			Print(_E," + [2] [1]resolve</font>", _CharColor, _Resolve)
+		ELSE
+			Print(_E, "")
+		ENDIF
+	ELSE
+		Print(_E, "")
+	ENDIF
+	Print(_CharTalents, "[1][2][3][4][5]", _A, _B, _C, _D, _E)
+	Add(_CharBonus,_PersInt)
+//-----------Char-Advantage-----------//
+	IF "c1"
+		CharacterHasStatus(%Char,BLESSED)
+	THEN
+		Add(_CharAdv,1)
+		Print(_A," | <font color='#46b195'>blessed</font>")
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		IsTagged(%Char,"ABST_BOSS")
+	THEN
+		IF "c1&!c2"
+			IsHardcore()
+			HasGlobalFlag("ABST_NoBossBoost")
+		THEN
+			Add(_CharAdv,1)
+			Print(_B," | [1]advantageous</font>", _CharColor)
+		ELSE
+			Print(_B,"")
+		ENDIF
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%DuckFlag,1)
+	THEN
+		Add(_CharAdv,1)
+		Print(_C," | [1]duck duck goose</font>", _CharColor)
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(%Char,Escapist)
+	THEN
+		IF "c1"
+			CharacterHasStatus(%Char,FLANKED)
+		THEN
+			Add(_CharAdv,1)
+			Print(_D," | [1]field tactician</font>", _CharColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,ABST_FSDM)
+	THEN
+		Add(_CharAdv,1)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_FSDM)
+			SetVar(%Char,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(%Char,"CharacterRemoveStatus")
+		ENDIF
+		Print(_E," | [1]five star diner</font>", _CharColor)
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,LEADERSHIP)
+	THEN
+		IF "c1&c2&c3&!c4"
+			CharacterGetStatusSourceCharacter(%Char,LEADERSHIP,_Leader)
+			CharacterGetAbility(_StatInt,_Leader,Leadership)
+			CharacterIsAlly(_Leader,%Char)
+			IsEqual(%PreviewFlag,1)			
+		THEN
+			Multiply(_StatInt,4)
+			GetRandomBetween(_Roll,1,100)
+			IF "c1"
+				IsLessThen(_Roll,_StatInt)
+			THEN
+				Add(_CharAdv,1)
+				Print(_F," | [1]leadership</font>", _CharColor)
+			ELSE
+				Print(_F,"")
+			ENDIF
+		ELSE
+			Print(_F,"")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%LivingFlag,1)
+	THEN
+		Add(_CharAdv,1)
+		Print(_G," | [1]living armour</font>", _CharColor)
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%MnemonicFlag,1)
+	THEN
+		Print(_H," | [1]mnemonic</font>", _CharColor)
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%MorningFlag,1)
+	THEN
+		IF "c1"
+			CharacterHasStatus(%Char,ABST_AEGIS)
+		THEN
+			Add(_CharAdv,1)
+			Print(_I," | [1]field tactician</font>", _CharColor)
+			IF "!c1"
+				IsEqual(%PreviewFlag,1)
+			THEN
+				CharacterRemoveStatus(%Char,ABST_AEGIS,null,0)
+			ENDIF	
+			Print(_J,"")
+		ELSE
+			Add(_CharAdv,1)
+			Print(_I,"")
+			Print(_J," | [1]morning person</font>", _CharColor)
+			IF "!c1"
+				IsEqual(%PreviewFlag,1)
+			THEN
+				CharacterRemoveStatus(%Char,ABST_MORNING,null,0)
+			ENDIF	
+		ENDIF
+	ELSE
+		Print(_J,"")
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,CURSED)
+	THEN
+		Subtract(_CharAdv,1)
+		Print(_K," | <font color='#d040d0'>cursed</font>")
+	ELSE
+		Print(_K,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,ABST_MAGUS)
+	THEN
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_MAGUS)
+			SetVar(%Char,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(%Char,"CharacterRemoveStatus")
+		ENDIF
+		Subtract(_CharAdv,1)
+		Print(_L," | <font color='#d040d0'>ice king</font>")
+	ELSE
+		Print(_L,"")
+	ENDIF
+	Print(_CharAdvText,"[1][2][3][4][5][6][7][8][9][10][11][12]", _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L)
+//-----------Caster-Bonuses-----------//
+	IF "c1"
+		CharacterHasTalent(_Caster,Ambidextrous)
+	THEN
+		IF "c1"
+			CharacterHasSkill(_Caster,Target_SingleHandedAttack)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_A," + 5 [1]ambidextrous</font>", _CasterColor)
+		ELSE
+			Print(_A,"")
+		ENDIF
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ARROW_CHECK_MAGIC)
+	THEN
+		Add(_CasterBonus,5)
+		Print(_B," + 5 [1]arrow recovery</font>", _CasterColor)
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,FaroutDude)
+	THEN
+		IF "c1&(c2|c3|c4|c5)"
+			IsEqual(_WeaponStatus,1)
+			CharacterHasWeaponType(_Caster,Bow,1)
+			CharacterHasWeaponType(_Caster,Wand,1)
+			CharacterHasWeaponType(_Caster,Crossbow,1)
+			CharacterHasWeaponType(_Caster,Staff,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_C," + 5 [1]far out man</font>", _CasterColor)
+		ELSE
+			Print(_C,"")
+		ENDIF
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Perfectionist)
+	THEN
+		IF "c1&c2"
+			CharacterGetStat(_Vitality,_Caster,Vitality)
+			IsEqual(_Vitality,1.0)
+		THEN
+			Add(_CasterBonus,3)
+			Print(_D," + 3 [1]hothead</font>", _CasterColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,AttackOfOpportunity)
+	THEN
+			IF "c1&!c2&!c3&!c4&c5"
+				CharacterHasWeaponType(_Caster,Bow,1)
+				CharacterHasWeaponType(_Caster,Wand,1)
+				CharacterHasWeaponType(_Caster,Crossbow,1)
+				CharacterHasWeaponType(_Caster,Staff,1)
+				IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_E," + 5 [1]opportunist</font>", _CasterColor)
+		ELSE
+			Print(_E,"")
+		ENDIF
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,WarriorLoreGrenadeRange)
+	THEN
+		IF "c1&c2"
+			CharacterHasStatus(_Caster,ADRENALINE)
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,5)
+			Print(_F," + 5 [1]martial focus</font>", _CasterColor)
+		ELIF "c1"
+			IsEqual(_WeaponStatus,1)
+		THEN
+			Add(_CasterBonus,3)
+			Print(_F," + 3 [1]martial focus</font>", _CasterColor)
+		ELSE
+			Print(_F,"")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,GRENADE_CHECK_MAGIC)
+	THEN
+		IF "!c1"
+			CharacterIsAlly(%Char,_Caster)
+		THEN
+			Add(_CasterBonus,10)
+			Print(_G," + 10 [1]martial focus</font>", _CasterColor)
+		ELSE
+			Subtract(_CasterBonus,10)
+			Print(_G," - 10 [1]martial focus</font>", _CasterColor)
+		ENDIF
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,DualWieldingDodging)
+	THEN
+		IF "c1&!c2&!c3&c4&c5"
+			CharacterHasWeaponType(_Caster,Wand,1)
+			CharacterHasSkill(_Caster,Target_SingleHandedAttack)
+			CharacterHasSkill(_Caster,Shout_RecoverArmour)
+			GetVar(_Parry,_Caster,"DualCounter")
+			IsGreaterThen(_Parry,0)
+		THEN
+			Multiply(_Parry,5)
+			Add(_CasterBonus,_Parry)
+			Print(_H," + [2] [1]sword dancer</font>", _CasterColor, _Parry)
+		ELSE
+			Print(_H,"")
+		ENDIF
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Torturer)
+	THEN
+		IF "c1"
+			IsEqual(%TorturerFlag,1)
+		THEN
+			Add(_CasterBonus,10)
+			Print(_I," + 10 [1]torturer</font>", _CasterColor)
+		ELSE
+			Print(_I,"")
+		ENDIF
+	ELSE
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Unstable)
+	THEN
+		IF "c1"
+			IsEqual(%UnstableFlag,1)
+		THEN
+			IF "c1&c2"
+				GetVar(_Unstable,%Char,"UnstableCounter")
+				IsGreaterThen(_Unstable,0)
+			THEN
+				Multiply(_Unstable,10)
+				Add(_Unstable,10)
+			ELSE
+				Set(_Unstable,10)
+			ENDIF
+								Add(_CasterBonus,_Unstable)
+			Print(_J," + [2] [1]vindictive</font>", _CasterColor, _Unstable)
+		ELSE
+			Print(_J,"")
+		ENDIF
+	ELSE
+		Print(_J,"")
+	ENDIF
+	IF "c1"
+		CharacterGetAbility(_RetInt,_Caster,Reflection)
+	THEN
+		IF "c1"
+			IsGreaterThen(_RetInt,0)
+		THEN
+			Print(_K," + [1] [2]ret.</font>", _RetInt, _CasterColor)
+		ELSE
+			Print(_K, "")
+		ENDIF
+	ENDIF
+	Print(_CasterTalents,"[1][2][3][4][5][6][7][8][9][10][11]",  _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K)
+	Add(_CasterBonus,_RetInt)
+//-----------Caster-Advantage-------//
+	IF "c1"
+		CharacterHasStatus(_Caster,BLESSED)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_A," | <font color='#46b195'>blessed</font>")
+	ELSE
+		Print(_A,"")
+	ENDIF
+	IF "c1"
+		IsTagged(%Char,"ABST_BOSS")
+	THEN
+			IF "c1&!c2"
+				IsHardcore()
+				HasGlobalFlag("ABST_NoBossBoost")
+		THEN
+			Add(_CharAdv,1)
+			Print(_B," | [1]advantageous</font>", _CharColor)
+		ELSE
+			Print(_B,"")
+		ENDIF
+	ELSE
+		Print(_B,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster,Demon)
+	THEN
+		IF "c1"
+			IsEqual(%Surface,1)
+		THEN
+			Add(_CasterAdv,1)
+			Print(_C," | [1]demon</font>", _CasterColor)
+		ELSE
+			Print(_C,"")
+		ENDIF
+	ELSE
+		Print(_C,"")
+	ENDIF
+	IF "c1"
+		CharacterHasTalent(_Caster, ElementalRanger)
+	THEN
+		IF "c1&(c2|c3)"
+			IsEqual(_WeaponStatus,1)
+			CharacterHasWeaponType(_Caster, Bow)
+			CharacterHasWeaponType(_Caster, Crossbow)
+		THEN
+			Add(_CasterAdv,1)
+			Print(_D," | [1]elemental ranger</font>", _CasterColor)
+		ELSE
+			Print(_D,"")
+		ENDIF
+	ELSE
+		Print(_D,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_EXEC)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_E," | [1]executioner</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_EXEC)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_E,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_GUERILLA)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_F," | [1]guerrilla</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_GUERILLA)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_F,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%Char,LEADERSHIP)
+	THEN
+		IF "c1&c2&c3&c4&!c5"
+			CharacterGetStatusSourceCharacter(%Char,LEADERSHIP,_Leader)
+			CharacterGetAbility(_StatInt,_Leader,Leadership)
+			CharacterIsAlly(_Leader,%Char)
+			CharacterHasTalent(_Leader,Escapist)
+			IsEqual(%PreviewFlag,1)			
+		THEN
+			Multiply(_StatInt,4)
+			GetRandomBetween(_Roll,1,100)
+			IF "c1"
+				IsLessThen(_Roll,_StatInt)
+			THEN
+				Add(_CharAdv,1)
+				Print(_G," | [1]leadership</font>", _CharColor)
+			ELSE
+				Print(_G,"")
+			ENDIF
+		ELSE
+			Print(_G,"")
+		ENDIF
+	ELSE
+		Print(_G,"")
+	ENDIF
+	IF "c1"
+		IsEqual(%SavageFlag,1)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Caster,ViolentMagic)
+		THEN
+			Print(_H," | [1]savage sortilege</font> (if applying cursed)", _CasterColor)
+			Add(_CharAdv,1)
+		ELSE
+			Print(_H,"")
+		ENDIF
+	ELSE
+		Print(_H,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_RUSH)
+	THEN
+		Add(_CasterAdv,1)
+		Print(_I," | [1]what a rush</font>", _CasterColor)
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_RUSH)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_I,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,CURSED)
+	THEN
+		Subtract(_CasterAdv,1)
+		Print(_J," | <font color='#d040d0'>cursed</font>")
+	ELSE
+		Print(_J,"")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Caster,ABST_ALLIN)
+	THEN
+		Subtract(_CasterAdv,1)
+		Print(_K," | <font color='#d040d0'>martial focus</font>")
+		IF "!c1"
+			IsEqual(%PreviewFlag,1)
+		THEN
+			Set(%RemovedStatus,ABST_ALLIN)
+			SetVar(_Caster,"RemovedStatus",%RemovedStatus)
+			CharacterEvent(_Caster,"CharacterRemoveStatus")
+		ENDIF
+	ELSE
+		Print(_K,"")
+	ENDIF
+	Print(_CasterAdvText,"[1][2][3][4][5][6][7][8][9][10][11]", _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K)
+//-----------Home-Stretch-----------//
+	IF "!c1&c2"
+		CharacterHasTalent(%Char,Raistlin)
+		IsGreaterThen(_ArmorFloat,.005)
+	THEN
+		Multiply(_ArmorFloat,100)
+		Cast(_ArmorInt,_ArmorFloat)
+		Print(_A, "[1]% <font color='#64c1ea' size='14'>magical armor</font> + ", _ArmorInt)
+	ELSE
+		Print(_A, "")
+		Set(_ArmorInt,0)
+	ENDIF
+	IF "c1&!c2"
+		GetVar(_HighestRoll,%Char,"HighestRoll")
+		IsEqual(_WeaponStatus,1)
+	THEN
+		Set(_HighestRoll,100)
+	ENDIF
+	Multiply(_StatFloat,.5)
+	Cast(_StatInt,_StatFloat)
+	Add(_CharBonus,_StatInt)
+	Add(_DeflectInt,_ArmorInt)
+	Add(_DeflectInt,_CharBonus)
+	SetVar(%Char,"DeflectInt",_DeflectInt)
+	GetRandomBetween(_Roll,1,_HighestRoll)
+	Set(_PrintRoll,_Roll)
+	Add(_Roll,_CasterBonus)
+	GetRandomBetween(_Roll2,1,_HighestRoll)
+	Set(_PrintRoll2,_Roll2)
+	Add(_Roll2,_CasterBonus)
+	IF "c1"
+		IsGreaterThen(_CasterAdv,_CharAdv)
+	THEN
+		Print(_B, " with advantage")
+		IF "(c1|c2)&(c3|c4)"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+			IsLessThen(_Roll2,_DeflectInt)
+			IsEqual(_Roll2,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+//------------------//
+		IF "c1"
+			IsLessThen(_PrintRoll,_PrintRoll2)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll, _PrintRoll2)
+			Set(_FinalRoll,_Roll2)
+		ELIF "c1"
+			IsGreaterThen(_PrintRoll,_PrintRoll2)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ELSE
+			Print(_C, "[1], [2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ENDIF
+//------------------//
+	ELIF "c1"
+		IsGreaterThen(_CharAdv,_CasterAdv)
+	THEN
+		Print(_B, " with disadvantage")
+		IF "(c1|c2)|(c3|c4)"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+			IsLessThen(_Roll2,_DeflectInt)
+			IsEqual(_Roll2,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+//------------------//
+		IF "c1"
+			IsLessThen(_PrintRoll2,_PrintRoll)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll, _PrintRoll2)
+			Set(_FinalRoll,_Roll2)
+		ELIF "c1"
+			IsGreaterThen(_PrintRoll2,_PrintRoll)
+		THEN
+			Print(_C, "<font color='#aaafb4'>[1],</font>[2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ELSE
+			Print(_C, "[1], [2]", _PrintRoll2, _PrintRoll)
+			Set(_FinalRoll,_Roll)
+		ENDIF
+//------------------//
+	ELSE
+	Print(_B, "")
+	Set(_FinalRoll,_Roll)
+	Print(_C, "[1]", _PrintRoll)
+		IF "c1|c2"
+			IsLessThen(_Roll,_DeflectInt)
+			IsEqual(_Roll,_DeflectInt)
+		THEN
+			Set(%Saved,1)
+			SetVar(%Char,"Saved",%Saved)
+		ENDIF
+	ENDIF
+	IF "c1&c2"
+		GetVar(_D,%Char,"NameString")
+		GetVar(_E,_Caster,"NameString")
+	THEN
+	ENDIF
+	IF "c1"
+		IsEqual(%PreviewFlag,1)
+	THEN
+		Print(_F, "[1][2]</font> has resist score of [6] against a magic effect from [4][5]</font>:<font size='14'><br>     [1]{ </font>[8][9] [1]wits bonus</font>[10][11]<br>     [4]{ </font>1-100 rolled [13][14][15]</font>", _CharColor, _D, %StatusString, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ELIF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Print(_F, "[1][2]</font> resisted [4][5]</font>'s [3] attempt:<font size='14'> [6] to resist &gt; [7] to apply<br>     [1]{ </font>[8][9] [1]wits bonus</font>[10][11]<br>     [4]{ </font>[12] rolled (out of [16])[13][14][15]</font>", _CharColor, _D, %StatusString, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ELSE
+		Print(_F, "[1][2]</font>[3] by [4][5]</font>:<font size='14'> [6] to resist &lt; [7] to apply<br>     [1]{ </font>[8][9] [1]wits bonus</font>[10][11]<br>     [4]{ </font>[12] rolled (out of [16])[13][14][15]</font>", _CharColor, _D, %StatusString2, _CasterColor, _E, _DeflectInt, _FinalRoll, _A, _StatInt, _CharTalents, _CharAdvText, _C, _B, _CasterTalents, _CasterAdvText, _HighestRoll)
+	ENDIF
+	IF "!c1&!c2"
+		IsEqual(_D,"NULL")
+		IsEqual(_E,"NULL")
+	THEN
+		SetVar(%Char,"CombatLogString",_F)
+	ELSE
+		SetVar(%Char,"CombatLogString",_D)
+	ENDIF
+	Set(_HighestRoll,100)
+	SetVar(%Char,"HighestRoll",_HighestRoll)
+	Set(_HighestRoll,0)
+	SetVar(%Char,"WeaponStatus",_HighestRoll)
+
+//===========================================================//
+//                 ABST Status Overrides                    *//
+//===========================================================//
+
+EVENT ABSTCharacterSetBurning
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_BURNING)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_BURNING)
+		GetStatusTurns(_Character,TURNS_BURNING,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	ListClear(_RemoveList)
+	IF "c1&!c2"
+		CharacterHasStatus(_Character, WET)
+		CharacterHasStatus(_Character, WARM)
+	THEN
+		ListAdd(_RemoveList, WET)
+		Set(_Result, WARM)
+	ELIF "c1&c2"
+		CharacterHasStatus(_Character, WET)
+		CharacterHasStatus(_Character, WARM)
+	THEN
+		ListAdd(_RemoveList, WET)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, CHILLED)
+		CharacterHasStatus(_Character, OVR_CHILLED)
+	THEN
+		ListAdd(_RemoveList,CHILLED)
+		ListAdd(_RemoveList,OVR_CHILLED)
+		Set(_Result, WARM)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FROZEN)
+	THEN
+		ListAdd(_RemoveList,FROZEN)
+		Set(_Result, WET)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, NECROFIRE)
+		CharacterHasStatus(_Character, HOLY_FIRE)
+	THEN
+		Set(_Result,null)
+	ELSE
+		Print(%StatusString,"<font color='#fe6e27'>Burning</font>")
+		Print(%StatusString2," was <font color='#fe6e27'>Burned</font>")
+		Set(%TorturerFlag,1)
+		Set(_Result,BURNING)
+		Set(%Char,_Character)
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_BURNING)
+		ENDIF
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character,OILED)
+	THEN
+		Add(_Turns,1)
+	ENDIF
+	Set(%Surface,0)
+	Set(%DuckFlag,0)
+	Set(%TorturerFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_BURNING,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetNecrofire
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_NECROFIRE)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_NECROFIRE)
+		GetStatusTurns(_Character,TURNS_NECROFIRE,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, PETRIFIED)
+	THEN
+		Set(_Result,null)
+	ELSE
+		ListAdd(_RemoveList, CHILLED)
+		ListAdd(_RemoveList,OVR_CHILLED)
+		ListAdd(_RemoveList, WET)
+		ListAdd(_RemoveList, FROZEN)
+		Print(%StatusString,"<font color='#fe6e27'>Necrofire</font>")
+		Print(%StatusString2," was lit with <font color='#fe6e27'>Necrofire</font>")
+		Set(%TorturerFlag,1)
+		IF "c1"
+			CharacterHasTalent(_Character,LivingArmor)
+		THEN
+			Set(%LivingFlag,1)
+		ENDIF
+		Set(_Result,NECROFIRE)
+		Set(%Char,_Character)
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_NECROFIRE)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%TorturerFlag,0)
+	Set(%DuckFlag,0)
+	Set(%LivingFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_NECROFIRE,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetChilled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_CHILLED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character, BURNING)
+	THEN
+		ListAdd(_RemoveList, BURNING)
+		Set(_Result, WARM)
+	ELIF "c1|c2|c3"
+		CharacterHasStatus(_Character, FROZEN)
+		CharacterHasStatus(_Character, NECROFIRE)
+		CharacterHasStatus(_Character, HOLY_FIRE)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character, WARM)
+	THEN
+		ListAdd(_RemoveList, WARM)
+		Set(_Result,null)
+		ELIF "c1|c2"
+			CharacterHasStatus(_Character, CHILLED)
+			CharacterHasStatus(_Character, OVR_CHILLED)
+		THEN
+		Set(_Result, OVR_FROZEN)
+		Set(_Turns,1)
+	ELSE
+		Print(%StatusString,"<font color='#cfecff'>Chilled</font>")
+		Print(%StatusString2," was [1]", %StatusString)
+		Set(_Result,OVR_CHILLED)
+		Set(_Turns,null)
+		Set(%Char,_Character)
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_CHILLED)
+		ELIF "c1"
+			CharacterHasStatus(_Character, WET)
+		THEN
+			Set(_Result, OVR_FROZEN)
+			Set(_Turns,1)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%DuckFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ABSTCharacterSetFrozen
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_FROZEN)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_FROZEN)
+		GetStatusTurns(_Character,TURNS_FROZEN,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, FROZEN)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BURNING)
+	THEN
+		ListAdd(_RemoveList, BURNING)
+		Set(_Result, WET)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, NECROFIRE)
+		CharacterHasStatus(_Character, HOLY_FIRE)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character, WARM)
+	THEN
+		ListAdd(_RemoveList, WARM)
+		Set(_Result, OVR_CHILLED)
+	ELSE
+		Print(%StatusString,"<font color='#cfecff'>Frozen</font>")
+		Print(%StatusString2," was [1]", %StatusString)
+		IF "c1|c2"
+			CharacterHasStatus(_Character,ABST_AEGIS)
+			CharacterHasStatus(_Character,ABST_MORNING)
+		THEN
+			Set(%MorningFlag,1)
+		ENDIF
+		Set(_Result,FROZEN)
+		Set(%Char,_Character)
+		IF "c1"
+			CharacterHasStatus(_Character, MAGIC_SHELL)
+		THEN
+			Set(%StatusString2,"'s <font color='#4197e2'>Magic Shell</font> was purged")
+		ENDIF
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_FROZEN)
+		ELIF "c1"
+			CharacterHasStatus(_Character, MAGIC_SHELL)
+		THEN
+			ListClear(_RemoveList)
+			ListAdd(_RemoveList, MAGIC_SHELL)
+			Set(_Result,ABST_LOG)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%DuckFlag,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_FROZEN,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetPetrified
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_PETRIFIED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_PETRIFIED)
+		GetStatusTurns(_Character,TURNS_PETRIFIED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, PETRIFIED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#7f3d00'>Petrified</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(_Result,PETRIFIED)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, MAGIC_SHELL)
+	THEN
+		Set(%StatusString2,"'s <font color='#4197e2'>Magic Shell</font> was purged")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_PETRIFIED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, MAGIC_SHELL)
+	THEN
+		ListClear(_RemoveList)
+		ListAdd(_RemoveList, MAGIC_SHELL)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListClear(_RemoveList)
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_PETRIFIED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetShocked
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_SHOCKED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character, STUNNED)
+		CharacterHasStatus(_Character, PETRIFIED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, SHOCKED)
+		CharacterHasStatus(_Character,OVR_SHOCKED)
+	THEN
+		Set(_Result,OVR_STUNNED)
+		Set(_Turns,1)
+	ELSE
+		Print(%StatusString,"<font color='#7d71d9'>Shocked</font>")
+		Print(%StatusString2," was [1]", %StatusString)
+		Set(_Result,OVR_SHOCKED)
+		Set(_Turns,null)
+		Set(%Char,_Character)
+		IF "c1"
+			CharacterHasStatus(_Character, MAGIC_SHELL)
+		THEN
+			Set(%StatusString2,"'s <font color='#4197e2'>Magic Shell</font> was purged")
+		ENDIF
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_SHOCKED)
+		ELIF "c1"
+			CharacterHasStatus(_Character, MAGIC_SHELL)
+		THEN
+			ListAdd(_RemoveList, MAGIC_SHELL)
+			Set(_Result,ABST_LOG)
+		ELIF "c1"
+			CharacterHasStatus(_Character, WET)
+		THEN
+			Set(_Result,OVR_STUNNED)
+			Set(_Turns,1)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%DuckFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ABSTCharacterSetStunned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_STUNNED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_STUNNED)
+		GetStatusTurns(_Character,TURNS_STUNNED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#7d71d9'>Stunned</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(_Result,STUNNED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, MAGIC_SHELL)
+	THEN
+		Set(%StatusString2,"'s <font color='#4197e2'>Magic Shell</font> was purged")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_STUNNED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, MAGIC_SHELL)
+	THEN
+		ListClear(_RemoveList)
+		ListAdd(_RemoveList, MAGIC_SHELL)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListClear(_RemoveList)
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	Set(%DuckFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_STUNNED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetSlowed
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_SLOWED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_SLOWED)
+		GetStatusTurns(_Character,TURNS_SLOWED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#454545'>Slowed</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result,SLOWED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, HASTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Haste</font> was slackened")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_SLOWED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, HASTED)
+	THEN
+		ListAdd(_RemoveList, HASTED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_SLOWED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetFeared
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_FEAR)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_FEAR)
+		GetStatusTurns(_Character,TURNS_FEAR,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#fcd203'>Terror</font>")
+	Print(%StatusString2," was <font color='#fcd203'>Terrified</font>")
+	Set(_Result,FEAR)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Clear Mind</font> was troubled")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, ENRAGED)
+	THEN
+		Set(%StatusString2,"'s <font color='#c80030'>Rage</font> was cooled")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_FEAR)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+		CharacterHasStatus(_Character, ENRAGED)
+	THEN
+		ListAdd(_RemoveList, CLEAR_MINDED)
+		ListAdd(_RemoveList, ENRAGED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_FEAR,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetCharmed
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_CHARMED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_CHARMED)
+		GetStatusTurns(_Character,TURNS_CHARMED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#ffb8b8'>Charmed</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(_Result,CHARMED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Clear Mind</font> was troubled")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, ENRAGED)
+	THEN
+		Set(%StatusString2,"'s <font color='#c80030'>Rage</font> was cooled")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_CHARMED)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+		CharacterHasStatus(_Character, ENRAGED)
+	THEN
+		ListAdd(_RemoveList, CLEAR_MINDED)
+		ListAdd(_RemoveList, ENRAGED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_CHARMED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetMuted
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_MUTED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_MUTED)
+		GetStatusTurns(_Character,TURNS_MUTED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#b823cb'>Silenced</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	IF "c1"
+		CharacterHasTalent(_Character,Memory)
+	THEN
+		Set(%MnemonicFlag,1)
+	ENDIF
+	Set(%UnstableFlag,1)
+	Set(_Result,MUTED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#81ab00'>Rest</font> was disturbed")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_MUTED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		ListAdd(_RemoveList, RESTED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MnemonicFlag,0)
+	Set(%UnstableFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_MUTED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetBlind
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_BLIND)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_BLIND)
+		GetStatusTurns(_Character,TURNS_BLIND,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#454545'>Blind</font>")
+	Print(%StatusString2," was <font color='#454545'>Blinded</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result,BLIND)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#81ab00'>Rest</font> was disturbed")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_BLIND)
+	ELIF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		ListAdd(_RemoveList, RESTED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	Set(%DuckFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_BLIND,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetCrippled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_CRIPPLED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_CRIPPLED)
+		GetStatusTurns(_Character,TURNS_CRIPPLED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#ffffff'>Crippled</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result,CRIPPLED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, HASTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Haste</font> was slackened")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#81ab00'>Rest</font> was disturbed")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_CRIPPLED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		ListAdd(_RemoveList, RESTED)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, HASTED)
+	THEN
+		ListAdd(_RemoveList, HASTED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_CRIPPLED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetKnockedDown
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_KNOCKED_DOWN)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_KNOCKED_DOWN)
+		GetStatusTurns(_Character,TURNS_KNOCKED_DOWN,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#ffffff'>Knocked Down</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(_Result,KNOCKED_DOWN)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		Set(%StatusString2,"'s <font color='#81ab00'>Rest</font> was disturbed")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_KNOCKED_DOWN)
+	ELIF "c1"
+		CharacterHasStatus(_Character, RESTED)
+	THEN
+		ListAdd(_RemoveList, RESTED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_KNOCKED_DOWN,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetRegeneration
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_REGENERATION)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_REGENERATION)
+		GetStatusTurns(_Character,TURNS_REGENERATION,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	ListClear(_RemoveList)
+	Set(_Result,REGENERATION)
+	IF "c1"
+		IsTagged(_Character,"UNDEAD")
+	THEN
+		Set(%Regen,1)
+		Print(%StatusString,"<font color='#97fbff'>Regeneration</font>")
+		Print(%StatusString2," was <font color='#97fbff'>Regenerated</font>")
+		Set(%UnstableFlag,1)
+		Set(%Char,_Character)
+		IF "c1"
+			CharacterHasStatus(_Character, POISONED)
+		THEN
+			Set(%StatusString2,"'s <font color='#00aa00'>Poison</font> was purged")
+		ENDIF
+		CallFunction("PhysArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_REGENERATION)
+		ELIF "c1"
+			CharacterHasStatus(_Character, POISONED)
+		THEN
+			ListAdd(_RemoveList, POISONED)
+			Set(_Result,ABST_LOG)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	Set(%DuckFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_REGENERATION,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetPoisoned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_POISONED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_POISONED)
+		GetStatusTurns(_Character,TURNS_POISONED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Set(_Result,POISONED)
+	IF "!c1"
+		IsTagged(_Character,"UNDEAD")
+	THEN
+		Print(%StatusString,"<font color='#65c900'>Poisoned</font>")
+		Print(%StatusString2," was [1]", %StatusString)
+		Set(%TorturerFlag,1)
+		Set(%Char,_Character)
+		IF "c1"
+			CharacterHasStatus(_Character, REGENERATION)
+		THEN
+			Set(%StatusString2,"'s <font color='#97fbff'>Regeneration</font> was purged")
+		ENDIF
+		CallFunction("MagicArmorTally")
+		IF "c1"
+			IsEqual(%Saved,1)
+		THEN
+			Set(_Result,DEF_POISONED)
+		ELIF "c1"
+			CharacterHasStatus(_Character, REGENERATION)
+		THEN
+			ListAdd(_RemoveList, REGENERATION)
+			Set(_Result,ABST_LOG)
+		ENDIF
+	ELSE
+		ListAdd(_RemoveList, REGENERATION)
+	ENDIF
+	Set(%Surface,0)
+	Set(%TorturerFlag,0)
+	Set(%DuckFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_POISONED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetBleeding
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_BLEEDING)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_BLEEDING)
+		GetStatusTurns(_Character,TURNS_BLEEDING,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#ffffff'>Bleeding</font>")
+	Print(%StatusString2," was <font color='#ffffff'>Bled</font>")
+	Set(%TorturerFlag,1)
+	Set(_Result,BLEEDING)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		Set(%StatusString2,"'s <font color='#7f3d00'>Fortification</font> was punctured")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, REGENERATION)
+	THEN
+		Set(%StatusString2,"'s <font color='#97fbff'>Regeneration</font> was purged")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_BLEEDING)
+	ELIF "c1"
+		CharacterHasStatus(_Character, REGENERATION)
+	THEN
+		ListAdd(_RemoveList, REGENERATION)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		ListAdd(_RemoveList, FORTIFIED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%TorturerFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_BLEEDING,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetCursed
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_CURSED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_CURSED)
+		GetStatusTurns(_Character,TURNS_CURSED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Set(%SavageFlag,1)
+	Print(%StatusString,"<font color='#46b195'>Cursed</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result,CURSED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, WARM)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Warmth</font> was intensified")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, HOLY_FIRE)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Holy Fire</font> was corrupted")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, BURNING)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Burning</font> was blighted")
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character, CHILLED)
+		CharacterHasStatus(_Character,OVR_CHILLED)
+	THEN
+		Set(%StatusString2,"'s <font color='#cfecff'>Chill</font> was intensified")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_CURSED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, CHILLED)
+		CharacterHasStatus(_Character, OVR_CHILLED)
+	THEN
+		ListAdd(_RemoveList, CHILLED)
+		ListAdd(_RemoveList,OVR_CHILLED)
+		Set(_Result, FROZEN)
+		CharacterApplyStatus(_Character,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BURNING)
+	THEN
+		ListAdd(_RemoveList, BURNING)
+		Set(_Result, NECROFIRE)
+		CharacterApplyStatus(_Character,ABST_LOG)
+	ELIF "c1|c2"
+		CharacterHasStatus(_Character, WARM)
+		CharacterHasStatus(_Character, HOLY_FIRE)
+	THEN
+		ListAdd(_RemoveList, WARM)
+		ListAdd(_RemoveList, HOLY_FIRE)
+		Set(_Result, BURNING)
+		CharacterApplyStatus(_Character,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%SavageFlag,0)
+	Set(%UnstableFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_CURSED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetDiseased
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_DISEASED)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_DISEASED)
+		GetStatusTurns(_Character,TURNS_DISEASED,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#7f00ff'>Diseased</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result,DISEASED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		Set(%StatusString2,"'s <font color='#7f3d00'>Fortification</font> was purged")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DISEASED)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		ListAdd(_RemoveList, FORTIFIED)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_DISEASED,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetDecaying
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_DECAYING_TOUCH)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_DECAYING_TOUCH)
+		GetStatusTurns(_Character,TURNS_DECAYING_TOUCH,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	Print(%StatusString,"<font color='#b823cb'>Decaying</font>")
+	Print(%StatusString2," was <font color='#b823cb'>Decayed</font>")
+	Set(%UnstableFlag,1)
+	IF "c1"
+		CharacterHasTalent(_Character,WarriorLoreNaturalHealth)
+	THEN
+		Set(%PictureFlag,1)
+	ENDIF
+	Set(_Result,DECAYING_TOUCH)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		Set(%StatusString2,"'s <font color='#7f3d00'>Fortification</font> was purged")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DECAYING_TOUCH)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		ListAdd(_RemoveList, FORTIFIED)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	Set(%PictureFlag,0)
+	Set(%DuckFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_DECAYING_TOUCH,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetChicken
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_CHICKEN)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_CHICKEN)
+		GetStatusTurns(_Character,TURNS_CHICKEN,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#f7ba14'>Chicken Form</font>")
+	Print(%StatusString2," was turned into a <font color='#f7ba14'>Chicken</font>")
+	Set(_Result, CHICKEN)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_CHICKEN)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_CHICKEN,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+//The OVR_SLEEPING event differs because it just sets SLEEPING if a save is failed. A skill that tried setting OVR_SLEEPING for multiple turns would be out of luck.
+EVENT ABSTCharacterSetSleeping
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_SLEEPING)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_SLEEPING)
+		GetStatusTurns(_Character,TURNS_SLEEPING,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#639594'>Sleeping</font>")
+	Print(%StatusString2," was put to <font color='#639594'>Sleep</font>")
+	Set(_Result,SLEEPING)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Clear Mind</font> was troubled")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, ENRAGED)
+	THEN
+		Set(%StatusString2,"'s <font color='#c80030'>Rage</font> was cooled")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_SLEEPING)
+	ELSE
+		ListAdd(_RemoveList, INVISIBLE)
+		IF "c1|c2"
+			CharacterHasStatus(_Character, CLEAR_MINDED)
+			CharacterHasStatus(_Character, ENRAGED)
+		THEN
+			ListAdd(_RemoveList, CLEAR_MINDED)
+			ListAdd(_RemoveList, ENRAGED)
+			Set(_Result,ABST_LOG)
+		ENDIF
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_SLEEPING,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTCharacterSetInfectiousDiseased
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_INFECTIOUS_DISEASED)
+ACTIONS
+	Print(%StatusString,"<font color='#b823cb'>Infected</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result, OVR_INFECTIOUS_DISEASED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		Set(%StatusString2,"'s <font color='#46b195'>Blessing</font> was purged")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		Set(%StatusString2,"'s <font color='#7f3d00'>Fortification</font> was purged")
+	ENDIF
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_INFECT)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FORTIFIED)
+	THEN
+		ListAdd(_RemoveList, FORTIFIED)
+		Set(_Result,ABST_LOG)
+	ELIF "c1"
+		CharacterHasStatus(_Character, BLESSED)
+	THEN
+		ListAdd(_RemoveList, BLESSED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ABSTCharacterSetMadness
+//Not ideal, won't respond to the number of turns designated on the skill entry
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_MADNESS)
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(_Character, TURNS_MADNESS)
+		GetStatusTurns(_Character,TURNS_MADNESS,_Turns)
+	THEN
+	ELSE
+		Set(_Turns,1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
+	THEN
+		Set(%MorningFlag,1)
+	ENDIF
+	Print(%StatusString,"<font color='#c9aa58'>Madness</font>")
+	Print(%StatusString2," was <font color='#c9aa58'>Maddened</font>")
+	Set(_Result,MADNESS)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	IF "c1"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+	THEN
+		Set(%StatusString2,"'s <font color='#fe6e27'>Clear Mind</font> was troubled")
+	ENDIF
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_MADNESS)
+	ELIF "c1"
+		CharacterHasStatus(_Character, CLEAR_MINDED)
+	THEN
+		ListAdd(_RemoveList, CLEAR_MINDED)
+		Set(_Result,ABST_LOG)
+	ENDIF
+	Set(%Surface,0)
+	Set(%MorningFlag,0)
+	CharacterRemoveStatus(_Character,TURNS_MADNESS,null,0)
+	RETURN(_RemoveList,_Result,_Turns)
+
+EVENT ABSTSetShackles
+//This one's a doozie. Meant to trigger the original hardcoded status by temporarily setting a the target's armor to 0 then shooting a shackles projectile.
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	FLOAT:_ShacklesArmor
+	INT:_ShacklesInt
+ON
+	FetchCharacterApplyStatusData(_Character, OVR_SHACKLES_OF_PAIN)
+ACTIONS
+	Print(%StatusString,"<font color='#b823cb'>Shackled</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	Set(_Result, PROC_SHACKLES_OF_PAIN)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("ShackleMath")
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_SHACKLES)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//              New Vanilla Status Events                   *//
+//===========================================================//
+//These vanilla statuses didn't need to be replaced because they do not have entries in Statuses.gameScript. We only needed to remove the saving throw.
+
+EVENT ResistExchange
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, DEMONIC_BARGAIN)
+ACTIONS
+	Print(%StatusString,"<font color='#f7ba14'>Demonic Bargain</font>")
+	Print(%StatusString2," was forced into a <font color='#f7ba14'>Demonic Bargain</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, DEMONIC_BARGAIN)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DEMONIC_BARGAIN)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistWeak
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, WEAK)
+ACTIONS
+	Print(%StatusString,"<font color='#ffffff'>Weak</font>")
+	Print(%StatusString2," was <font color='#ffffff'>Weakened</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, WEAK)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_WEAK)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistDazed
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, DAZED)
+ACTIONS
+	Print(%StatusString,"<font color='#ffffff'>Dazed</font>")
+	Print(%StatusString2," was <font color='#ffffff'>Dazed</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, DAZED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DAZED)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistNull
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, NULL_RESISTANCE)
+ACTIONS
+	Print(%StatusString,"<font color='#f7ba14'>Null Resistance</font>")
+	Print(%StatusString2," was <font color='#f7ba14'>Nullified</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, NULL_RESISTANCE)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_NULL_RESISTANCE)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistFireblood
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, FIREBLOOD)
+ACTIONS
+	Print(%StatusString,"<font color='#fe6e27'>Fireblood</font>")
+	Print(%StatusString2," was tainted with <font color='#fe6e27'>Fireblood</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, FIREBLOOD)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_FIREBLOOD)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistDeaf
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, DEAF)
+ACTIONS
+	Print(%StatusString,"<font color='#c9aa58'>Deaf</font>")
+	Print(%StatusString2," was <font color='#c9aa58'>Deafened</font>")
+	Set(%UnstableFlag,1)
+	Set(_Result, DEAF)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DEAF)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistEntangled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, ENTANGLED)
+ACTIONS
+	Print(%StatusString,"<font color='#81ab00'>Entangled</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%TorturerFlag,1)
+	Set(_Result, ENTANGLED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("MagicArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_ENTANGLED)
+	ENDIF
+	Set(%Surface,0)
+	Set(%TorturerFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistDisarm
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, DISARMED)
+ACTIONS
+	Print(%StatusString,"<font color='#ffffff'>Disarmed</font>")
+	Print(%StatusString2," was [1]", %StatusString)
+	Set(%UnstableFlag,1)
+	IF "c1"
+		CharacterHasTalent(_Character,Memory)
+	THEN
+	Set(%MnemonicFlag,1)
+	ENDIF
+	Set(_Result, DISARMED)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	IF "c1"
+		IsEqual(%Saved,1)
+	THEN
+		Set(_Result,DEF_DISARMED)
+	ENDIF
+	Set(%Surface,0)
+	Set(%UnstableFlag,0)
+	Set(%MnemonicFlag,0)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CharacterSetOiled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, OILED)
+ACTIONS
+	Set(_Result,OILED)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character, WET)
+	THEN
+		Set(_Result,null)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//                 ABST Surface Statuses                    *//
+//===========================================================//
+//These are separate statuses that trigger the real ones. Spun off to avoid notification spam.
+
+EVENT SurfCharacterSetBlind
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_BLIND)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,BLIND)
+		CharacterHasStatus(_Character,DEF_BLIND)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_BLIND)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetShocked
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_SHOCKED)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,OVR_SHOCKED)
+		CharacterHasStatus(_Character,DEF_SHOCKED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_SHOCKED)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetStunned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_STUNNED)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,STUNNED)
+		CharacterHasStatus(_Character,DEF_STUNNED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_STUNNED)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetBurning
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_BURNING)
+ACTIONS
+	CharacterApplyStatus(_Character,TURNS_BURNING,2)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,BURNING)
+		CharacterHasStatus(_Character,DEF_BURNING)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_BURNING)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetNecrofire
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_NECROFIRE)
+ACTIONS
+	CharacterApplyStatus(_Character,TURNS_NECROFIRE,2)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,NECROFIRE)
+		CharacterHasStatus(_Character,DEF_NECROFIRE)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_NECROFIRE)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetRegeneration
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_REGENERATION)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,REGENERATION)
+		CharacterHasStatus(_Character,DEF_REGENERATION)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_REGENERATION)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetPoisoned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_POISONED)
+ACTIONS
+	CharacterApplyStatus(_Character,TURNS_POISONED,2)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,POISONED)
+		CharacterHasStatus(_Character,DEF_POISONED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_POISONED)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetDecaying
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_DECAYING_TOUCH)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,DECAYING_TOUCH)
+		CharacterHasStatus(_Character,DEF_DECAYING_TOUCH)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_DECAYING_TOUCH)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetChilled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_CHILLED)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,OVR_CHILLED)
+		CharacterHasStatus(_Character,DEF_CHILLED)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_CHILLED)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT SurfCharacterSetFrozen
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, SDEF_FROZEN)
+ACTIONS
+	IF "c1|c2"
+		CharacterHasStatus(_Character,FROZEN)
+		CharacterHasStatus(_Character,DEF_FROZEN)
+	THEN
+		Set(_Result,null)
+	ELIF "c1"
+		CharacterHasStatus(_Character,CASTER_SURFACE)
+	THEN
+		IF "c1"
+			CharacterHasTalent(_Character,NoAttackOfOpportunity)
+		THEN
+			Set(%DuckFlag,1)
+		ENDIF
+		Set(%Surface,1)
+		Set(_Result,OVR_FROZEN)
+	ENDIF
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//                 ABST Surface Caster Flags                *//
+//===========================================================//
+//Don't ask
+
+EVENT CasterCharacterSetBlind
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_BLIND)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,BLIND)
+		CharacterHasStatus(_Character,DEF_BLIND)
+	THEN
+		Set(_Result,null)
+	ELSE
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetShocked
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_SHOCKED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,OVR_SHOCKED)
+		CharacterHasStatus(_Character,DEF_SHOCKED)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetStunned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_STUNNED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,STUNNED)
+		CharacterHasStatus(_Character,DEF_STUNNED)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetBurning
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_BURNING)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,BURNING)
+		CharacterHasStatus(_Character,DEF_BURNING)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetNecrofire
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_NECROFIRE)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,NECROFIRE)
+		CharacterHasStatus(_Character,DEF_NECROFIRE)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetRegeneration
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_REGENERATION)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,REGENERATION)
+		CharacterHasStatus(_Character,DEF_REGENERATION)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetPoisoned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_POISONED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,POISONED)
+		CharacterHasStatus(_Character,DEF_POISONED)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetDecaying
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_DECAYING_TOUCH)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,DECAYING_TOUCH)
+		CharacterHasStatus(_Character,DEF_DECAYING_TOUCH)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetChilled
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_CHILLED)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,OVR_CHILLED)
+		CharacterHasStatus(_Character,DEF_CHILLED)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT CasterCharacterSetFrozen
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CASTER_FROZEN)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,FROZEN)
+		CharacterHasStatus(_Character,DEF_FROZEN)
+	THEN
+		Set(_Result,null)
+	ELSE
+			CharacterRemoveStatus(_Character,CASTER_SURFACE,null,0)
+		Set(_Result,CASTER_SURFACE)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//            Additional Vanilla Status Events              *//
+//===========================================================//
+//Vanilla statuses with no saving throws still need to interact with ABST statuses, which is why they get events here in addition to the ones in statuses.gamescript.
+
+EVENT AddCharacterSetWet
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	CHARACTER:_Caster
+ON
+	FetchCharacterApplyStatusData(_Character, WET)
+ACTIONS
+	Set(_Result,WET)
+	ListClear(_RemoveList)
+// If Rain procs on future turns this may confuse the caster catcher
+	IF "c1&c2"
+		CharacterHasStatus(_Character, OVR_CHILLED)
+		CharacterGetStatusSourceCharacter(_Character, CASTER_NONSURFACE, _Caster)
+	THEN
+		CharacterApplyStatus(_Character,OVR_FROZEN,1,0,_Caster)
+		Set(%RemovedStatus,WET)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+	ELIF "c1&c2"
+		CharacterHasStatus(_Character, OVR_SHOCKED)
+		CharacterGetStatusSourceCharacter(_Character, CASTER_NONSURFACE,_Caster)
+	THEN
+		CharacterApplyStatus(_Character,OVR_STUNNED,1,0,_Caster)
+		Set(%RemovedStatus,WET)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetCleanseWounds
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CLEANSE_WOUNDS)
+ACTIONS
+	Set(_Result,CLEANSE_WOUNDS)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_INFECTIOUS_DISEASED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetSteamLance
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, STEAM_LANCE)
+ACTIONS
+	Set(_Result,STEAM_LANCE)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_INFECTIOUS_DISEASED)
+	ListAdd(_RemoveList, OVR_CHILLED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetHealingElixir
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, HEALING_ELIXIR)
+ACTIONS
+	Set(_Result,HEALING_ELIXIR)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_INFECTIOUS_DISEASED)
+	ListAdd(_RemoveList, OVR_CHILLED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetBlessed
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, BLESSED)
+ACTIONS
+	Set(_Result,BLESSED)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_INFECTIOUS_DISEASED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetFortified
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, FORTIFIED)
+ACTIONS
+	Set(_Result,FORTIFIED)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_INFECTIOUS_DISEASED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetHolyFire
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, HOLY_FIRE)
+ACTIONS
+	Set(_Result,HOLY_FIRE)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_CHILLED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetWarm
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, WARM)
+ACTIONS
+	Set(_Result,WARM)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character, OVR_CHILLED)
+	THEN
+		ListAdd(_RemoveList,OVR_CHILLED)
+		Set(%RemovedStatus,WARM)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetBurning
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, BURNING)
+ACTIONS
+	Set(_Result,BURNING)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character, OVR_CHILLED)
+	THEN
+		ListAdd(_RemoveList,OVR_CHILLED)
+		Set(%RemovedStatus,BURNING)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+		CharacterApplyStatus(_Character,WARM)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetNecrofire
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, NECROFIRE)
+ACTIONS
+	Set(_Result,NECROFIRE)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_CHILLED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetChilled
+VARS
+	CHARACTER:_Character
+	CHARACTER:_Caster
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, CHILLED)
+ACTIONS
+	Set(_Result,CHILLED)
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, OVR_CHILLED)
+		CharacterGetStatusSourceCharacter(_Character, CASTER_NONSURFACE, _Caster)
+	THEN
+		CharacterApplyStatus(_Character, OVR_FROZEN,1,0,_Caster)
+		Set(%RemovedStatus,OVR_CHILLED)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetFrozen
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, FROZEN)
+ACTIONS
+	Set(_Result,FROZEN)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_CHILLED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetPetrified
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, PETRIFIED)
+ACTIONS
+	Set(_Result,PETRIFIED)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_SHOCKED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetShocked
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	CHARACTER:_Caster
+ON
+	FetchCharacterApplyStatusData(_Character, SHOCKED)
+ACTIONS
+	Set(_Result,SHOCKED)
+	ListClear(_RemoveList)
+	IF "c1&c2"
+		CharacterHasStatus(_Character, OVR_SHOCKED)
+		CharacterGetStatusSourceCharacter(_Character, CASTER_NONSURFACE, _Caster)
+	THEN
+		CharacterApplyStatus(_Character,OVR_STUNNED,1,0,_Caster)
+		Set(%RemovedStatus,SHOCKED)
+		SetVar(_Character,"RemovedStatus",%RemovedStatus)
+		CharacterEvent(_Character,"CharacterRemoveStatus")
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT AddCharacterSetStunned
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, STUNNED)
+ACTIONS
+	Set(_Result,STUNNED)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, OVR_SHOCKED)
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//               Misc Fetch Status Functions                *//
+//===========================================================//
+
+EVENT ResistABSTDual
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, ABST_DUAL5)
+ACTIONS
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasStatus(_Character,ABST_DUAL5)
+	THEN
+		CharacterRemoveStatus(_Character,ABST_DUAL5,null,0)
+		Set(_Result, ABST_DUAL10)
+	ELIF "c1"
+		CharacterHasStatus(_Character,ABST_DUAL10)
+	THEN
+		CharacterRemoveStatus(_Character,ABST_DUAL10,null,0)
+		Set(_Result, ABST_DUAL15)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,ABST_DUAL15)
+	THEN
+		CharacterRemoveStatus(_Character,ABST_DUAL15,null,0)
+		Set(_Result, ABST_DUAL20)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,ABST_DUAL20)
+	THEN
+		CharacterRemoveStatus(_Character,ABST_DUAL20,null,0)
+		Set(_Result, ABST_DUAL25)			
+	ELSE
+		Set(_Result, ABST_DUAL5)	
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ResistPreviewPhys
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, ABST_PHYSPREVIEW)
+ACTIONS
+	Set(%PreviewFlag,1)
+	ListClear(_RemoveList)
+	Set(_Result, ABST_PHYSPREVIEW)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	Set(%PreviewFlag,0)	
+	RETURN(_RemoveList,_Result,null)
+	
+EVENT ResistPreviewMagic
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, ABST_MAGICPREVIEW)
+ACTIONS
+	Set(%PreviewFlag,1)
+	ListClear(_RemoveList)
+	Set(_Result, ABST_MAGICPREVIEW)
+	Set(%Char,_Character)
+	CallFunction("MagicArmorTally")
+	Set(%PreviewFlag,0)	
+	RETURN(_RemoveList,_Result,null)	
+
+EVENT LeechTalentCounter
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	FLOAT:_Vit
+ON
+	FetchCharacterApplyStatusData(_Character, ABST_LEECH)
+ACTIONS
+	Set(_Result, null)
+	ListClear(_RemoveList)
+	IF "c1&c2&c3&c4"
+		CharacterHasTalent(_Character,Leech)
+		IsInActiveTurn(_Character)
+		CharacterGetStat(_Vit,_Character,Vitality)
+		IsLessThen(_Vit,1.0)
+	THEN
+		Set(_Result, ABST_LEECH)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT FSDPhysTalentEffect
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, ABST_FSD)
+ACTIONS
+	Set(_Result, null)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasTalent(_Character,FiveStarRestaurant)
+	THEN
+		Set(_Result, ABST_FSD)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+EVENT FSDMagTalentEffect
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, DRUNK)
+ACTIONS
+	Set(_Result, DRUNK)
+	ListClear(_RemoveList)
+	IF "c1"
+		CharacterHasTalent(_Character,FiveStarRestaurant)
+	THEN
+		CharacterApplyStatus(_Character,ABST_FSDM,-1)
+	ENDIF
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//               Status Conversions for Items               *//
+//===========================================================//
+//Surfaces apply vanilla statuses to items (check root templates to see what I mean) but if a chair is targeted by an ABST fireball we want to make sure it just
+//gets vanilla burning, for simplicity's sake and so we don't break quests that require the BURNING be applied to items.
+
+EVENT ItemSetOVRBurning
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_BURNING)
+ACTIONS
+	Set(_Result,BURNING)
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ItemSetOVRNecrofire
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_NECROFIRE)
+ACTIONS
+	Set(_Result,NECROFIRE)
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ItemSetOVRChilled
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_CHILLED)
+ACTIONS
+	Set(_Result,CHILLED)
+	ListClear(_RemoveList)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ItemSetOVRFrozen
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_FROZEN)
+ACTIONS
+	Set(_Result,FROZEN)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ItemSetOVRCursed
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_CURSED)
+ACTIONS
+	Set(_Result,CURSED)
+	RETURN(_RemoveList,_Result,null)
+
+EVENT ItemSetOVRShocked
+VARS
+	ITEM:_Item
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchItemApplyStatusData(_Item, OVR_SHOCKED)
+ACTIONS
+	Set(_Result,SHOCKED)
+	RETURN(_RemoveList,_Result,null)
+
+//===========================================================//
+//                Vanilla Recovery Add-Ons                  *//
+//===========================================================//
+//Additional events so ABST statuses trigger perseverance on recovery.
+
+EVENT CharRemoveMad
+VARS
+	CHARACTER:_Character
+ON
+	OnCharacterStatusRemoved(_Character, MADNESS)
+ACTIONS
+	CharacterApplyStatus(_Character, POST_MAGIC_CONTROL, 0)
+
+EVENT CharRemoveCharmed
+VARS
+	CHARACTER:_Character
+ON
+	OnCharacterStatusRemoved(_Character, CHARMED)
+ACTIONS
+	CharacterApplyStatus(_Character, POST_MAGIC_CONTROL, 0)
+
+EVENT CharRemoveSleeping
+VARS
+	CHARACTER:_Character
+ON
+	OnCharacterStatusRemoved(_Character, SLEEPING)
+ACTIONS
+	CharacterApplyStatus(_Character, POST_MAGIC_CONTROL, 0)
+
+EVENT CharRemoveChicken
+VARS
+	CHARACTER:_Character
+ON
+	OnCharacterStatusRemoved(_Character, CHICKEN)
+ACTIONS
+	CharacterApplyStatus(_Character, POST_PHYS_CONTROL, 0)
+
+//===========================================================//
+//                      Misc Functions                      *//
+//===========================================================//
+
+EVENT IncreaseDif
+VARS
+CHARACTER:_Char
+INT:_Int
+ON
+	OnGlobalFlagCleared("ABST_IncreaseResolve")
+ACTIONS
+	Add(%ResolveLevel,1)
+
+EVENT LowerDif
+VARS
+CHARACTER:_Char
+INT:_Int
+ON
+	OnGlobalFlagCleared("ABST_DecreaseResolve")
+ACTIONS
+	IF "c1"
+		IsGreaterThen(%ResolveLevel,0)
+	THEN
+		Subtract(%ResolveLevel,1)
+	ENDIF
