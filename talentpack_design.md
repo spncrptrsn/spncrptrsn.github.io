@@ -8,8 +8,8 @@ Here's how I use story scripting to implement custom talents for my upcoming tal
 
 Though the Divinity Engine doesn't offer any options for creating new talents, modders took early notice of a few hopeful quirks:
 
- * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but they aren't fully functional, and they do not show up in character sheets under normal conditions.
- * These deprecated talents can be succesfully attached to armor pieces, which will make them visible on the character sheet as long as the armor piece stays equipped.
+ * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but they aren't fully functional, and do not show up in character sheets under normal conditions.
+ * These deprecated talents can be succesfully attached to armor pieces, which _will_ make them visible on the character sheet as long as the armor piece stays equipped.
 
 Once Larian opened up D:OS 2's localization files to modders, it was possible to take a non-functioning deprecated talent, script new effects, change it's name and description, and create something indistinguishable from a brand new talent in every respect but one very essential one: No matter how cool your new perk was, it would remain hopelessly attached to a breastplate or a pair of trousers. All you had was an armor effect on a different character sheet.
 
