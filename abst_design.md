@@ -1,6 +1,6 @@
 ### Design decisions behind Armor-Based Saving Throws
 
-Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of succeeding on a last-ditch 20% attempt to petrify some monstrosity bearing down on you, the affront of having your next turn stolen by a Hail Mary 5% charm arrow.
+Divinity: Original Sin 2's armor system took the guess-work out of setting status effects, sacrificing some of the excitement that can come from uncertainty: the elation of succeeding on a last-ditch 20% attempt to petrify some monstrosity bearing down on you, the affront of having your next turn stolen by a Hail Mary charm arrow with a 5% chance to succeed.
 
 Armor-Based Saving Throws is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Implementing a fully stat-based saving throw system would have thrown out what was great about 'health bar' armor: how it allows the player to point to a unit and know exactly how vulnerable it is; how it makes the player work for debuffs by softening up a target first. ABST retains these strengths, but turns a unit's percentage of armor remaining into their _chance_ to resist physical or magic debuffs. 
 
@@ -20,21 +20,3 @@ When Larian enabled the modding of D:OS 2's localization files, this opened the 
 A player who fails a flat 50% roll to set Chicken Form may come away resenting what RNG stole from them. A player who can emerge from Smoke (gaining advantage from Guerrilla), trigger Adrenaline, Backlash into position (gaining +5 from Sword Dancer), use Flurry (another +5 from Sword Dancer), and finish with a juiced-up Chicken Touch attempt (with advantage and a +10 bonus) is a player who was empowered to rig the numbers in their favor, who just might relish that succesful chickening all the more for it.
 
 ![Image](https://i.imgur.com/5u0llvb.jpg)
-
-### Using story code to introduce custom Talents
-
-Here's how I use story scripting to implement custom talents for a talent pack I created with another member of the D:OS 2 modding communitiy, getting around hardcoded limitations to open up new options for character builds. (Said pack has yet to be released. As of this writing, we are still squishing bugs.)
-
-Though the Divinity Engine doesn't offer any options for creating new talents, the modding community took early notice of a few hopeful quirks:
-
- * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but they aren't fully functional, and they do not show up in character sheets under normal conditions.
- * These deprecated talents can be succesfully attached to armor pieces, which will make them visible on the character sheet as long as the armor piece stays equipped.
-
-Once Larian opened up D:OS 2's localization files to modders, it was possible to take a non-functioning deprecated talent, script new effects, change it's name and description, and create something indistinguishable from a brand new talent in every respect but one very essential one: No matter how cool your new perk was, it would remain hopelessly attached to a breastplate or a pair of trousers. All you had was an armor effect on a different character sheet.
-
-There were however three underutilized armor slots that didn't show up on the character sheet, used for temporary effects granted by spells that the engine considered equipped items: the Wings slot, for Polymorph effects visible on the back; the Horns slot, for Polymorph effects shown on the head; and the Overhead slot, for the floating 'Inner Demon' visual effect. These slots weren't filled nearly as much as a players Weapon, Helmet, or Ring slots, but they were still necessary for a number of common skills, at least as they were originally coded.
-
-If polymorph skills were decoupled from their armor effects entirely, it would open these slots up as nodes for custom talents, attached to players via invisible 'armor.' To preserve the visual transformation of Polymorph skills, you could use the Transform call to have them trigger the visual transformation of these talent-granting items, which would revert to invisibility at the end of the effect. Using this method you could implement new talents with the following limitations, which we considered pretty reasonable:
-
- * These talents would have to be selected from a dialogue menu, as we were still prevented from making them show up as selectable before they were granted.
- * Players could choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots we had to work with.
