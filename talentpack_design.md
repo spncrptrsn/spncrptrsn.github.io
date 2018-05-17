@@ -1,6 +1,6 @@
 
 
-### Using story code to introduce custom Talents
+### Using story scripting to introduce the first custom talents to D:OS 2
 
 Here's how I use story scripting to implement custom talents for my upcoming talent pack, getting around hardcoded limitations that modders have lived with since D:OS1. (As of this writing, the mod is being bugtested by a few other members of the community before release next week.)
 
