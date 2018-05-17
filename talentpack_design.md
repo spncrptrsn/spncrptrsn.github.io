@@ -22,4 +22,4 @@ But if polymorph skills were decoupled from their armor effects entirely, it wou
  
 ![Image](https://i.imgur.com/miAt51k.jpg)
 
-The player's unspent talent points are checked when the dialogue triggers, and one is removed upon selection. Talent requirements are also taken into account with this method, marked by a number of temporary flags, like one would use for any quest dialogue. 
+The player's unspent talent points are checked when the dialogue triggers, and one is removed upon selection. Talent requirements are also taken into account with this method, marked by a number of temporary flags, like one would use for any quest dialogue. This requirement check triggers again after the player finishes using a respec mirror, removing the talent and refunding the point if any requiremed abilities have been removed.
