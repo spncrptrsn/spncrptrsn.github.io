@@ -4,6 +4,8 @@
 
 Here's how I use story scripting to implement custom talents for a talent pack I created with another member of the D:OS 2 modding communitiy, getting around hardcoded limitations to open up new options for character builds. (Said pack has yet to be released. As of this writing, we are still squishing bugs.)
 
+![Image](https://i.imgur.com/qgeJl1t.jpg)
+
 Though the Divinity Engine doesn't offer any options for creating new talents, the modding community took early notice of a few hopeful quirks:
 
  * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but they aren't fully functional, and they do not show up in character sheets under normal conditions.
@@ -17,3 +19,5 @@ If polymorph skills were decoupled from their armor effects entirely, it would o
 
  * These talents would have to be selected from a dialogue menu, as we were still prevented from making them show up as selectable before they were granted.
  * Players could choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots we had to work with.
+ 
+![Image](https://i.imgur.com/miAt51k.jpg)
