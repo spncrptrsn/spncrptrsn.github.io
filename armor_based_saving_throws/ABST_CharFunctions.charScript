@@ -1,0 +1,1772 @@
+#INCLUDE ABST_Notifications
+INIT
+CHARACTER:__Me
+USING ABST_Notifications
+EVENTS
+
+//===========================================================//
+//                Caster Helper Functions		            *//
+//===========================================================//
+// Because our gamescript needs to know who the caster is for any given FetchCharacterApplyStatusData.
+
+EVENT CasterStatusApplier
+ON
+	OnTimer("ApplyCasterStatus")
+ACTIONS
+	CharacterApplyStatus(__Me,CASTER_AURA)
+	CharacterApplyStatus(__Me,CASTER_NONSURFACE,1,0,__Me)
+
+EVENT CasterStatusRemover
+ON
+	OnTimer("RemoveCasterStatus")
+ACTIONS
+	CharacterRemoveStatus(__Me,CASTER_AURA,null,0)
+	CharacterRemoveStatus(__Me,CASTER_NONSURFACE,null,0)
+
+EVENT ResetSurfaceCasterOnStatusRemoved
+ON
+	OnCharacterStatusRemoved(__Me,BLIND)
+	OnCharacterStatusRemoved(__Me,SHOCKED)
+	OnCharacterStatusRemoved(__Me,OVR_SHOCKED)
+	OnCharacterStatusRemoved(__Me,STUNNED)
+	OnCharacterStatusRemoved(__Me,BURNING)
+	OnCharacterStatusRemoved(__Me,NECROFIRE)
+	OnCharacterStatusRemoved(__Me,REGENERATION)
+	OnCharacterStatusRemoved(__Me,POISONED)
+	OnCharacterStatusRemoved(__Me,DECAYING_TOUCH)
+	OnCharacterStatusRemoved(__Me,CHILLED)
+	OnCharacterStatusRemoved(__Me,OVR_CHILLED)
+	OnCharacterStatusRemoved(__Me,FROZEN)
+ACTIONS
+	CharacterRemoveStatus(__Me,CASTER_SURFACE,null,0)
+
+//===========================================================//
+//                       Talent Stuff                       *//
+//===========================================================//
+
+EVENT ArrowRecoveryOnMagicArrow
+ON
+	OnSkillCast(__Me,Projectile_CharmingArrow)
+	OnSkillCast(__Me,Projectile_SlowDownArrow)
+	OnSkillCast(__Me,Projectile_PoisonArrow)
+	OnSkillCast(__Me,Projectile_PoisonedCloudArrow)
+	OnSkillCast(__Me,Projectile_StaticCloudArrow)
+	OnSkillCast(__Me,Projectile_SteamCloudArrow)
+	OnSkillCast(__Me,Projectile_StunningArrow)
+	OnSkillCast(__Me,Projectile_CursedFireArrow)
+	OnSkillCast(__Me,Projectile_WaterArrow)
+	OnSkillCast(__Me,Projectile_FreezingArrow)
+	OnSkillCast(__Me,Projectile_ExplosionArrow)
+	OnSkillCast(__Me,Projectile_FireArrow)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,RangerLoreArrowRecover)
+	THEN
+		CharacterApplyStatus(__Me,ARROW_CHECK_MAGIC,1)
+		Set(%ScrubbedStatus,ARROW_CHECK_MAGIC)
+		StartTimer("StatusRemovalTimer",2,0)
+	ENDIF
+
+EVENT ArrowRecoveryOnPhysicalArrow
+ON
+	OnSkillCast(__Me,Projectile_KnockedOutArrow)
+	OnSkillCast(__Me,Projectile_BleedingArrow)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,RangerLoreArrowRecover)
+	THEN
+		CharacterApplyStatus(__Me,ARROW_CHECK_PHYS,1)
+		Set(%ScrubbedStatus,ARROW_CHECK_PHYS)
+		StartTimer("StatusRemovalTimer",2,0)
+	ENDIF
+
+EVENT EscapistOnShieldsUp
+ON
+	OnSkillCast(__Me,Shout_RecoverArmour)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,Escapist)
+	THEN
+		StartTimer("EscapistShieldsUpApply",1,0)
+	ENDIF
+
+EVENT EscapistShieldsUpApplier
+ON
+	OnTimer("EscapistShieldsUpApply")
+ACTIONS
+	CharacterApplyStatus(__Me,ABST_AEGIS,1)
+
+EVENT ExecutionerOnKillingBlow
+VARS
+CHARACTER:_Char
+ON
+	OnDie(__Me,_,_Char,_)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(_Char,Executioner)
+	THEN
+		CharacterApplyStatus(_Char,ABST_EXEC,1)
+	ENDIF
+
+EVENT GuerrillaOnSneakAttack
+ON
+	OnCharacterStatusRemoved(__Me,SNEAKING)
+	OnCharacterStatusRemoved(__Me,INVISIBLE)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,SurpriseAttack)
+	THEN
+		CharacterApplyStatus(__Me,ABST_GUERILLA,-1)
+		Set(%ScrubbedStatus,ABST_GUERILLA)
+		StartTimer("StatusRemovalTimer",2,0)
+	ENDIF
+
+EVENT GuerrillaOnChloroform
+// Because Chloroform doesn't break sneak
+ON
+	OnSkillCast(__Me,Projectile_Chloroform)
+ACTIONS
+	IF "c1&(c2|c3)"
+		CharacterHasTalent(__Me,SurpriseAttack)
+		CharacterHasStatus(__Me,SNEAKING)
+		CharacterHasStatus(__Me,INVISIBLE)
+	THEN
+		CharacterApplyStatus(__Me,ABST_GUERILLA,-1)
+		Set(%ScrubbedStatus,ABST_GUERILLA)
+		StartTimer("StatusRemovalTimer",3,0)
+	ENDIF
+
+EVENT IceKingOnMagus
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Projectile_StaffOfMagus)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(_Char,IceKing)
+	THEN
+		StartTimer("IceKingMagusApply",1.5,0)
+	ENDIF
+
+EVENT IceKingMagusApplier
+ON
+	OnTimer("IceKingMagusApply")
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,ABST_MISSED)
+	THEN
+		CharacterApplyStatus(__Me,ABST_MAGUS,1)
+	ENDIF
+
+EVENT MorningPersonOnResurrected
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Teleportation_ResurrectScroll)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,ResurrectToFullHealth)
+	THEN
+		StartTimer("MorningPersonsResApply",1,0)
+	ENDIF
+
+EVENT MorningPersonsResApplier
+ON
+	OnTimer("MorningPersonsResApply")
+ACTIONS
+	CharacterApplyStatus(__Me,ABST_MORNING,-1)
+
+EVENT ParryMasterOnWeaponSkill
+// This is a clumsy way of identifying weapon skills. Needs more flexibility.
+ON
+	OnSkillCast(__Me,Target_HeavyAttack)
+	OnSkillCast(__Me,Target_DualWieldingAttack)
+	OnSkillCast(__Me,Target_KneeBreaker)
+	OnSkillCast(__Me,Target_SleepingArms)
+	OnSkillCast(__Me,Target_CripplingBlow)
+	OnSkillCast(__Me,Target_Overpower)
+	OnSkillCast(__Me,Target_SerratedEdge)
+	OnSkillCast(__Me,Target_CorruptedBlade)
+	OnSkillCast(__Me,Target_TerrifyingCruelty)
+	OnSkillCast(__Me,Target_GagOrder)
+	OnSkillCast(__Me,Target_Fatality)
+	OnSkillCast(__Me,Target_Flurry)
+	OnSkillCast(__Me,Target_DaggersDrawn)
+	OnSkillCast(__Me,Cone_GroundSmash)
+	OnSkillCast(__Me,Shout_Whirlwind)
+	OnSkillCast(__Me,Rush_BatteringRam)
+	OnSkillCast(__Me,Rush_BullRush)
+	OnSkillCast(__Me,Projectile_ThrowingKnife)
+	OnSkillCast(__Me,Projectile_FanOfKnives)
+	OnSkillCast(__Me,MultiStrike_BlinkStrike)
+	OnSkillCast(__Me,MultiStrike_Vault)
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterHasSkill(__Me,Target_DualWieldingAttack)
+		IsInCombat(__Me)
+		CharacterHasTalent(__Me,DualWieldingDodging)
+	THEN
+		StartTimer("ParryMasterMomentum",1.5,0)
+	ENDIF
+
+EVENT ParryMasterMomentumApplier
+ON
+	OnTimer("ParryMasterMomentum")
+ACTIONS
+	Add(%DualCounter,1)
+	CharacterApplyStatus(__Me,ABST_DUAL5,-1)
+
+EVENT SlingshotOnFlurry
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Target_DualWieldingAttack)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(_Char,WarriorLoreGrenadeRange)
+	THEN
+		StartTimer("SlingshotFlurryApply",1.5,0)
+	ENDIF
+
+EVENT SlingshotFlurryApplier
+ON
+	OnTimer("SlingshotFlurryApply")
+ACTIONS
+	CharacterApplyStatus(__Me,ABST_FLURRY,1)
+
+EVENT SlingshotOnAllIn
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Target_HeavyAttack)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(_Char,WarriorLoreGrenadeRange)
+	THEN
+		StartTimer("SlingshotAllInApply",1.5,0)
+	ENDIF
+
+EVENT SlingshotAllInApplier
+ON
+	OnTimer("SlingshotAllInApply")
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,ABST_MISSED)
+	THEN
+		CharacterApplyStatus(__Me,ABST_ALLIN,1)
+	ENDIF
+
+EVENT SlingshotOnMagicGrenade
+ON
+	OnSkillCast(__Me,Projectile_Quest_Arx_Groom_CursedPoisonFlask)
+	OnSkillCast(__Me,Projectile_Grenade_Flashbang)
+	OnSkillCast(__Me,Projectile_Grenade_Molotov)
+	OnSkillCast(__Me,Projectile_Grenade_CursedMolotov)
+	OnSkillCast(__Me,Projectile_Grenade_Love)
+	OnSkillCast(__Me,Projectile_Grenade_MindMaggot)
+	OnSkillCast(__Me,Projectile_Grenade_PoisonFlask)
+	OnSkillCast(__Me,Projectile_Grenade_MustardGas)
+	OnSkillCast(__Me,Projectile_Grenade_CursedPoisonFlask)
+	OnSkillCast(__Me,Projectile_Grenade_Terror)
+	OnSkillCast(__Me,Projectile_Grenade_Taser)
+	OnSkillCast(__Me,Projectile_Grenade_Ice)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,WarriorLoreGrenadeRange)
+	THEN
+		CharacterApplyStatus(__Me,GRENADE_CHECK_MAGIC,1)
+		Set(%ScrubbedStatus,GRENADE_CHECK_MAGIC)
+		StartTimer("StatusRemovalTimer",2,0)
+	ENDIF
+
+EVENT SlingshotOnPhysicalGrenade
+ON
+	OnSkillCast(__Me,Projectile_Grenade_Tremor)
+	OnSkillCast(__Me,Projectile_Grenade_Nailbomb)
+	OnSkillCast(__Me,Projectile_Grenade_ChemicalWarfare)
+ACTIONS
+	IF "c1"
+		CharacterHasTalent(__Me,WarriorLoreGrenadeRange)
+	THEN
+		CharacterApplyStatus(__Me,GRENADE_CHECK_PHYS,1)
+		Set(%ScrubbedStatus,GRENADE_CHECK_PHYS)
+		StartTimer("StatusRemovalTimer",2,0)
+	ENDIF
+
+EVENT UnstableStatusAppliedScore
+ON
+	OnCharacterStatusApplied(__Me,NULL_RESISTANCE)
+	OnCharacterStatusApplied(__Me,DEAF)
+	OnCharacterStatusApplied(__Me,BLIND)
+	OnCharacterStatusApplied(__Me,MUTED)
+	OnCharacterStatusApplied(__Me,CURSED)
+	OnCharacterStatusApplied(__Me,FIREBLOOD)
+	OnCharacterStatusApplied(__Me,DISARMED)
+	OnCharacterStatusApplied(__Me,CRIPPLED)
+	OnCharacterStatusApplied(__Me,DISEASED)
+	OnCharacterStatusApplied(__Me,SHACKLES_OF_PAIN)
+	OnCharacterStatusApplied(__Me,DECAYING_TOUCH)
+	OnCharacterStatusApplied(__Me,DEMONIC_BARGAIN)
+	OnCharacterStatusApplied(__Me,OVR_INFECTIOUS_DISEASED)
+	OnCharacterStatusApplied(__Me,DAZED)
+	OnCharacterStatusApplied(__Me,SLOWED)
+	OnCharacterStatusApplied(__Me,WEAK)
+ACTIONS
+	Add(%UnstableCounter,1)
+
+EVENT UnstableStatusRemovedScore
+ON
+	OnCharacterStatusRemoved(__Me,NULL_RESISTANCE)
+	OnCharacterStatusRemoved(__Me,DEAF)
+	OnCharacterStatusRemoved(__Me,BLIND)
+	OnCharacterStatusRemoved(__Me,MUTED)
+	OnCharacterStatusRemoved(__Me,CURSED)
+	OnCharacterStatusRemoved(__Me,FIREBLOOD)
+	OnCharacterStatusRemoved(__Me,DISARMED)
+	OnCharacterStatusRemoved(__Me,CRIPPLED)
+	OnCharacterStatusRemoved(__Me,DISEASED)
+	OnCharacterStatusRemoved(__Me,SHACKLES_OF_PAIN)
+	OnCharacterStatusRemoved(__Me,DECAYING_TOUCH)
+	OnCharacterStatusRemoved(__Me,DEMONIC_BARGAIN)
+	OnCharacterStatusRemoved(__Me,OVR_INFECTIOUS_DISEASED)
+	OnCharacterStatusRemoved(__Me,DAZED)
+	OnCharacterStatusRemoved(__Me,SLOWED)
+	OnCharacterStatusRemoved(__Me,WEAK)
+ACTIONS
+	Subtract(%UnstableCounter,1)
+	
+EVENT PhysPreviewFirst
+ON
+	OnCharacterStatusApplied(__Me,ABST_PHYSPREVIEW)
+ACTIONS	
+	StartTimer("MagicPreviewTimer",.25,0)
+	
+EVENT MagicPreviewSecond	
+VARS
+CHARACTER:_Char
+ON
+	OnTimer("MagicPreviewTimer")
+ACTIONS	
+	IF "c1"
+		CharacterGetStatusSourceCharacter(__Me,ABST_PHYSPREVIEW,_Char)
+	THEN
+		CharacterApplyStatus(__Me,ABST_MAGICPREVIEW,1,0,_Char)
+	ENDIF	
+
+//===========================================================//
+//                      Misc Functions                      *//
+//===========================================================//
+
+EVENT RemoveOldShacklesSkill
+ON
+	OnSkillAdded(__Me,Target_Ovr_ShacklesOfPain,1)
+ACTIONS
+	IF "c1"
+		CharacterHasSkill(__Me,Target_ShacklesOfPain)
+	THEN
+		CharacterRemoveSkill(__Me,Target_ShacklesOfPain)
+	ENDIF
+
+EVENT RemoveOldInfectSkill
+ON
+	OnSkillAdded(__Me,Target_Ovr_Infect,1)
+ACTIONS
+	IF "c1"
+		CharacterHasSkill(__Me,Target_Infect)
+	THEN
+		CharacterRemoveSkill(__Me,Target_Infect)
+	ENDIF
+
+EVENT ShacklesOfPainHelper
+// The insane lengths we go to so a hardcoded skill can have a percent chance to apply.
+VARS
+CHARACTER:_Char
+FLOAT3:_Flut
+ON
+	OnCharacterStatusApplied(__Me,PROC_SHACKLES_OF_PAIN)
+ACTIONS
+	IF "c1"
+		CharacterGetStatusSourceCharacter(__Me,PROC_SHACKLES_OF_PAIN,_Char)
+	THEN
+		ShootLocalProjectileAt(Projectile_ShackledShot,_Char,_Flut,__Me)
+	ENDIF
+
+EVENT ABSTReverseSource
+ON
+	OnCharacterFlagCleared("ABST_HasBlessOrCurse",__Me)
+ACTIONS
+	IF "c1"
+		CharacterHasSkill(__Me,Target_Bless)
+	THEN
+		CharacterRemoveSkill(__Me,Target_Bless)
+		CharacterAddSkill(__Me,Target_Curse)
+	ELIF "c1"
+		CharacterHasSkill(__Me,Target_Curse)
+	THEN
+		CharacterRemoveSkill(__Me,Target_Curse)
+		CharacterAddSkill(__Me,Target_Bless)
+	ENDIF
+
+//===========================================================//
+//                   Status Removal Functions               *//
+//===========================================================//
+
+EVENT RemoveStatusCharacterEvent
+ON
+	OnCharacterEvent(__Me,"CharacterRemoveStatus")
+ACTIONS
+	Set(%ScrubbedStatus,%RemovedStatus)
+	StartTimer("StatusRemovalTimer",.25,0)
+
+EVENT TimedStatusRemover
+ON
+	OnTimer("StatusRemovalTimer")
+ACTIONS
+	CharacterRemoveStatus(__Me,%ScrubbedStatus,null,0)
+
+EVENT EndOfTurnStatusRemover
+ON
+	OnTimer("RemoveTalentStuff")
+ACTIONS
+	CharacterRemoveStatus(__Me,ABST_GUERILLA,null,0)
+	CharacterRemoveStatus(__Me,ABST_EXEC,null,0)
+	CharacterRemoveStatus(__Me,ABST_RUSH,null,0)
+	CharacterRemoveStatus(__Me,ABST_DUAL5,null,0)
+	CharacterRemoveStatus(__Me,ABST_DUAL10,null,0)
+	CharacterRemoveStatus(__Me,ABST_DUAL15,null,0)
+	CharacterRemoveStatus(__Me,ABST_DUAL20,null,0)
+	CharacterRemoveStatus(__Me,ABST_DUAL25,null,0)
+
+//===========================================================//
+//               Weapon Statuses Applied                    *//
+//===========================================================//
+
+EVENT WeaponBleedingAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_BLEEDING_10)
+	OnCharacterStatusApplied(__Me,WEP_BLEEDING_25)
+	OnCharacterStatusApplied(__Me,WEP_BLEEDING_50)
+	OnCharacterStatusApplied(__Me,WEP_BLEEDING_75)
+	OnCharacterStatusApplied(__Me,WEP_BLEEDING)
+ACTIONS
+	StartTimer("BleedingWeaponTimer",.25,0)
+
+EVENT WeaponBleedingAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("BleedingWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_BLEEDING_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_BLEEDING_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLEEDING_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_BLEEDING_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLEEDING_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_BLEEDING_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLEEDING_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_BLEEDING_75)
+	ELSE
+		Set(_Status,WEP_BLEEDING)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_BLEEDING,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponBlindAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_BLIND_10)
+	OnCharacterStatusApplied(__Me,WEP_BLIND_25)
+	OnCharacterStatusApplied(__Me,WEP_BLIND_50)
+	OnCharacterStatusApplied(__Me,WEP_BLIND_75)
+	OnCharacterStatusApplied(__Me,WEP_BLIND)
+ACTIONS
+	StartTimer("BlindWeaponTimer",.15,0)
+
+EVENT WeaponBlindAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("BlindWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_BLIND_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_BLIND_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLIND_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_BLIND_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLIND_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_BLIND_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BLIND_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_BLIND_75)
+	ELSE
+		Set(_Status,WEP_BLIND)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_BLIND,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponBurningAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_BURNING_10)
+	OnCharacterStatusApplied(__Me,WEP_BURNING_25)
+	OnCharacterStatusApplied(__Me,WEP_BURNING_50)
+	OnCharacterStatusApplied(__Me,WEP_BURNING_75)
+	OnCharacterStatusApplied(__Me,WEP_BURNING)
+ACTIONS
+	StartTimer("BurningWeaponTimer",.25,0)
+
+EVENT WeaponBurningAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("BurningWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_BURNING_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_BURNING_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BURNING_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_BURNING_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BURNING_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_BURNING_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_BURNING_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_BURNING_75)
+	ELSE
+		Set(_Status,WEP_BURNING)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_BURNING,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponCharmedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_CHARMED_10)
+	OnCharacterStatusApplied(__Me,WEP_CHARMED_25)
+	OnCharacterStatusApplied(__Me,WEP_CHARMED_50)
+	OnCharacterStatusApplied(__Me,WEP_CHARMED_75)
+	OnCharacterStatusApplied(__Me,WEP_CHARMED)
+ACTIONS
+	StartTimer("CharmedWeaponTimer",.45,0)
+
+EVENT WeaponCharmedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("CharmedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_CHARMED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_CHARMED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHARMED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_CHARMED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHARMED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_CHARMED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHARMED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_CHARMED_75)
+	ELSE
+		Set(_Status,WEP_CHARMED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_CHARMED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponChilledAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_CHILLED_10)
+	OnCharacterStatusApplied(__Me,WEP_CHILLED_25)
+	OnCharacterStatusApplied(__Me,WEP_CHILLED_50)
+	OnCharacterStatusApplied(__Me,WEP_CHILLED_75)
+	OnCharacterStatusApplied(__Me,WEP_CHILLED)
+ACTIONS
+	StartTimer("ChilledWeaponTimer",.35,0)
+
+EVENT WeaponChilledAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("ChilledWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_CHILLED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_CHILLED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHILLED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_CHILLED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHILLED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_CHILLED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CHILLED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_CHILLED_75)
+	ELSE
+		Set(_Status,WEP_CHILLED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_CHILLED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponCrippledAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_CRIPPLED_10)
+	OnCharacterStatusApplied(__Me,WEP_CRIPPLED_25)
+	OnCharacterStatusApplied(__Me,WEP_CRIPPLED_50)
+	OnCharacterStatusApplied(__Me,WEP_CRIPPLED_75)
+	OnCharacterStatusApplied(__Me,WEP_CRIPPLED)
+ACTIONS
+	StartTimer("CrippledWeaponTimer",.15,0)
+
+EVENT WeaponCrippledAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("CrippledWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_CRIPPLED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_CRIPPLED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CRIPPLED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_CRIPPLED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CRIPPLED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_CRIPPLED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CRIPPLED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_CRIPPLED_75)
+	ELSE
+		Set(_Status,WEP_CRIPPLED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_CRIPPLED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponCursedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_CURSED_10)
+	OnCharacterStatusApplied(__Me,WEP_CURSED_25)
+	OnCharacterStatusApplied(__Me,WEP_CURSED_50)
+	OnCharacterStatusApplied(__Me,WEP_CURSED_75)
+	OnCharacterStatusApplied(__Me,WEP_CURSED)
+ACTIONS
+	StartTimer("CursedWeaponTimer",.15,0)
+
+EVENT WeaponCursedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("CursedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_CURSED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_CURSED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CURSED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_CURSED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CURSED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_CURSED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_CURSED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_CURSED_75)
+	ELSE
+		Set(_Status,WEP_CURSED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_CURSED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponDecayingAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_DECAYING_TOUCH_10)
+	OnCharacterStatusApplied(__Me,WEP_DECAYING_TOUCH_25)
+	OnCharacterStatusApplied(__Me,WEP_DECAYING_TOUCH_50)
+	OnCharacterStatusApplied(__Me,WEP_DECAYING_TOUCH_75)
+	OnCharacterStatusApplied(__Me,WEP_DECAYING_TOUCH)
+ACTIONS
+	StartTimer("DecayingWeaponTimer",.15,0)
+
+EVENT WeaponDecayingAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("DecayingWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_DECAYING_TOUCH_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_DECAYING_TOUCH_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DECAYING_TOUCH_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_DECAYING_TOUCH_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DECAYING_TOUCH_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_DECAYING_TOUCH_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DECAYING_TOUCH_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_DECAYING_TOUCH_75)
+	ELSE
+		Set(_Status,WEP_DECAYING_TOUCH)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_DECAYING_TOUCH,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponDiseasedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_DISEASED_10)
+	OnCharacterStatusApplied(__Me,WEP_DISEASED_25)
+	OnCharacterStatusApplied(__Me,WEP_DISEASED_50)
+	OnCharacterStatusApplied(__Me,WEP_DISEASED_75)
+	OnCharacterStatusApplied(__Me,WEP_DISEASED)
+ACTIONS
+	StartTimer("DiseasedWeaponTimer",.15,0)
+
+EVENT WeaponDiseasedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("DiseasedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_DISEASED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_DISEASED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISEASED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_DISEASED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISEASED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_DISEASED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISEASED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_DISEASED_75)
+	ELSE
+		Set(_Status,WEP_DISEASED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_DISEASED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponDisarmedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_DISARMED_10)
+	OnCharacterStatusApplied(__Me,WEP_DISARMED_25)
+	OnCharacterStatusApplied(__Me,WEP_DISARMED_50)
+	OnCharacterStatusApplied(__Me,WEP_DISARMED_75)
+	OnCharacterStatusApplied(__Me,WEP_DISARMED)
+ACTIONS
+	StartTimer("DisarmedWeaponTimer",.15,0)
+
+EVENT WeaponDisarmedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("DisarmedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_DISARMED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_DISARMED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISARMED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_DISARMED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISARMED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_DISARMED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_DISARMED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_DISARMED_75)
+	ELSE
+		Set(_Status,WEP_DISARMED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,DISARMED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponFearAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_FEAR_10)
+	OnCharacterStatusApplied(__Me,WEP_FEAR_25)
+	OnCharacterStatusApplied(__Me,WEP_FEAR_50)
+	OnCharacterStatusApplied(__Me,WEP_FEAR_75)
+	OnCharacterStatusApplied(__Me,WEP_FEAR)
+ACTIONS
+	StartTimer("FearWeaponTimer",.45,0)
+
+EVENT WeaponFearAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("FearWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_FEAR_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_FEAR_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FEAR_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_FEAR_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FEAR_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_FEAR_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FEAR_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_FEAR_75)
+	ELSE
+		Set(_Status,WEP_FEAR)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_FEAR,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponFrozenAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_FROZEN_10)
+	OnCharacterStatusApplied(__Me,WEP_FROZEN_25)
+	OnCharacterStatusApplied(__Me,WEP_FROZEN_50)
+	OnCharacterStatusApplied(__Me,WEP_FROZEN_75)
+	OnCharacterStatusApplied(__Me,WEP_FROZEN)
+ACTIONS
+	StartTimer("FrozenWeaponTimer",.45,0)
+
+EVENT WeaponFrozenAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("FrozenWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_FROZEN_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_FROZEN_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FROZEN_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_FROZEN_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FROZEN_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_FROZEN_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_FROZEN_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_FROZEN_75)
+	ELSE
+		Set(_Status,WEP_FROZEN)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_FROZEN,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponInfectAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_INFECTIOUS_DISEASED_10)
+	OnCharacterStatusApplied(__Me,WEP_INFECTIOUS_DISEASED_25)
+	OnCharacterStatusApplied(__Me,WEP_INFECTIOUS_DISEASED_50)
+	OnCharacterStatusApplied(__Me,WEP_INFECTIOUS_DISEASED_75)
+	OnCharacterStatusApplied(__Me,WEP_INFECTIOUS_DISEASED)
+ACTIONS
+	StartTimer("InfectWeaponTimer",.15,0)
+
+EVENT WeaponInfectAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("InfectWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_INFECTIOUS_DISEASED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_INFECTIOUS_DISEASED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_INFECTIOUS_DISEASED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_INFECTIOUS_DISEASED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_INFECTIOUS_DISEASED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_INFECTIOUS_DISEASED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_INFECTIOUS_DISEASED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_INFECTIOUS_DISEASED_75)
+	ELSE
+		Set(_Status,WEP_INFECTIOUS_DISEASED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_INFECTIOUS_DISEASED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponKnockedDownAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_KNOCKED_DOWN_10)
+	OnCharacterStatusApplied(__Me,WEP_KNOCKED_DOWN_25)
+	OnCharacterStatusApplied(__Me,WEP_KNOCKED_DOWN_50)
+	OnCharacterStatusApplied(__Me,WEP_KNOCKED_DOWN_75)
+	OnCharacterStatusApplied(__Me,WEP_KNOCKED_DOWN)
+ACTIONS
+	StartTimer("KnockedDownWeaponTimer",.45,0)
+
+EVENT WeaponKnockedDownAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("KnockedDownWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_KNOCKED_DOWN_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_KNOCKED_DOWN_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_KNOCKED_DOWN_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_KNOCKED_DOWN_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_KNOCKED_DOWN_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_KNOCKED_DOWN_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_KNOCKED_DOWN_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_KNOCKED_DOWN_75)
+	ELSE
+		Set(_Status,WEP_KNOCKED_DOWN)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_KNOCKED_DOWN,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponMutedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_MUTED_10)
+	OnCharacterStatusApplied(__Me,WEP_MUTED_25)
+	OnCharacterStatusApplied(__Me,WEP_MUTED_50)
+	OnCharacterStatusApplied(__Me,WEP_MUTED_75)
+	OnCharacterStatusApplied(__Me,WEP_MUTED)
+ACTIONS
+	StartTimer("MutedWeaponTimer",.15,0)
+
+EVENT WeaponMutedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("MutedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_MUTED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_MUTED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_MUTED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_MUTED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_MUTED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_MUTED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_MUTED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_MUTED_75)
+	ELSE
+		Set(_Status,WEP_MUTED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_MUTED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponNecrofireAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_NECROFIRE_10)
+	OnCharacterStatusApplied(__Me,WEP_NECROFIRE_25)
+	OnCharacterStatusApplied(__Me,WEP_NECROFIRE_50)
+	OnCharacterStatusApplied(__Me,WEP_NECROFIRE_75)
+	OnCharacterStatusApplied(__Me,WEP_NECROFIRE)
+ACTIONS
+	StartTimer("NecrofireWeaponTimer",.25,0)
+
+EVENT WeaponNecrofireAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("NecrofireWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_NECROFIRE_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_NECROFIRE_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_NECROFIRE_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_NECROFIRE_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_NECROFIRE_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_NECROFIRE_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_NECROFIRE_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_NECROFIRE_75)
+	ELSE
+		Set(_Status,WEP_NECROFIRE)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_NECROFIRE,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponPetrifiedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_PETRIFIED_10)
+	OnCharacterStatusApplied(__Me,WEP_PETRIFIED_25)
+	OnCharacterStatusApplied(__Me,WEP_PETRIFIED_50)
+	OnCharacterStatusApplied(__Me,WEP_PETRIFIED_75)
+	OnCharacterStatusApplied(__Me,WEP_PETRIFIED)
+ACTIONS
+	StartTimer("PetrifiedWeaponTimer",.45,0)
+
+EVENT WeaponPetrifiedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("PetrifiedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_PETRIFIED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_PETRIFIED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_PETRIFIED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_PETRIFIED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_PETRIFIED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_PETRIFIED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_PETRIFIED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_PETRIFIED_75)
+	ELSE
+		Set(_Status,WEP_PETRIFIED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_PETRIFIED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponPoisonedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_POISONED_10)
+	OnCharacterStatusApplied(__Me,WEP_POISONED_25)
+	OnCharacterStatusApplied(__Me,WEP_POISONED_50)
+	OnCharacterStatusApplied(__Me,WEP_POISONED_75)
+	OnCharacterStatusApplied(__Me,WEP_POISONED)
+ACTIONS
+	StartTimer("POISONEDWeaponTimer",.25,0)
+
+EVENT WeaponPoisonedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("POISONEDWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_POISONED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_POISONED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_POISONED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_POISONED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_POISONED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_POISONED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_POISONED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_POISONED_75)
+	ELSE
+		Set(_Status,WEP_POISONED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_POISONED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponShockedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_SHOCKED_10)
+	OnCharacterStatusApplied(__Me,WEP_SHOCKED_25)
+	OnCharacterStatusApplied(__Me,WEP_SHOCKED_50)
+	OnCharacterStatusApplied(__Me,WEP_SHOCKED_75)
+	OnCharacterStatusApplied(__Me,WEP_SHOCKED)
+ACTIONS
+	StartTimer("ShockedWeaponTimer",.35,0)
+
+EVENT WeaponShockedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("ShockedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_SHOCKED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_SHOCKED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SHOCKED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_SHOCKED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SHOCKED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_SHOCKED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SHOCKED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_SHOCKED_75)
+	ELSE
+		Set(_Status,WEP_SHOCKED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_SHOCKED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponSleepingAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_SLEEPING_10)
+	OnCharacterStatusApplied(__Me,WEP_SLEEPING_25)
+	OnCharacterStatusApplied(__Me,WEP_SLEEPING_50)
+	OnCharacterStatusApplied(__Me,WEP_SLEEPING_75)
+	OnCharacterStatusApplied(__Me,WEP_SLEEPING)
+ACTIONS
+	StartTimer("SleepingWeaponTimer",.45,0)
+
+EVENT WeaponSleepingAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("SleepingWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_SLEEPING_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_SLEEPING_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLEEPING_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_SLEEPING_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLEEPING_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_SLEEPING_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLEEPING_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_SLEEPING_75)
+	ELSE
+		Set(_Status,WEP_SLEEPING)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_SLEEPING,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponSlowedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_SLOWED_10)
+	OnCharacterStatusApplied(__Me,WEP_SLOWED_25)
+	OnCharacterStatusApplied(__Me,WEP_SLOWED_50)
+	OnCharacterStatusApplied(__Me,WEP_SLOWED_75)
+	OnCharacterStatusApplied(__Me,WEP_SLOWED)
+ACTIONS
+	StartTimer("SlowedWeaponTimer",.15,0)
+
+EVENT WeaponSlowedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("SlowedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_SLOWED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_SLOWED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLOWED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_SLOWED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLOWED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_SLOWED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_SLOWED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_SLOWED_75)
+	ELSE
+		Set(_Status,WEP_SLOWED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_SLOWED,_Turns,0,_Char)
+	ENDIF
+
+EVENT WeaponStunnedAppliedCheck
+ON
+	OnCharacterStatusApplied(__Me,WEP_STUNNED_10)
+	OnCharacterStatusApplied(__Me,WEP_STUNNED_25)
+	OnCharacterStatusApplied(__Me,WEP_STUNNED_50)
+	OnCharacterStatusApplied(__Me,WEP_STUNNED_75)
+	OnCharacterStatusApplied(__Me,WEP_STUNNED)
+ACTIONS
+	StartTimer("StunnedWeaponTimer",.45,0)
+
+EVENT WeaponStunnedAppliedTimer
+VARS
+CHARACTER:_Char
+INT:_Turns
+STATUS:_Status
+ON
+	OnTimer("StunnedWeaponTimer")
+ACTIONS
+	Set(%WeaponStatus,1)
+	IF "c1"
+		CharacterHasStatus(__Me,WEP_STUNNED_10)
+	THEN
+		Set(%HighestRoll,20)
+		Set(_Status,WEP_STUNNED_10)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_STUNNED_25)
+	THEN
+		Set(%HighestRoll,40)
+		Set(_Status,WEP_STUNNED_25)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_STUNNED_50)
+	THEN
+		Set(%HighestRoll,60)
+		Set(_Status,WEP_STUNNED_50)
+	ELIF "c1"
+		CharacterHasStatus(__Me,WEP_STUNNED_75)
+	THEN
+		Set(%HighestRoll,80)
+		Set(_Status,WEP_STUNNED_75)
+	ELSE
+		Set(_Status,WEP_STUNNED)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,_Status,_Char)
+		GetStatusTurns(__Me,_Status,_Turns)
+	THEN
+		Set(%ScrubbedStatus,_Status)
+		StartTimer("StatusRemovalTimer",.4,0)
+		CharacterApplyStatus(__Me,OVR_STUNNED,_Turns,0,_Char)
+	ENDIF
+
+//===========================================================//
+//                  Contact Status Functions                *//
+//===========================================================//
+
+EVENT SkillContactStatus
+// Another rather clunky weapon skill catcher.
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Target_HeavyAttack)
+	OnCharacterUsedSkillOnMe(_Char,Target_DualWieldingAttack)
+	OnCharacterUsedSkillOnMe(_Char,Target_KneeBreaker)
+	OnCharacterUsedSkillOnMe(_Char,Target_SleepingArms)
+	OnCharacterUsedSkillOnMe(_Char,Target_CripplingBlow)
+	OnCharacterUsedSkillOnMe(_Char,Target_Overpower)
+	OnCharacterUsedSkillOnMe(_Char,Target_SerratedEdge)
+	OnCharacterUsedSkillOnMe(_Char,Target_CorruptedBlade)
+	OnCharacterUsedSkillOnMe(_Char,Target_TerrifyingCruelty)
+	OnCharacterUsedSkillOnMe(_Char,Target_GagOrder)
+	OnCharacterUsedSkillOnMe(_Char,Target_Fatality)
+	OnCharacterUsedSkillOnMe(_Char,Target_Flurry)
+	OnCharacterUsedSkillOnMe(_Char,Target_DaggersDrawn)
+	OnCharacterUsedSkillOnMe(_Char,Cone_GroundSmash)
+	OnCharacterUsedSkillOnMe(_Char,Shout_Whirlwind)
+	OnCharacterUsedSkillOnMe(_Char,Rush_BatteringRam)
+	OnCharacterUsedSkillOnMe(_Char,Rush_BullRush)
+	OnCharacterUsedSkillOnMe(_Char,MultiStrike_BlinkStrike)
+	OnCharacterUsedSkillOnMe(_Char,MultiStrike_Vault)
+ACTIONS
+	Set(%Contacted,_Char)
+	Set(%ContactCaster,__Me)
+	CallFunction("ContactFunction")
+
+EVENT ContactFunctionCalled
+ON
+	OnFunction("ContactFunction")
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(%ContactCaster,CONTACT_CHILLED)
+	THEN
+		Set(%ContactStatus,OVR_CHILLED)
+		StartTimer("ContactedStatTimer",1.0,0)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%ContactCaster,CONTACT_STUNNED)
+	THEN
+		Set(%ContactStatus,OVR_STUNNED)
+		StartTimer("ContactedStatTimer",1.0,0)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%ContactCaster,CONTACT_BURNING)
+	THEN
+		Set(%ContactStatus,OVR_BURNING)
+		StartTimer("ContactedStatTimer",1.0,0)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%ContactCaster,CONTACT_POISONED)
+	THEN
+		Set(%ContactStatus,OVR_POISONED)
+		StartTimer("ContactedStatTimer",1.0,0)
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%ContactCaster,CONTACT_FROZEN)
+	THEN
+		Set(%ContactStatus,OVR_FROZEN)
+		StartTimer("ContactedStatTimer",1.0,0)
+	ENDIF
+
+EVENT ContactStatusTimer
+ON
+	OnTimer("ContactStatTimer")
+ACTIONS
+	CharacterApplyStatus(%Contacted,CASTER_NONSURFACE,1,0,%ContactCaster)
+	CharacterApplyStatus(%Contacted,%ContactStatus,1,0,%ContactCaster)
+
+//===========================================================//
+//                Optional Tactician Functions              *//
+//===========================================================//
+
+EVENT RallyCharRemoveFrozen
+ON
+	OnCharacterStatusRemoved(__Me, FROZEN)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_FROZEN, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_FROZEN, 3)
+		ENDIF
+	ENDIF
+
+EVENT RallyCharRemoveStunned
+ON
+	OnCharacterStatusRemoved(__Me, STUNNED)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_STUNNED, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_STUNNED, 3)
+		ENDIF
+	ENDIF
+
+EVENT RallyCharRemovePetrified
+ON
+	OnCharacterStatusRemoved(__Me, PETRIFIED)
+	OnCharacterStatusRemoved(__Me, CHICKEN)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_PETRIFIED, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_PETRIFIED, 3)
+		ENDIF
+	ENDIF
+
+EVENT RallyCharRemoveKnockedDown
+ON
+	OnCharacterStatusRemoved(__Me, KNOCKED_DOWN)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_KNOCKED_DOWN, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_KNOCKED_DOWN, 3)
+		ENDIF
+	ENDIF
+
+EVENT RallyCharRemoveSleeping
+ON
+	OnCharacterStatusRemoved(__Me, SLEEPING)
+	OnCharacterStatusRemoved(__Me, FEAR)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_SLEEP, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_SLEEP, 3)
+		ENDIF
+	ENDIF
+
+EVENT RallyCharRemoveCharmed
+ON
+	OnCharacterStatusRemoved(__Me, CHARMED)
+	OnCharacterStatusRemoved(__Me, MADNESS)
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("ABST_Rally")
+	THEN
+		IF "!c1&!c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_CHARMED, 2)
+		ENDIF
+		IF "!c1&c2"
+			CharacterIsInParty(__Me)
+			CharacterHasTalent(__Me,WalkItOff)
+		THEN
+			CharacterApplyStatus(__Me, RALLY_CHARMED, 3)
+		ENDIF
+	ENDIF
