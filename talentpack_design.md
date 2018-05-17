@@ -21,3 +21,5 @@ But if polymorph skills were decoupled from their armor effects entirely, it wou
  * Players can choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots I had to work with.
  
 ![Image](https://i.imgur.com/miAt51k.jpg)
+
+Talent requirements are taken into account by checking the players abilities when the dialogue triggers, and granting them a number of temporary flags, like one would use for any quest dialogue. 
