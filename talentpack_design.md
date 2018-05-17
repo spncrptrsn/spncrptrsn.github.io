@@ -15,9 +15,9 @@ Once Larian opened up D:OS 2's localization files to modders, it was possible to
 
 However, there were three underutilized armor slots that did not show up on the character sheet, used for temporary effects granted by spells that the engine considered equipped items: the Wings slot, for Polymorph effects visible on the back; the Horns slot, for Polymorph effects shown on the head; and the Overhead slot, for the floating 'Inner Demon' visual effect. Though these slots weren't filled nearly as much as a players Weapon, Helmet, or Ring slots—making them potential platforms for adding armor-attached mods without taking up one of the players _real_ armor slots—they were still necessary for a number of common skills, at least as they were originally coded.
 
-If polymorph skills were decoupled from their armor effects entirely, it would open these slots up as nodes for custom talents, attached to players via invisible 'armor.' To preserve the visual transformation of Polymorph skills, you could use the Transform call to have them trigger the visual transformation of these talent-granting items, which would revert to invisibility at the end of the effect. Using this method you could implement new talents with the following limitations, which we considered pretty reasonable:
+But if polymorph skills were decoupled from their armor effects entirely, it would open these slots up as nodes for custom talents, attached to players via invisible 'armor.' To preserve the visual effects of Polymorph skills, one could use the Transform call to have them trigger the superficial transformation of these hidden talent-granting items, which would revert to invisibility at the end of the effect. I used this method to implement new talents with the following limitations:
 
- * These talents would have to be selected from a dialogue menu, as we were still prevented from making them show up as selectable before they were granted.
- * Players could choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots we had to work with.
+ * Because these talents were still prevented from being displayed on the character's list of greyed-out potential talents, they would have to be selected from a dialogue menu.
+ * Players can choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots I had to work with.
  
 ![Image](https://i.imgur.com/miAt51k.jpg)
