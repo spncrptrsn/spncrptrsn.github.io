@@ -4,7 +4,8 @@ Divinity: Original Sin 2's armor system took the guess-work out of setting statu
 
 [Armor-Based Saving Throws](https://steamcommunity.com/sharedfiles/filedetails/?id=1157299447) is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Implementing a fully stat-based saving throw system would have thrown out what was great about 'health bar' armor: how it allows the player to point to a unit and know exactly how vulnerable it is; how it makes the player work for debuffs by softening up a target first. ABST retains these strengths, but turns a unit's percentage of armor remaining into their _chance_ to resist physical or magic debuffs. 
 
-This is accomplished with scripting, by altering instances of the FetchCharacterApplyStatusData event, which filters incoming status effects before they are resolved on targets. Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
+This is accomplished with scripting, by altering instances of the FetchCharacterApplyStatusData event, which filters incoming status effects before they are resolved on targets. 
+
 ```
 EVENT ABSTCharacterSetChilled
 VARS
@@ -60,6 +61,8 @@ ACTIONS
 	Set(%DuckFlag,0)
 	RETURN(_RemoveList,_Result,null)
   ```
+  
+Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
 
 ![Image](https://i.imgur.com/LREhPza.jpg)
 
