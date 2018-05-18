@@ -24,71 +24,50 @@ KBSECTION
 //===========================================================//
 
 IF
-	GameStarted(_Level, _)
+GameStarted(_Level, _)
 AND
-	IsCharacterCreationLevel(_Level, 0)
+IsCharacterCreationLevel(_Level, 0)
 AND
-	NOT GlobalGetFlag("MT_Initialized", 1)
+NOT GlobalGetFlag("MT_Initialized", 1)
 THEN
-	TimerLaunch("MT_InitializationDelay", 100);
+TimerLaunch("MT_InitializationDelay", 100);
 
 IF
-	TimerFinished("MT_InitializationDelay")
+TimerFinished("MT_InitializationDelay")
 THEN
-	IterateParties("MT_EditorChecks");
+IterateParties("MT_EditorChecks");
 
 IF
-	StoryEvent((CHARACTERGUID)_Char, "MT_EditorChecks")
+StoryEvent((CHARACTERGUID)_Char, "MT_EditorChecks")
 THEN
-	PROC_MT_AddPlaceholders(_Char);
-	PROC_MT_AddTestingSkills(_Char);
-	GlobalSetFlag("MT_Initialized");
+PROC_MT_AddPlaceholders(_Char);
+PROC_MT_AddTestingSkills(_Char);
+GlobalSetFlag("MT_Initialized");
 
 IF
-	CharacterJoinedParty(_Char)
+CharacterJoinedParty(_Char)
 AND
-	DB_IsPlayer(_Char)
+DB_IsPlayer(_Char)
 AND
-	CharacterIsSummon(_Char, 0)
+CharacterIsSummon(_Char, 0)
 THEN
-	PROC_MT_AddPlaceholders(_Char);
+PROC_MT_AddPlaceholders(_Char);
 
 PROC
-	PROC_MT_AddPlaceholders((CHARACTERGUID)_Char)
+PROC_MT_AddPlaceholders((CHARACTERGUID)_Char)
 AND
-	ObjectGetFlag(_Char, "MT_NoTalents", 0)
+ObjectGetFlag(_Char, "MT_NoTalents", 0)
 AND
-	ObjectGetFlag(_Char, "MT_OneTalent", 0)
+ObjectGetFlag(_Char, "MT_OneTalent", 0)
 AND
-	ObjectGetFlag(_Char, "MT_TwoTalents", 0)
+ObjectGetFlag(_Char, "MT_TwoTalents", 0)
 AND
-	ObjectGetFlag(_Char, "MT_ThreeTalents", 0)
+ObjectGetFlag(_Char, "MT_ThreeTalents", 0)
 THEN
-	ItemTemplateAddTo("MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae",_Char,1,0);
-	ItemTemplateAddTo("MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004",_Char,1,0);
-	ItemTemplateAddTo("MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62",_Char,1,0);
-	ObjectSetFlag(_Char,"MT_NoTalents");
-
-PROC
-	PROC_MT_AddTestingSkills((CHARACTERGUID)_Char)
-THEN
-	CharacterAddAbility(_Char,"Polymorph",2);
-	CharacterAddAbility(_Char,"Summoning",2);
-	CharacterAddAbility(_Char,"EarthSpecialist",2);
-	CharacterAddAbility(_Char,"AirSpecialist",2);
-	CharacterAddSourcePoints(_Char,1);
-	CharacterAddTalentPoint(_Char,3);
-	CharacterAddSkill(_Char,"Shout_SpiderLegs");
-	CharacterAddSkill(_Char,"Shout_Wings");
-	CharacterAddSkill(_Char,"Shout_BullHorns");
-	CharacterAddSkill(_Char,"Shout_MedusaHead");
-	CharacterAddSkill(_Char,"Shout_InnerDemon");
-	CharacterAddSkill(_Char,"Summon_Condor");
-	CharacterAddSkill(_Char,"Summon_Cat");
-	CharacterAddSkill(_Char,"Summon_Incarnate");
-	CharacterAddSkill(_Char,"Projectile_PoisonDartStart");
-	CharacterAddSkill(_Char,"Target_EvasiveManeuver");
-	CharacterAddAbility(_Char,"Leadership",1);
+ItemTemplateAddTo("MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae",_Char,1,0);
+ItemTemplateAddTo("MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004",_Char,1,0);
+ItemTemplateAddTo("MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62",_Char,1,0);
+ObjectSetFlag(_Char,"MT_NoTalents");
 
 IF
 ItemTemplateAddedToCharacter(MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae,_Wings,_Char)
@@ -133,235 +112,235 @@ ObjectSetFlag(_Char,"MT_HasPoint");
 //===========================================================//
 
 IF
-	ObjectFlagSet(_Flag, (CHARACTERGUID)_Char, _)
+ObjectFlagSet(_Flag, (CHARACTERGUID)_Char, _)
 AND
-	QRY_MT_GetItem(_Char, _Flag)
+QRY_MT_GetItem(_Char, _Flag)
 AND
-	DB_MT_ItemEquipped(_Char, _Item, _Template)
+DB_MT_ItemEquipped(_Char, _Item, _Template)
 AND
-	DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer)
+DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer)
 AND
-	DB_MT_FlagTimer(_Char, _FlagTimer)
+DB_MT_FlagTimer(_Char, _FlagTimer)
 THEN
-	Transform(_Item, _Template, 0, 1, 1);
-	CharacterAddTalentPoint(_Char, -1);
-	TimerLaunch(_FlagTimer, 500);
-	CharacterUnequipItem(_Char, (ITEMGUID)_Item);
-	TimerLaunch(_ItemTimer, 500);
-	CharacterAddTalent(_Char, _Talent);
-	NOT DB_MT_ItemEquipped(_Char, _Item, _Template);
-	NOT DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
+Transform(_Item, _Template, 0, 1, 1);
+CharacterAddTalentPoint(_Char, -1);
+TimerLaunch(_FlagTimer, 500);
+CharacterUnequipItem(_Char, (ITEMGUID)_Item);
+TimerLaunch(_ItemTimer, 500);
+CharacterAddTalent(_Char, _Talent);
+NOT DB_MT_ItemEquipped(_Char, _Item, _Template);
+NOT DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
 
 QRY
-	QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
+QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
 AND
-	ObjectGetFlag(_Char, "MT_NoTalents", 1)
+ObjectGetFlag(_Char, "MT_NoTalents", 1)
 AND
-	DB_MT_Equipped_Wings(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Wings(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_TalentFlags(_Flag, _Template, _, _, _Talent)
+DB_MT_TalentFlags(_Flag, _Template, _, _, _Talent)
 AND
-	GetUUID(_Char, _UUID)
+GetUUID(_Char, _UUID)
 AND
-	StringConcatenate("MT_NoToOne_", _UUID, _FlagTimer)
+StringConcatenate("MT_NoToOne_", _UUID, _FlagTimer)
 THEN
-	DB_MT_ItemEquipped(_Char, _Item, _Template);
-	DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
-	DB_MT_FlagTimer(_Char, _FlagTimer);
+DB_MT_ItemEquipped(_Char, _Item, _Template);
+DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
+DB_MT_FlagTimer(_Char, _FlagTimer);
 
 QRY
-	QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
+QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
 AND
-	ObjectGetFlag(_Char, "MT_OneTalent", 1)
+ObjectGetFlag(_Char, "MT_OneTalent", 1)
 AND
-	DB_MT_Equipped_Horns(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Horns(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_TalentFlags(_Flag, _, _Template, _, _Talent)
+DB_MT_TalentFlags(_Flag, _, _Template, _, _Talent)
 AND
-	GetUUID(_Char, _UUID)
+GetUUID(_Char, _UUID)
 AND
-	StringConcatenate("MT_OneToTwo_", _UUID, _FlagTimer)
+StringConcatenate("MT_OneToTwo_", _UUID, _FlagTimer)
 THEN
-	DB_MT_ItemEquipped(_Char, _Item, _Template);
-	DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
-	DB_MT_FlagTimer(_Char, _FlagTimer);
+DB_MT_ItemEquipped(_Char, _Item, _Template);
+DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
+DB_MT_FlagTimer(_Char, _FlagTimer);
 
 QRY
-	QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
+QRY_MT_GetItem((CHARACTERGUID)_Char, (STRING)_Flag)
 AND
-	ObjectGetFlag(_Char, "MT_TwoTalents", 1)
+ObjectGetFlag(_Char, "MT_TwoTalents", 1)
 AND
-	DB_MT_Equipped_Overhead(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Overhead(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_TalentFlags(_Flag, _, _, _Template, _Talent)
+DB_MT_TalentFlags(_Flag, _, _, _Template, _Talent)
 AND
-	GetUUID(_Char, _UUID)
+GetUUID(_Char, _UUID)
 AND
-	StringConcatenate("MT_TwoToThree_", _UUID, _FlagTimer)
+StringConcatenate("MT_TwoToThree_", _UUID, _FlagTimer)
 THEN
-	DB_MT_ItemEquipped(_Char, _Item, _Template);
-	DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
-	DB_MT_FlagTimer(_Char, _FlagTimer);
+DB_MT_ItemEquipped(_Char, _Item, _Template);
+DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
+DB_MT_FlagTimer(_Char, _FlagTimer);
 
 //===========================================================//
 //                     Removing Talents                     *//
 //===========================================================//
 
 IF
-	ObjectFlagSet("MT_RefundTalents", (CHARACTERGUID)_Char, _ID)
+ObjectFlagSet("MT_RefundTalents", (CHARACTERGUID)_Char, _ID)
 AND
-	QRY_MT_NumberOfTalents(_Char)
+QRY_MT_NumberOfTalents(_Char)
 AND
-	DB_MT_RefundTalentPoint(_Char, _Points)
+DB_MT_RefundTalentPoint(_Char, _Points)
 AND
-	GetUUID(_Char, _UUID)
+GetUUID(_Char, _UUID)
 AND
-	StringConcatenate("MT_AnyToNone_", _UUID, _FlagTimer)
+StringConcatenate("MT_AnyToNone_", _UUID, _FlagTimer)
 THEN
-	PROC_MT_RemoveTalents(_Char);
-	PROC_MT_TransformItems(_Char);
-	CharacterAddTalentPoint(_Char, _Points);
-	DB_MT_FlagTimer(_Char, _FlagTimer);
-	TimerLaunch(_FlagTimer, 500);
-	NOT DB_MT_RefundTalentPoint(_Char, _Points);
-	ObjectClearFlag(_Char, "MT_RefundTalents");
+PROC_MT_RemoveTalents(_Char);
+PROC_MT_TransformItems(_Char);
+CharacterAddTalentPoint(_Char, _Points);
+DB_MT_FlagTimer(_Char, _FlagTimer);
+TimerLaunch(_FlagTimer, 500);
+NOT DB_MT_RefundTalentPoint(_Char, _Points);
+ObjectClearFlag(_Char, "MT_RefundTalents");
 	
 PROC
-	PROC_MT_RemoveTalents((CHARACTERGUID)_Char)
+PROC_MT_RemoveTalents((CHARACTERGUID)_Char)
 AND
-	DB_MT_TalentFlags(_Flag, _, _, _, _Talent)
+DB_MT_TalentFlags(_Flag, _, _, _, _Talent)
 THEN
-	CharacterRemoveTalent(_Char, _Talent);
-	ObjectClearFlag(_Char, _Flag);
+CharacterRemoveTalent(_Char, _Talent);
+ObjectClearFlag(_Char, _Flag);
 
 PROC
-	PROC_MT_TransformItems((CHARACTERGUID)_Char)
+PROC_MT_TransformItems((CHARACTERGUID)_Char)
 AND
-	DB_MT_Equipped_Wings(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Wings(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_BlankItems("Wings", _Template)
+DB_MT_BlankItems("Wings", _Template)
 THEN
-	Transform(_Item, _Template, 0, 1, 1);
-	CharacterUnequipItem(_Char, _Item);
-	TimerLaunch(_ItemTimer, 500);
+Transform(_Item, _Template, 0, 1, 1);
+CharacterUnequipItem(_Char, _Item);
+TimerLaunch(_ItemTimer, 500);
 
 PROC
-	PROC_MT_TransformItems((CHARACTERGUID)_Char)
+PROC_MT_TransformItems((CHARACTERGUID)_Char)
 AND
-	DB_MT_Equipped_Horns(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Horns(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_BlankItems("Horns", _Template)
+DB_MT_BlankItems("Horns", _Template)
 THEN
-	Transform(_Item, _Template, 0, 1, 1);
-	CharacterUnequipItem(_Char, _Item);
-	TimerLaunch(_ItemTimer, 500);
+Transform(_Item, _Template, 0, 1, 1);
+CharacterUnequipItem(_Char, _Item);
+TimerLaunch(_ItemTimer, 500);
 
 PROC
-	PROC_MT_TransformItems((CHARACTERGUID)_Char)
+PROC_MT_TransformItems((CHARACTERGUID)_Char)
 AND
-	DB_MT_Equipped_Overhead(_Char, _Item, _ItemTimer)
+DB_MT_Equipped_Overhead(_Char, _Item, _ItemTimer)
 AND
-	DB_MT_BlankItems("Overhead", _Template)
+DB_MT_BlankItems("Overhead", _Template)
 THEN
-	Transform(_Item, _Template, 0, 1, 1);
-	CharacterUnequipItem(_Char, _Item);
-	TimerLaunch(_ItemTimer, 500);
+Transform(_Item, _Template, 0, 1, 1);
+CharacterUnequipItem(_Char, _Item);
+TimerLaunch(_ItemTimer, 500);
 	
 QRY
-	QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
+QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
 AND
-	ObjectGetFlag(_Char, "MT_OneTalent", 1)
+ObjectGetFlag(_Char, "MT_OneTalent", 1)
 THEN
-	DB_MT_RefundTalentPoint(_Char, 1);
+DB_MT_RefundTalentPoint(_Char, 1);
 
 QRY
-	QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
+QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
 AND
-	ObjectGetFlag(_Char, "MT_TwoTalents", 1)
+ObjectGetFlag(_Char, "MT_TwoTalents", 1)
 THEN
-	DB_MT_RefundTalentPoint(_Char, 2);
+DB_MT_RefundTalentPoint(_Char, 2);
 
 QRY
-	QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
+QRY_MT_NumberOfTalents((CHARACTERGUID)_Char)
 AND
-	ObjectGetFlag(_Char, "MT_ThreeTalents", 1)
+ObjectGetFlag(_Char, "MT_ThreeTalents", 1)
 THEN
-	DB_MT_RefundTalentPoint(_Char, 3);
+DB_MT_RefundTalentPoint(_Char, 3);
 
 //===========================================================//
 //                      Flag Timers                         *//
 //===========================================================//
 
 IF
-	TimerFinished(_FlagTimer)
+TimerFinished(_FlagTimer)
 AND
-	DB_MT_FlagTimer(_Char, _FlagTimer)
+DB_MT_FlagTimer(_Char, _FlagTimer)
 AND
-	StringContains(_FlagTimer, "MT_NoToOne", 1)
+StringContains(_FlagTimer, "MT_NoToOne", 1)
 THEN
-	ObjectClearFlag(_Char,"MT_NoTalents");
-	ObjectSetFlag(_Char,"MT_OneTalent");
-	NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
+ObjectClearFlag(_Char,"MT_NoTalents");
+ObjectSetFlag(_Char,"MT_OneTalent");
+NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
 
 IF
-	TimerFinished(_FlagTimer)
+TimerFinished(_FlagTimer)
 AND
-	DB_MT_FlagTimer(_Char, _FlagTimer)
+DB_MT_FlagTimer(_Char, _FlagTimer)
 AND
-	StringContains(_FlagTimer, "MT_OneToTwo", 1)
+StringContains(_FlagTimer, "MT_OneToTwo", 1)
 THEN
-	ObjectClearFlag(_Char,"MT_OneTalent");
-	ObjectSetFlag(_Char,"MT_TwoTalents");
-	NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
+ObjectClearFlag(_Char,"MT_OneTalent");
+ObjectSetFlag(_Char,"MT_TwoTalents");
+NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
 
 IF
-	TimerFinished(_FlagTimer)
+TimerFinished(_FlagTimer)
 AND
-	DB_MT_FlagTimer(_Char, _FlagTimer)
+DB_MT_FlagTimer(_Char, _FlagTimer)
 AND
-	StringContains(_FlagTimer, "MT_TwoToThree", 1)
+StringContains(_FlagTimer, "MT_TwoToThree", 1)
 THEN
-	ObjectClearFlag(_Char,"MT_TwoTalents");
-	ObjectSetFlag(_Char,"MT_ThreeTalents");
-	NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
+ObjectClearFlag(_Char,"MT_TwoTalents");
+ObjectSetFlag(_Char,"MT_ThreeTalents");
+NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
 
 IF
-	TimerFinished(_FlagTimer)
+TimerFinished(_FlagTimer)
 AND
-	DB_MT_FlagTimer(_Char, _FlagTimer)
+DB_MT_FlagTimer(_Char, _FlagTimer)
 AND
-	StringContains(_FlagTimer, "MT_AnyToNone", 1)
+StringContains(_FlagTimer, "MT_AnyToNone", 1)
 THEN
-	ObjectClearFlag(_Char,"MT_OneTalent");
-	ObjectClearFlag(_Char,"MT_TwoTalents");
-	ObjectClearFlag(_Char,"MT_ThreeTalents");
-	ObjectSetFlag(_Char,"MT_NoTalents");
-	NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
+ObjectClearFlag(_Char,"MT_OneTalent");
+ObjectClearFlag(_Char,"MT_TwoTalents");
+ObjectClearFlag(_Char,"MT_ThreeTalents");
+ObjectSetFlag(_Char,"MT_NoTalents");
+NOT	DB_MT_FlagTimer(_Char, _FlagTimer);
 
 //===========================================================//
 //                      Item Timers                         *//
 //===========================================================//
 
 IF
-	TimerFinished(_TimerName)
+TimerFinished(_TimerName)
 AND
-	DB_MT_Equipped_Wings(_Char,_Wings,_TimerName)
+DB_MT_Equipped_Wings(_Char,_Wings,_TimerName)
 THEN
-	CharacterEquipItem(_Char,_Wings);
+CharacterEquipItem(_Char,_Wings);
 
 IF
-	TimerFinished(_TimerName)
+TimerFinished(_TimerName)
 AND
-	DB_MT_Equipped_Horns(_Char,_Horns,_TimerName)
+DB_MT_Equipped_Horns(_Char,_Horns,_TimerName)
 THEN
-	CharacterEquipItem(_Char,_Horns);
+CharacterEquipItem(_Char,_Horns);
 
 IF
-	TimerFinished(_TimerName)
+TimerFinished(_TimerName)
 AND
-	DB_MT_Equipped_Overhead(_Char,_Overhead,_TimerName)
+DB_MT_Equipped_Overhead(_Char,_Overhead,_TimerName)
 THEN
-	CharacterEquipItem(_Char,_Overhead);
+CharacterEquipItem(_Char,_Overhead);
 
 //===========================================================//
 //                      Dialog Helpers                      *//
