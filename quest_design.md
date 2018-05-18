@@ -1,8 +1,8 @@
 ### Scripting a whodunnit where the witnesses are already dead
 
-I wanted my first quest to be a mystery, based around two of my favorite mechanics from D:OS 2: ghosts and flesh memories. If you were trying to solve a mystery in Rivellon, a ghost would still retain its subjectivity, and potentially mislead you. Flesh memories don't lie though. 
+This quest is based around two of my favorite mechanics from D:OS 2: ghosts and flesh memories—those accessible to Elves via the Corpse Eater talent. If you were trying to solve a mystery in Rivellon, a ghost would still retain its subjectivity, and could potentially mislead you. Flesh memories don't lie, though. 
 
-(This quest has yet to be published, but some important scenes and dialogues are included below--once the Talent solution came to me that project turned into a black hole of my modding time.)
+(This quest has yet to be published, but some important scenes and dialogues are included below—the Talent solution came to me mid-development and has sucked up all my modding time since.)
 
 What if you heard one thing from a ghost, suspected you were being lied to, and had the opportunity to test their word against the memories you discovered through Elven flesh consumption? When I first considered this, it was clear why bodily memories were never central to a questline--not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and impart to you the impressions for a nominal fee?
 
