@@ -18,13 +18,11 @@ The player comes across a ghost standing next to a lootable corpse with an arm a
 
  * Convince a very sarcastic ghost to give up his compatriots to the person who just crushed him under a tree. Gain a journal entry detailing what he told you about his friends' last moments. Gain a journal entry about his reticence if you fail.
  * Failing that conversation check, consume his hand. Gain a journal entry from what you learn from his final memories. (With the option of confronting him about what you learned.)
- * Failing that conversation check, give up and consume his spirit for source. In his final moments he tries to appease you. Gain a journal entry wondering what he meant.
- * Pick up the Source Orb and get a journal entry wondering what a magister was doing with a gem of pure source in his pocket. This last one can be start the quest without using Spirit Vision, and missing the spirit entirely.
+ * Failing that conversation check, give up and consume his spirit for source. In his final moments he tries to mollify you by starting to stammer out what he knows. Gain a journal entry wondering what he was about to say.
+ * Pick up the Source Orb and get a journal entry wondering what a magister was doing with a gem of pure source in his pocket. This last one can start the quest without using Spirit Vision, and missing the spirit entirely.
  
  Here's an example of how that encounter might play out:
  
  [![Image](https://i.imgur.com/rj0757H.jpg)](https://www.youtube.com/watch?v=YRqnh_M4TZs&feature=youtu.be)
   
-If you don't have an elf in your party, you can find the corpse taster having set up shop by some abandoned wagons.
- 
- 
+Though all these paths will start the quest, the path that gets you the most information involves experiencing the flesh memory. If your party doesn't have an elf, the corpse taster is waiting for you by the abandoned wagons. Though even if you do have one, he may still have a useful recipe for Elven Bone Broth to provide...
