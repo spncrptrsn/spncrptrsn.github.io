@@ -27,4 +27,4 @@ The player comes across a ghost standing next to a lootable corpse with an arm a
   
 Though all these paths will start the quest, the path that gets you the most information involves experiencing the flesh memory. If your party doesn't have an elf, the corpse taster is waiting for you by the abandoned wagons. Though even if you do have one, he may still have a useful recipe for Elven Bone Broth to provide later on.
 
-More to come soon.
+More to come soon. Story script [here](https://github.com/spncrptrsn/spncrptrsn.github.io/blob/master/quest_scripts/Story/ARX_GhostCaper.txt).
