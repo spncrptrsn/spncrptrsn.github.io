@@ -36,7 +36,29 @@ Transform(_Item, _Template, 0, 1, 0);
 CharacterUnequipItem(_Char, (ITEMGUID)_Item);
 TimerLaunch(_ItemTimer, 250);
 ```
-[(Full scripts here.)](https://github.com/spncrptrsn/spncrptrsn.github.io/tree/master/talentpack_scripts/story)
+Adding a selected talent also involves transforming these equipped items. [(Full scripts here.)](https://github.com/spncrptrsn/spncrptrsn.github.io/tree/master/talentpack_scripts/story)
+
+```
+IF
+ObjectFlagSet(_Flag, (CHARACTERGUID)_Char, _)
+AND
+QRY_MT_GetItem(_Char, _Flag)
+AND
+DB_MT_ItemEquipped(_Char, _Item, _Template)
+AND
+DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer)
+AND
+DB_MT_FlagTimer(_Char, _FlagTimer)
+THEN
+Transform(_Item, _Template, 0, 1, 1);
+CharacterAddTalentPoint(_Char, -1);
+TimerLaunch(_FlagTimer, 500);
+CharacterUnequipItem(_Char, (ITEMGUID)_Item);
+TimerLaunch(_ItemTimer, 500);
+CharacterAddTalent(_Char, _Talent);
+NOT DB_MT_ItemEquipped(_Char, _Item, _Template);
+NOT DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
+```
 
 I used this method to implement new talents with the following limitations:
 
