@@ -8,7 +8,7 @@ What if you heard one thing from a ghost, suspected you were being misled, and h
 
 [![Image](https://i.imgur.com/S1zm6nt.jpg)](https://www.youtube.com/watch?v=Rh3ilkQX77U&feature=youtu.be)
 
-I set my quest outside Arx to take advantage of all the free real estate, and the premise emerged from the context. In the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white-robes. Most were felled by voidwoken, but at least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim the treasures they stole for yourself?
+I set my quest outside Arx to take advantage of all the relatively empty real estate, and the premise emerged from the context: In the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white robes. Most were felled by voidwoken, but at least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim the treasures they stole for yourself?
 
 The quest is introduced near the wreckage of the Lady Vengeance, where the magister who made it farthest from the carnage picked a very unfortunate place to stand. By this point the player is well-primed to activate Spirit Vision when they see a corpse, but there are other quest initiation paths for those who don't.
 
