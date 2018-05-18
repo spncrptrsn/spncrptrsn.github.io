@@ -6,7 +6,7 @@ This quest is based around two of my favorite mechanics from D:OS 2: ghosts and 
 
 What if you heard one thing from a ghost, suspected you were being misled, and had the opportunity to test their word against the spirits own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a quest—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about the experience for a reasonable fee?
 
-![Image](https://imgur.com/a/K8gBC5e)
+![Image](https://i.imgur.com/S1zm6nt.jpg)
 
 I set my quest outside Arx to take advantage of all the free real estate, and the premise emerged from the context. In the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white-robes. Most were felled by voidwoken, but at least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim what they took from the vault?
 
