@@ -19,3 +19,10 @@ At this stage the quest has one points of first discovery that cannot be missed:
  * Failing that conversation check, give up and consume his spirit for source. In his final moments he tries to appease you. Gain a journal entry wondering what he meant.
  * Pick up the Source Orb and get a journal entry wondering what a magister was doing with a gem of pure source in his pocket. This can be done without using Spirit Vision, and missing the spirit entirely.
  
+ Here's an example of how that encounter might play out:
+ 
+ VIDEO
+ 
+ Suppose you didn't have an elf in your party? As you make your way to Arx, another unmissable quest update occurs in the form of an NPC who accosts you.
+ 
+ 
