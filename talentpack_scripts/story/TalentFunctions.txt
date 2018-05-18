@@ -95,9 +95,9 @@ DB_MT_MaxSummonControl(_Owner, _Number)
 AND
 _Number >= 2
 AND
-HasActiveStatus(_Owner, "BURNING", 0)
+HasActiveStatus(_Owner, "MT_SUMMONFATIGUE", 0)
 THEN
-ApplyStatus(_Owner, "BURNING", -1.0, 1);
+ApplyStatus(_Owner, "MT_SUMMONFATIGUE", -1.0, 1);
 
 PROC
 PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
@@ -106,9 +106,9 @@ DB_MT_MaxSummonControl(_Owner, _Number)
 AND
 _Number < 2
 AND
-HasActiveStatus(_Owner, "BURNING", 1)
+HasActiveStatus(_Owner, "MT_SUMMONFATIGUE", 1)
 THEN
-RemoveStatus(_Owner, "BURNING");
+RemoveStatus(_Owner, "MT_SUMMONFATIGUE");
 
 //===========================================================//
 //                      Unruly Visitors                     *//
