@@ -2,7 +2,7 @@
 
 This quest is based around two of my favorite mechanics from D:OS 2: ghosts and flesh memories—those accessible to Elves via the Corpse Eater talent. If you were trying to solve a mystery in Rivellon, a ghost would still retain its subjectivity, and could potentially mislead you. Flesh memories don't lie, though. 
 
-(This quest has yet to be published, but some important scenes and dialogues are included below—the Talent solution came to me mid-development and has sucked up all my modding time since.)
+(This quest has yet to be published, but some early scenes and dialogues are included below.)
 
 What if you heard one thing from a ghost, suspected you were being lied to, and had the opportunity to test their word against the spirits own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a questline—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about their experience for a nominal fee?
 
