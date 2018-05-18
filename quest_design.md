@@ -14,7 +14,7 @@ The quest is introduced near the wreckage of the Lady Vengeance, where the magis
 
 ![Image](https://i.imgur.com/tGacrP2.jpg)
 
-The player comes across a ghost standing next to a lootable corpse with an arm and a source gem inside. At this point there are four methods for getting the initial journal entry.
+The player comes across a ghost standing next to a lootable corpse with an arm and a source gem inside. At this point there are four methods for getting journal entries providing the initial quest hook.
 
  * Convince a very sarcastic ghost to give up his compatriots to the person who just crushed him under a tree. Gain a journal entry detailing what he told you about his friends' last moments. Gain a journal entry about his reticence if you fail.
  * Failing that conversation check, consume his hand. Gain a journal entry from what you learn from his final memories. (With the option of confronting him about what you learned.)
