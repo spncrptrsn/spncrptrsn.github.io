@@ -17,7 +17,7 @@ The quest is introduced near the wreckage of the Lady Vengeance, where the magis
 The player comes across a ghost standing next to a lootable corpse with an arm and a source gem inside. At this point there are four methods for getting the initial journal entry.
 
  * Convince a very sarcastic ghost to give up his compatriots to the person who just crushed him under a tree. Gain a journal entry detailing what he told you about his friends' last moments. Gain a journal entry about his reticence if you fail.
- * Failing that conversation check, consume his hand. Gain a journal entry from what you learn from his final memories. (With the option of confronting him about what you learned. After he confronts you about eating his hand, of course.)
+ * Failing that conversation check, consume his hand. Gain a journal entry from what you learn from his final memories. (With the option of confronting him about what you learned.)
  * Failing that conversation check, give up and consume his spirit for source. In his final moments he tries to appease you. Gain a journal entry wondering what he meant.
  * Pick up the Source Orb and get a journal entry wondering what a magister was doing with a gem of pure source in his pocket. This last one can be start the quest without using Spirit Vision, and missing the spirit entirely.
  
