@@ -3,10 +3,18 @@ SubGoalCombiner SGC_AND
 INITSECTION
 
 KBSECTION
+//===========================================================//
+//                      Reactionary                         *//
+//===========================================================//
+
 IF 
 CharacterCharacterEvent((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker,"ChanceToHitMeleeEvent")
 THEN
 CharacterAttack((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker);
+
+//===========================================================//
+//                      Perforator                          *//
+//===========================================================//
 
 IF
 StoryEvent((CHARACTERGUID)_Char,"BackstabTimer")
@@ -26,81 +34,81 @@ SetStoryEvent((CHARACTERGUID)_Char,"BackstabEvent");
 //===========================================================//
 
 IF
-	CharacterStatusApplied(_Summon, "SUMMONING_ABILITY", _)
+CharacterStatusApplied(_Summon, "SUMMONING_ABILITY", _)
 AND
-	CharacterIsSummon(_Summon, 1)
+CharacterIsSummon(_Summon, 1)
 AND
-	CharacterGetOwner(_Summon, _Owner)
+CharacterGetOwner(_Summon, _Owner)
 AND
-	CharacterHasTalent(_Owner, "Charm", 1)
+CharacterHasTalent(_Owner, "Charm", 1)
 THEN
-	CharacterStatusText(_Summon, "Summon");
-	CharacterStatusText(_Owner, "Owner");
-	PROC_MT_SummonSpawnControl(_Owner);
-	PROC_MT_ApplySummonStatus(_Owner);
+CharacterStatusText(_Summon, "Summon");
+CharacterStatusText(_Owner, "Owner");
+PROC_MT_SummonSpawnControl(_Owner);
+PROC_MT_ApplySummonStatus(_Owner);
 
 PROC
-	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
 AND
-	DB_MT_MaxSummonControl(_Owner, _Number)
+DB_MT_MaxSummonControl(_Owner, _Number)
 AND
-	IntegerSum(_Number, 1, _Sum)
+IntegerSum(_Number, 1, _Sum)
 THEN
-	NOT DB_MT_MaxSummonControl(_Owner, _Number);
-	DB_MT_MaxSummonControl(_Owner, _Sum);
+NOT DB_MT_MaxSummonControl(_Owner, _Number);
+DB_MT_MaxSummonControl(_Owner, _Sum);
 
 PROC
-	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
 AND
-	NOT DB_MT_MaxSummonControl(_Owner, _)
+NOT DB_MT_MaxSummonControl(_Owner, _)
 THEN
-	DB_MT_MaxSummonControl(_Owner, 1);
+DB_MT_MaxSummonControl(_Owner, 1);
 
 IF
-	CharacterDied(_Summon)
+CharacterDied(_Summon)
 AND
-	CharacterIsSummon(_Summon, 1)
+CharacterIsSummon(_Summon, 1)
 AND
-	CharacterGetOwner(_Summon, _Owner)
+CharacterGetOwner(_Summon, _Owner)
 AND
-	CharacterHasTalent(_Owner, "Charm", 1)
+CharacterHasTalent(_Owner, "Charm", 1)
 THEN
-	CharacterStatusText(_Summon, "Summon");
-	CharacterStatusText(_Owner, "Owner");
-	PROC_MT_SummonDieControl(_Owner);
-	PROC_MT_ApplySummonStatus(_Owner);
+CharacterStatusText(_Summon, "Summon");
+CharacterStatusText(_Owner, "Owner");
+PROC_MT_SummonDieControl(_Owner);
+PROC_MT_ApplySummonStatus(_Owner);
 
 PROC
-	PROC_MT_SummonDieControl((CHARACTERGUID)_Owner)
+PROC_MT_SummonDieControl((CHARACTERGUID)_Owner)
 AND
-	DB_MT_MaxSummonControl(_Owner, _Number)
+DB_MT_MaxSummonControl(_Owner, _Number)
 AND
-	IntegerSubtract(_Number, 1, _Sum)
+IntegerSubtract(_Number, 1, _Sum)
 THEN
-	NOT DB_MT_MaxSummonControl(_Owner, _Number);
-	DB_MT_MaxSummonControl(_Owner, _Sum);
+NOT DB_MT_MaxSummonControl(_Owner, _Number);
+DB_MT_MaxSummonControl(_Owner, _Sum);
 
 PROC
-	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
 AND
-	DB_MT_MaxSummonControl(_Owner, _Number)
+DB_MT_MaxSummonControl(_Owner, _Number)
 AND
-	_Number >= 2
+_Number >= 2
 AND
-	HasActiveStatus(_Owner, "BURNING", 0)
+HasActiveStatus(_Owner, "BURNING", 0)
 THEN
-	ApplyStatus(_Owner, "BURNING", -1.0, 1);
+ApplyStatus(_Owner, "BURNING", -1.0, 1);
 
 PROC
-	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
 AND
-	DB_MT_MaxSummonControl(_Owner, _Number)
+DB_MT_MaxSummonControl(_Owner, _Number)
 AND
-	_Number < 2
+_Number < 2
 AND
-	HasActiveStatus(_Owner, "BURNING", 1)
+HasActiveStatus(_Owner, "BURNING", 1)
 THEN
-	RemoveStatus(_Owner, "BURNING");
+RemoveStatus(_Owner, "BURNING");
 
 //===========================================================//
 //                      Unruly Visitors                     *//
