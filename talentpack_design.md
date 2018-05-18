@@ -1,6 +1,6 @@
 
 
-### Using story scripting to introduce the first custom talents to Divinity: Original Sin 2
+### Using story scripting to introduce custom talents to Divinity: Original Sin 2
 
 Here's how I use story scripting to implement custom talents for my upcoming talent pack, getting around hardcoded limitations that modders have lived with since D:OS1. (As of this writing, the mod is being playtested by a few other members of the community before release next week with an initial batch of 12 new talents.)
 
