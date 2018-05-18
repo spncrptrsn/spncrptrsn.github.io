@@ -6,7 +6,7 @@ Here's how I use story scripting to implement custom talents for my upcoming tal
 
 ![Image](https://i.imgur.com/qgeJl1t.jpg)
 
-Though the Divinity Engine doesn't offer any options for creating new talents, modders took early notice of a few hopeful quirks:
+Though the Divinity Engine doesn't offer any options for creating new talents from whole cloth, modders took early notice of a few hopeful quirks:
 
  * A long list of cut talents from D:OS 2 and leftover talents from D:OS 1 can be added to characters via scripting, but they aren't fully functional, and do not show up in character sheets under normal conditions.
  * These deprecated talents can be succesfully attached to armor pieces, which _will_ make them visible on the character sheet as long as the armor piece stays equipped.
