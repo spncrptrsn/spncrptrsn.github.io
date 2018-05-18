@@ -62,7 +62,7 @@ ACTIONS
 	RETURN(_RemoveList,_Result,null)
   ```
   
-Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater.
+Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater. ([FUll scripts here](https://github.com/spncrptrsn/spncrptrsn.github.io/tree/master/abst_scripts).)
 
 ![Image](https://i.imgur.com/LREhPza.jpg)
 
