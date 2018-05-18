@@ -4,7 +4,7 @@ This quest is based around two of my favorite mechanics from D:OS 2: ghosts and 
 
 (This quest has yet to be published, but some early scenes and dialogues are included below.)
 
-What if you heard one thing from a ghost, suspected you were being misled, and had the opportunity to test their word against the spirits own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a quest—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about the experience for a reasonable fee?
+What if you heard one thing from a ghost, suspected you were being misled, and had the opportunity to test their word against the spirit'ss own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a quest—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about the experience for a reasonable fee?
 
 [![Image](https://i.imgur.com/S1zm6nt.jpg)](https://www.youtube.com/watch?v=Rh3ilkQX77U&feature=youtu.be)
 (This iamge is a link to an actual video.)
