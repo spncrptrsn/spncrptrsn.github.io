@@ -1,8 +1,5 @@
 INIT
 CHARACTER:%Char
-INT:%SummonCounter=0
-LIST<FIXEDSTRING>:%MT_ScrollList
-FIXEDSTRING:%Scroll
 LIST<CHARACTER>:%BlightSpawnList
 EVENTS
 
@@ -18,12 +15,6 @@ FLOAT3:_SpawnPoint
 ON
 	OnTurn(_Char,_)
 ACTIONS
-//	IF "c1&c2"
-//		CharacterHasTalent(_Char,ItemCreation)
-//		ListGetRandom(%MT_ScrollList,_Scroll)
-//	THEN
-//		CharacterAddToInventory(_Char,_Scroll,1,0)
-//	ENDIF
 	IF "c1"
 		CharacterHasTalent(_Char,ResistKnockdown)	
 	THEN
@@ -239,200 +230,7 @@ ACTIONS
 	THEN		
 		CharacterRemoveSkill(_Char,Target_PiercingHeavyAttack)
 		CharacterAddSkill(_Char,Target_HeavyAttack)
-	ENDIF
-
-EVENT CharmSummonCoutner
-VARS
-CHARACTER:_Char
-ON
-	OnCharacterEvent(_Char,"SummonCounter")
-ACTIONS
-	Add(%SummonCounter,1)
-	IF "c1"
-		IsGreaterThen(%SummonCounter,1)
-	THEN	
-		CharacterApplyStatus(_Char,ADRENALINE,-1)
-	ENDIF
-
-//EVENT BeastMadness
-//VARS
-//CHARACTER:_Char
-//ON
-//	OnCharacterEvent(_Char,"BeastMadness")
-//ACTIONS
-//	AddStatusInfluence(_Char,MADNESS,20)
-
-//EVENT BeastLeadership
-//VARS
-//CHARACTER:_Char
-//CHARACTER:_Leader
-//CHARACTER:_Summoner
-//ON
-//	OnCharacterStatusApplied(_Char,LEADERSHIP)
-//ACTIONS
-//	IF "c1&c2&c3&c4"
-//		CharacterHasStatus(_Char,SUMMONING_ABILITY)
-//		CharacterGetStatusSourceCharacter(_Char,LEADERSHIP,_Leader)
-//		GetVar(_Summoner,_Char,"BeastmasterLeader")
-//		IsEqual(_Summoner,_Char)
-//	THEN
-//		AddStatusInfluence(_Char,MADNESS,-20)
-//	ENDIF	
-	
-//EVENT BeastLeadershipRemoved
-//VARS
-//CHARACTER:_Char
-//ON
-//	OnCharacterStatusRemoved(_Char,LEADERSHIP)
-//ACTIONS
-//	IF "c1"
-//		CharacterHasStatus(_Char,SUMMONING_ABILITY)
-//	THEN
-//		AddStatusInfluence(_Char,MADNESS,20)
-//	ENDIF		
-
-EVENT GenerateScrollList
-ON
-	OnLoaded(_,_,_,_)
-ACTIONS
-	ListAdd(%MT_ScrollList,SCROLL_Curse)
-	ListAdd(%MT_ScrollList,SCROLL_Rain)
-	ListAdd(%MT_ScrollList,SCROLL_Teleportation)
-	ListAdd(%MT_ScrollList,SCROLL_Resurrect)
-	ListAdd(%MT_ScrollList,SCROLL_Fireball)
-	ListAdd(%MT_ScrollList,SCROLL_RegenerateStart)
-	ListAdd(%MT_ScrollList,SCROLL_HailStrike)
-	ListAdd(%MT_ScrollList,SCROLL_LighningBolt)
-	ListAdd(%MT_ScrollList,SCROLL_FossilStrike)
-	ListAdd(%MT_ScrollList,SCROLL_PoisonDart)
-	ListAdd(%MT_ScrollList,SCROLL_FlamingDaggers)
-	ListAdd(%MT_ScrollList,SCROLL_Rain_Blood)
-	ListAdd(%MT_ScrollList,SCROLL_Ranger_Charm)
-	ListAdd(%MT_ScrollList,SCROLL_Tornado_1)
-	ListAdd(%MT_ScrollList,SCROLL_Haste)
-	ListAdd(%MT_ScrollList,SCROLL_Fortify)
-	ListAdd(%MT_ScrollList,SCROLL_MeteorShower)
-	ListAdd(%MT_ScrollList,SCROLL_AcidSpores)
-	ListAdd(%MT_ScrollList,SCROLL_HailStorm)
-	ListAdd(%MT_ScrollList,SCROLL_ElectricFence)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_ChainHeal)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_ChainLightning)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_DeployMassTraps)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_DimensionalBolt)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_DustBlast)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_IceFan)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_InfectiousFlame)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_LaunchExplosiveTrap)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_LaunchOilBlob)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_PyroclasticEruption)
-	ListAdd(%MT_ScrollList,SCROLL_Projectile_Superconductor)
-	ListAdd(%MT_ScrollList,SCROLL_ProjectileStrike_DazingBolt)
-	ListAdd(%MT_ScrollList,SCROLL_Target_AcidInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ArcaneStitch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_BlackShroud)
-	ListAdd(%MT_ScrollList,SCROLL_Target_BloodBubble)
-	ListAdd(%MT_ScrollList,SCROLL_Target_BurnMyEyes)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Cannibalize)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ChickenTouch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Condense)
-	ListAdd(%MT_ScrollList,SCROLL_Target_CorpseExplosion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_CorrosiveTouch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_CryogenicStasis)
-	ListAdd(%MT_ScrollList,SCROLL_Target_CursedElectricInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_DeathsDoor)
-	ListAdd(%MT_ScrollList,SCROLL_Target_DeathWish)
-	ListAdd(%MT_ScrollList,SCROLL_Target_DecayingTouch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_DemonicBargain)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ElectricInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Equalize)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Fireblood)
-	ListAdd(%MT_ScrollList,SCROLL_Target_FireInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_FireWhip)
-	ListAdd(%MT_ScrollList,SCROLL_Target_FlamingCrescendo)
-	ListAdd(%MT_ScrollList,SCROLL_Target_FrostyShell)
-	ListAdd(%MT_ScrollList,SCROLL_Target_GraspOfTheStarved)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Harmony)
-	ListAdd(%MT_ScrollList,SCROLL_Target_IceInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Infect)
-	ListAdd(%MT_ScrollList,SCROLL_Target_MosquitoSwarm)
-	ListAdd(%MT_ScrollList,SCROLL_Target_NecrofireInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_PoisonInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_PowerInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_PressureSpike)
-	ListAdd(%MT_ScrollList,SCROLL_Target_RangedInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_RockSpikes)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ShacklesOfPain)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ShadowInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_ShockingTouch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_SoulMate)
-	ListAdd(%MT_ScrollList,SCROLL_Target_SourceVampirism)
-	ListAdd(%MT_ScrollList,SCROLL_Target_SpontaneousCombustion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_StripResistance)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Supercharge)
-	ListAdd(%MT_ScrollList,SCROLL_Target_TentacleLash)
-	ListAdd(%MT_ScrollList,SCROLL_Target_VacuumTouch)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Vaporize)
-	ListAdd(%MT_ScrollList,SCROLL_Target_WarpInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_WaterInfusion)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Windwalker)
-	ListAdd(%MT_ScrollList,SCROLL_Target_WinterBlast)
-	ListAdd(%MT_ScrollList,SCROLL_Target_WormTremor)
-	ListAdd(%MT_ScrollList,SCROLL_Target_Apportation)
-	ListAdd(%MT_ScrollList,SCROLL_Cone_CorrosiveSpray)
-	ListAdd(%MT_ScrollList,SCROLL_Cone_Flamebreath)
-	ListAdd(%MT_ScrollList,SCROLL_Cone_Shatter)
-	ListAdd(%MT_ScrollList,SCROLL_Cone_SilencingStare)
-	ListAdd(%MT_ScrollList,SCROLL_Cone_SteamLance)
-	ListAdd(%MT_ScrollList,SCROLL_Zone_LaserRay)
-	ListAdd(%MT_ScrollList,SCROLL_Quake_Earthquake)
-	ListAdd(%MT_ScrollList,SCROLL_Storm_Lightning)
-	ListAdd(%MT_ScrollList,SCROLL_Storm_Ethereal)
-	ListAdd(%MT_ScrollList,SCROLL_Wall_LivingWall)
-	ListAdd(%MT_ScrollList,SCROLL_Teleportation_Netherswap)
-	ListAdd(%MT_ScrollList,SCROLL_Teleportation_SwapGround)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_ArtilleryPlant)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_BloatedCorpse)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_BonePile)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_Cat)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_Condor)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_FireSlug)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_Incarnate)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_PlanarGateway)
-	ListAdd(%MT_ScrollList,SCROLL_Summon_TotemFromSurface)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_Apotheosis)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_BlindingRadiance)
-	ListAdd(%MT_ScrollList,SCROLL_Storm_Blood)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_BoneCage)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_BullHorns)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_ChameleonSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_CloseTheDoor)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_Contamination)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_FavourableWind)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_FireBrand)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_FlamingSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_FlamingTongues)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_FrostAura)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_GlobalCooling)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_HealingTears)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_IceBreaker)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_IceSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_Ignition)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_JellyfishSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_MassCorpseExplosion)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_MedusaHead)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_MendMetal)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_NecromancerTotems)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_PoisonousSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_PoisonWave)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_ReactiveArmor)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_ShedSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_SiphonPoison)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_SpiderLegs)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_SteelSkin)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_SummonInnerDemon)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_Supernova)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_VacuumAura)
-	ListAdd(%MT_ScrollList,SCROLL_Shout_Wings)	
+	ENDIF	
 
 EVENT BlightSpawnIterator
 VARS
@@ -454,58 +252,7 @@ ACTIONS
 		GetPosition(_BlightSpawnTarget,_SpawnPoint)
 	THEN
 		SpawnCharacter(_,MT_CorpsePlant_653f533f-d9f3-40df-a3b1-fa2594547f87,_SpawnPoint,0)
-	ENDIF
-	
-EVENT ClearHasFlags
-VARS
-CHARACTER:_Char
-ON
-	OnCharacterCharacterEvent(_Char,_Char,"MT_ClearHasFlags")
-ACTIONS	
-	ClearFlag(_Char,"MT_HasAnimalEmpathy")
-	ClearFlag(_Char,"MT_HasExtraSkillPoints")
-	ClearFlag(_Char,"MT_HasExtraStatPoints")
-	ClearFlag(_Char,"MT_HasEscapist")
-	ClearFlag(_Char,"MT_HasElementalAffinity")
-	ClearFlag(_Char,"MT_HasResurrectToFullHealth")
-	ClearFlag(_Char,"MT_HasLoneWolf")
-	ClearFlag(_Char,"MT_HasRaistlin")
-	ClearFlag(_Char,"MT_HasWhatARush")
-	ClearFlag(_Char,"MT_HasFaroutDude")
-	ClearFlag(_Char,"MT_HasLeech")
-	ClearFlag(_Char,"MT_HasFiveStarRestaurant")
-	ClearFlag(_Char,"MT_HasSurpriseAttack")
-	ClearFlag(_Char,"MT_HasDemon")
-	ClearFlag(_Char,"MT_HasIceKing")
-	ClearFlag(_Char,"MT_HasWalkItOff")
-	ClearFlag(_Char,"MT_HasStench")
-	ClearFlag(_Char,"MT_HasQuickStep")
-	ClearFlag(_Char,"MT_HasElementalRanger")
-	ClearFlag(_Char,"MT_HasRangerLoreArrowRecover")
-	ClearFlag(_Char,"MT_HasNoAttackOfOpportunity")
-	ClearFlag(_Char,"MT_HasWarriorLoreGrenadeRange")
-	ClearFlag(_Char,"MT_HasWarriorLoreNaturalHealth")
-	ClearFlag(_Char,"MT_HasAttackOfOpportunity")
-	ClearFlag(_Char,"MT_HasUnstable")
-	ClearFlag(_Char,"MT_HasAmbidextrous")
-	ClearFlag(_Char,"MT_HasTorturer")
-	ClearFlag(_Char,"MT_HasLivingArmor")
-	ClearFlag(_Char,"MT_HasExecutioner")
-	ClearFlag(_Char,"MT_HasDualWieldingDodging")
-	ClearFlag(_Char,"MT_HasResistDead")
-	ClearFlag(_Char,"MT_HasMemory")
-	ClearFlag(_Char,"MT_HasPerfectionist")
-	ClearFlag(_Char,"MT_HasViolentMagic")
-	ClearFlag(_Char,"MT_HasRogueLore")
-	ClearFlag(_Char,"MT_HasWarriorLore")
-	ClearFlag(_Char,"MT_HasRangerLore")
-	ClearFlag(_Char,"MT_HasFireSpecialist")
-	ClearFlag(_Char,"MT_HasWaterSpecialist")
-	ClearFlag(_Char,"MT_HasAirSpecialist")
-	ClearFlag(_Char,"MT_HasEarthSpecialist")
-	ClearFlag(_Char,"MT_HasNecromancy")
-	ClearFlag(_Char,"MT_HasSummoning")
-	ClearFlag(_Char,"MT_HasPolymorph")	
+	ENDIF	
 	
 EVENT ResistUntreatedPoison
 VARS
@@ -520,32 +267,26 @@ ACTIONS
 	IF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED1)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED1,null,0)
 		Set(_Result, MT_UNTREATED2)
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED2)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED2,null,0)
 		Set(_Result, MT_UNTREATED3)			
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED3)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED3,null,0)
 		Set(_Result, MT_UNTREATED4)			
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED4)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED4,null,0)
 		Set(_Result, MT_UNTREATED5)			
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED6)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED6,null,0)
 		Set(_Result, MT_UNTREATED7)
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED7)
 	THEN
-//		CharacterRemoveStatus(_Character,MT_UNTREATED7,null,0)
 		Set(_Result, MT_UNTREATED8)			
 	ELIF "c1"
 		CharacterHasStatus(_Character,MT_UNTREATED8)
