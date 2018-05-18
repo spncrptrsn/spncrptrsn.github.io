@@ -1,6 +1,6 @@
 ### Scripting a whodunnit where the witnesses are already dead
 
-When brainstorming my first quest I first considered what areas were empty enough to easily fit new scenes and actors. I chose the outskirts of Arx. The mechanics I wanted to build on were two of my favorites from the main game: ghosts and bodypart memories. If you were trying to solve a mystery in this setting, a ghost, though severed from the mortal world, would still retain its subjectivity, and potentially mislead you. Bodyparts don't lie though. 
+I wanted my first quest to be a mystery, based around two of my favorite mechanics from D:OS 2: ghosts and flesh memories. If you were trying to solve a mystery in Rivellon, a ghost would still retain its subjectivity, and potentially mislead you. Flesh memories don't lie though. 
 
 (This quest has yet to be published, but some important scenes and dialogues are included below--once the Talent solution came to me that project turned into a black hole of my modding time.)
 
