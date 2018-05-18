@@ -24,7 +24,7 @@ The player comes across a ghost standing next to a lootable corpse with an arm a
  
  Here's an example of how that encounter might play out:
  
- [![Image](https://i.imgur.com/S1zm6nt.jpg)](https://www.youtube.com/watch?v=YRqnh_M4TZs&feature=youtu.be)
+ [![Image](https://i.imgur.com/rj0757H.jpg)](https://www.youtube.com/watch?v=YRqnh_M4TZs&feature=youtu.be)
   
 If you don't have an elf in your party, you can find the corpse taster having set up shop by some abandoned wagons.
  
