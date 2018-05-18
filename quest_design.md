@@ -25,4 +25,6 @@ The player comes across a ghost standing next to a lootable corpse with an arm a
  
  [![Image](https://i.imgur.com/rj0757H.jpg)](https://www.youtube.com/watch?v=YRqnh_M4TZs&feature=youtu.be)
   
-Though all these paths will start the quest, the path that gets you the most information involves experiencing the flesh memory. If your party doesn't have an elf, the corpse taster is waiting for you by the abandoned wagons. Though even if you do have one, he may still have a useful recipe for Elven Bone Broth to provide...
+Though all these paths will start the quest, the path that gets you the most information involves experiencing the flesh memory. If your party doesn't have an elf, the corpse taster is waiting for you by the abandoned wagons. Though even if you do have one, he may still have a useful recipe for Elven Bone Broth to provide later on.
+
+More to come soon.
