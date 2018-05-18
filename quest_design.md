@@ -4,7 +4,7 @@ This quest is based around two of my favorite mechanics from D:OS 2: ghosts and 
 
 (This quest has yet to be published, but some important scenes and dialogues are included below—the Talent solution came to me mid-development and has sucked up all my modding time since.)
 
-What if you heard one thing from a ghost, suspected you were being lied to, and had the opportunity to test their word against the memories you discovered through Elven flesh consumption? When I first considered this, it was clear why bodily memories were never central to a questline--not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and impart to you the impressions for a nominal fee?
+What if you heard one thing from a ghost, suspected you were being lied to, and had the opportunity to test their word against the spirits own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a questline—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about their experience for a nominal fee?
 
 If there were bodies outside Arx, it would be a safe bet they'd be magisters or pilgrims. So the premise emerged from the context: in the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white-robes. Most were felled by voidwoken as they tried in vain to use these to defend themselves. At least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim his stolen artifacts?
 
