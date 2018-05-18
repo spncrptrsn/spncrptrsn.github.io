@@ -8,7 +8,7 @@ What if you heard one thing from a ghost, suspected you were being misled, and h
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=Rh3ilkQX77U
 " target="_blank"><img src="http://img.youtube.com/vi/Rh3ilkQX77U/0.jpg" 
-alt="Quest design reel" width="960" height="720" border="0" /></a>
+alt="Quest design reel" width="480" height="300" border="0" /></a>
 
 I set my quest outside Arx to take advantage of all the free real estate, and the premise emerged from the context. In the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white-robes. Most were felled by voidwoken, but at least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim what they took from the vault?
 
