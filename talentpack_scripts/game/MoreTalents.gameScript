@@ -65,7 +65,7 @@ ACTIONS
 		CharacterHasStatus(_Char,MADNESS)
 		GetVar(_Owner,_Char,"BeastmasterLeader")
 		CharacterGetStatusSourceCharacter(_Char,MADNESS,_Owner)
-		CharacterHasStatus(_Char,EXTRA_TURN)
+		CharacterHasStatus(_Char,MT_TURNEXTENDER)
 	THEN	
 		CharacterRemoveStatus(_Char,MADNESS,null,0)
 		CharacterEvent(_Char,"BeastmasterReapply")		
@@ -123,7 +123,7 @@ ACTIONS
 		GetVar(_Owner,_Char,"BeastmasterLeader")		
 	THEN
 		CharacterRemoveStatus(_Char,MT_AGITATED,null,0)
-		CharacterApplyStatus(_Char,EXTRA_TURN,1,1,_Owner)		
+		CharacterApplyStatus(_Char,MT_TURNEXTENDER,1,1,_Owner)		
 		CharacterApplyStatus(_Char,MADNESS,-1,1,_Owner)
 	ENDIF		
 		
