@@ -42,7 +42,7 @@ ACTIONS
 	ELSE
 		Print(%StatusString,"<font color='#cfecff'>Chilled</font>")
 		Print(%StatusString2," was [1]", %StatusString)
-		Set(_Result,OVR_CHILLED)
+		Set(_Result,CHILLED)
 		Set(_Turns,null)
 		Set(%Char,_Character)
 		CallFunction("MagicArmorTally")
