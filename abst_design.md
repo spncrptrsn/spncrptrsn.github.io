@@ -33,9 +33,8 @@ ACTIONS
 	THEN
 		ListAdd(_RemoveList, WARM)
 		Set(_Result,null)
-		ELIF "c1|c2"
+		ELIF "c1"
 			CharacterHasStatus(_Character, CHILLED)
-			CharacterHasStatus(_Character, OVR_CHILLED)
 		THEN
 		Set(_Result, OVR_FROZEN)
 		Set(_Turns,1)
