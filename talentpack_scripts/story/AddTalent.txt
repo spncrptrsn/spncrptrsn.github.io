@@ -1,0 +1,344 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//DB_MT_TalentFlags((STRING)_Flag, (STRING)_WingTemplate, (STRING)_HornTemplate, (STRING)_OverheadTemplate, (STRING)_Talent);
+DB_MT_TalentFlags("MT_Backstab", "ITEMGUID_MT_Rune_Backstab_c3169f40-e11e-44fc-801f-7353a4ba1d74", "Backstab", "NoReq", "NoReqFlag"); // Perforator // h9836a401g63f6g49c3g8fa0g9564cbad7628 // h39f1dfedg93f0g48bega382g17d1d9f2b373
+DB_MT_TalentFlags("MT_Beastmaster", "ITEMGUID_MT_Rune_Beastmaster_3223ca46-db61-4431-ba33-578a151c31a0", "Beastmaster", "Leadership", "MT_HasLeadership"); // Unruly Visitors // hf7681f8fg310cg4596g91efg571d32a2bd70 // h3a46e939gee4fg4009ga15fg86804238276b
+DB_MT_TalentFlags("MT_ChanceToHitMelee", "ITEMGUID_MT_Rune_ChanceToHitMelee_46d699af-acee-4bc4-b13f-74561fab2879", "ChanceToHitMelee", "NoReq", "NoReqFlag"); // Reactionary // h6e2e18fcg265bg4a62g855dg51cc05443219 // hc453c48fg7b72g479fgbc25gd3a2ba400219
+DB_MT_TalentFlags("MT_Charm", "ITEMGUID_MT_Rune_Charm_9f1365e6-f142-44fa-a472-fd11a712c6e3", "Charm", "Summoning", "MT_HasSummoning"); // Generous Host // hba2372ffge6deg418ag9ae7gc7b860cbcded // h349badc6gb093g4527g8f5fge03b7d8699a5
+DB_MT_TalentFlags("MT_ExtraWandCharge", "ITEMGUID_MT_Rune_ExtraWandCharge_aa979329-24bd-46c1-8355-1f677a68cd43", "ExtraWandCharge", "NoReq", "NoReqFlag"); // Bitter Tinctures // h8725f47dg3256g4d6agb02fg0a9c611146e8 // h3b08726bgd80cg4b77gaa6bg934b6fe6f9bf
+DB_MT_TalentFlags("MT_FolkDancer", "ITEMGUID_MT_Rune_FolkDancer_19c4e18f-6459-44a9-9a86-f7bbc7556fad", "FolkDancer", "Sneaking", "MT_HasSneaking"); // Shadowy Figure // h8fa27d2fgeb94g4475ga70ag1510273e6003 // hd749731fgb0cdg42a4g8133g6f2b8385b005
+DB_MT_TalentFlags("MT_InventoryAccess", "ITEMGUID_MT_Rune_InventoryAccess_02ba1088-54dc-4236-95c9-a3f7f2a226e1", "InventoryAccess", "NoReq", "NoReqFlag"); // Quick Change // h1b8aeef2gf10fg4ae0g8fe7g7a053b568517 // h105745ffgaa63g4816g93fdgdd9992e2a337
+DB_MT_TalentFlags("MT_ItemCreation", "ITEMGUID_MT_Rune_ItemCreation_a28e9cfe-7325-4410-b6fa-a57c6c846606", "ItemCreation", "Loremaster", "MT_HasLoremaster"); // Dog-Eared Grimoire // hb97606efg07d3g4d71gae3ag735767403366 // h5351657cg21cag4cf3g8a0cgf37cdea35602
+DB_MT_TalentFlags("MT_ResistKnockdown", "ITEMGUID_MT_Rune_ResistKnockdown_3773aa60-1bae-4fbe-80fa-46639bdc6bfd", "ResistKnockdown", "Necromancy", "MT_HasNecromancy"); // Invasive Species // h9d8d121cg92d2g4c1fgb5e5gd5b881d390d1 // h7f278b40gaa0eg4edcga4c6g92de77e1c04c
+DB_MT_TalentFlags("MT_SpillNoBlood", "ITEMGUID_MT_Rune_SpillNoBlood_207a89bf-c7c6-4802-bbfd-4590c14400dd", "SpillNoBlood", "AirSpecialist", "MT_HasAirSpecialist"); // Voltage Spike // h54fdcb17g804bg499eg8a8egc562dbfe0a24 // h17d48c1fg3287g4be8g900cgddfe62b2a4c9
+//DB_MT_TalentFlags("MT_ResistSilence", "ITEMGUID_MT_Rune_ResistSilence_af0fc6be-de05-489c-9b46-a4477524c65a", "ResistSilence", "NoReq", "NoReqFlag"); // Drunken Master
+
+//DB_MT_BlankItems((STRING)_Slot, (STRING)_Template);
+DB_MT_BlankItems("Horns", "MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004");
+DB_MT_BlankItems("Overhead", "MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62");
+//DB_MT_BlankItems("Wings", "MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae");
+
+//DB_MT_VanillaTalents((STRING)_Talent)
+DB_MT_VanillaTalents("Ambidextrous");
+DB_MT_VanillaTalents("RangerLoreArrowRecover");
+DB_MT_VanillaTalents("ResistDead");
+DB_MT_VanillaTalents("ElementalAffinity");
+DB_MT_VanillaTalents("Escapist");
+DB_MT_VanillaTalents("FaroutDude");
+DB_MT_VanillaTalents("FiveStarRestaurant");
+DB_MT_VanillaTalents("Raistlin");
+DB_MT_VanillaTalents("SurpriseAttack");
+DB_MT_VanillaTalents("Perfectionist");
+DB_MT_VanillaTalents("Leech");
+DB_MT_VanillaTalents("LivingArmor");
+DB_MT_VanillaTalents("LoneWolf");
+DB_MT_VanillaTalents("Memory");
+DB_MT_VanillaTalents("ResurrectToFullHealth");
+DB_MT_VanillaTalents("AttackOfOpportunity");
+DB_MT_VanillaTalents("DualWieldingDodging");
+DB_MT_VanillaTalents("AnimalEmpathy");
+DB_MT_VanillaTalents("ViolentMagic");
+DB_MT_VanillaTalents("WarriorLoreGrenadeRange");
+DB_MT_VanillaTalents("Stench");
+DB_MT_VanillaTalents("Torturer");
+DB_MT_VanillaTalents("Unstable");
+DB_MT_VanillaTalents("WalkItOff");
+DB_MT_VanillaTalents("WhatARush");
+DB_MT_VanillaTalents("ExtraSkillPoints");
+DB_MT_VanillaTalents("ExtraStatPoints");
+DB_MT_VanillaTalents("Demon");
+DB_MT_VanillaTalents("NoAttackOfOpportunity");
+DB_MT_VanillaTalents("ElementalRanger");
+DB_MT_VanillaTalents("Executioner");
+DB_MT_VanillaTalents("IceKing");
+DB_MT_VanillaTalents("WarriorLoreNaturalHealth");
+DB_MT_VanillaTalents("QuickStep");
+KBSECTION
+//===========================================================//
+//                         Initiating                       *//
+//===========================================================//
+
+IF
+	GameStarted(_Level, _)
+AND
+	IsCharacterCreationLevel(_Level, 0)
+AND
+	NOT GlobalGetFlag("MT_Initialized", 1)
+THEN
+	TimerLaunch("MT_InitializationDelay", 100);
+
+IF
+	TimerFinished("MT_InitializationDelay")
+THEN
+	IterateParties("MT_EditorChecks");
+
+IF
+	StoryEvent((CHARACTERGUID)_Char, "MT_EditorChecks")
+THEN
+	PROC_MT_AddPlaceholders(_Char);
+//	PROC_MT_AddTestingSkills(_Char);
+	GlobalSetFlag("MT_Initialized");
+
+IF
+	CharacterJoinedParty(_Char)
+AND
+	DB_IsPlayer(_Char)
+AND
+	CharacterIsSummon(_Char, 0)
+THEN
+	PROC_MT_AddPlaceholders(_Char);
+
+PROC
+	PROC_MT_AddPlaceholders((CHARACTERGUID)_Char)
+AND
+NOT CharacterGetEquippedItem(_Char,"Horns",_)
+THEN
+	ItemTemplateAddTo("MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004",_Char,1,0);
+	ItemTemplateAddTo("MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62",_Char,1,0);
+//	ItemTemplateAddTo("MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae",_Char,1,0);
+
+//PROC
+//	PROC_MT_AddTestingSkills((CHARACTERGUID)_Char)
+//THEN
+//	CharacterAddTalentPoint(_Char,6);
+//	CharacterAddAbilityPoint(_Char,3);
+//	CharacterAddCivilAbilityPoint(_Char,3);
+//	CharacterAddSkill(_Char,"Shout_BullHorns");
+//	CharacterAddSkill(_Char,"Shout_MedusaHead");
+//	CharacterAddSkill(_Char,"Shout_InnerDemon");
+//	CharacterAddSkill(_Char,"Summon_Incarnate");
+//	CharacterAddSkill(_Char,"Shout_InspireStart");
+
+IF
+	ItemTemplateAddedToCharacter(MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004,(ITEMGUID)_Horns,(CHARACTERGUID)_Char)
+AND
+	GetUUID(_Char, _UUID)
+AND
+	StringConcatenate("EquipHorns_", _UUID, _ItemTimer)
+THEN
+	DB_MT_NextSlot(_Char, 1);
+	DB_MT_RuneProgress(_Char,_Horns,1,0);
+	DB_MT_RuneProgress(_Char,_Horns,2,1);
+	DB_MT_RuneProgress(_Char,_Horns,3,2);
+	DB_MT_Equipped_Horns(_Char, _Horns, _ItemTimer);
+	TimerLaunch(_ItemTimer,500);
+
+IF
+	ItemTemplateAddedToCharacter(MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62,(ITEMGUID)_Overhead,(CHARACTERGUID)_Char)
+AND
+	GetUUID(_Char, _UUID)
+AND
+	StringConcatenate("EquipOverhead_", _UUID, _ItemTimer)
+THEN
+	DB_MT_RuneProgress(_Char,_Overhead,4,0);
+	DB_MT_RuneProgress(_Char,_Overhead,5,1);
+	DB_MT_RuneProgress(_Char,_Overhead,6,2);
+	DB_MT_Equipped_Overhead(_Char,_Overhead, _ItemTimer);
+	TimerLaunch(_ItemTimer,500);
+
+IF
+	ItemTemplateAddedToCharacter(MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae,(ITEMGUID)_Wings,(CHARACTERGUID)_Char)
+AND
+	GetUUID(_Char, _UUID)
+AND
+	StringConcatenate("EquipWings_", _UUID, _ItemTimer)
+THEN
+	DB_MT_NextSlot(_Char, 1);
+	DB_MT_RuneProgress(_Wings,1,0);
+	DB_MT_RuneProgress(_Wings,2,1);
+	DB_MT_RuneProgress(_Wings,3,2);
+	DB_MT_Equipped_Wings(_Char, _Wings, _ItemTimer);
+	TimerLaunch(_ItemTimer,500);
+
+IF 
+	ObjectFlagSet("MT_PointCheck",(CHARACTERGUID)_Char,_)
+AND
+	NOT CharacterGetTalentPoints(_Char,0)
+THEN
+	ObjectSetFlag(_Char,"MT_HasPoint");
+
+IF 
+	ObjectFlagSet("MT_PointCheck",(CHARACTERGUID)_Char,_)
+AND
+	DB_MT_NextSlot(_Char, 7)
+THEN
+	ObjectSetFlag(_Char,"MT_SixTalents");
+
+IF 
+	ObjectFlagSet("MT_PointCheck",(CHARACTERGUID)_Char,_)
+AND
+	NOT DB_MT_NextSlot(_Char, 1)
+THEN
+	ObjectSetFlag(_Char,"MT_CustomTalents");
+
+//===========================================================//
+//                      Adding Talents                      *//
+//===========================================================//
+
+IF
+	ObjectFlagSet((STRING)_Flag, (CHARACTERGUID)_Char, _)
+AND
+	DB_MT_NextSlot(_Char, _CurrentSlot)
+AND
+	DB_MT_TalentFlags(_Flag, _RuneTemplate, _Talent, _, _)
+AND
+	IntegerSum((INTEGER)_CurrentSlot, 1, (INTEGER)_NewSlot)
+AND
+	DB_MT_RuneProgress(_Char, _Item, _CurrentSlot, _LocalSlot)
+THEN
+	CharacterAddTalent(_Char, (STRING)_Talent);
+	ItemInsertRune(_Char, (ITEMGUID)_Item, (STRING)_RuneTemplate, (INTEGER)_LocalSlot);
+	CharacterAddTalentPoint(_Char,-1);
+	NOT	DB_MT_NextSlot(_Char, _CurrentSlot);
+	DB_MT_NextSlot(_Char, _NewSlot);
+	
+//===========================================================//
+//                   Respec Custom Talents                  *//
+//===========================================================//
+
+IF
+	ObjectFlagSet("MT_RefundTalents", (CHARACTERGUID)_Char, _)
+AND
+	DB_MT_Equipped_Horns(_Char, _Horns, _HTimer)
+AND
+	DB_MT_Equipped_Overhead(_Char, _Overhead, _OTimer)
+//AND
+//	DB_MT_Equipped_Wings(_Char, _Wings, _WTimer)
+AND
+	DB_MT_NextSlot(_Char, _Next)
+AND
+	IntegerSubtract((INTEGER)_Next,1,(INTEGER)_Refund)
+THEN
+	ItemDestroy((ITEMGUID)_Horns);
+	ItemDestroy((ITEMGUID)_Overhead);
+//	ItemDestroy((ITEMGUID)_Wings);
+	NOT DB_MT_Equipped_Horns(_Char, _Horns, _HTimer);
+	NOT DB_MT_Equipped_Overhead(_Char, _Overhead, _OTimer);
+//	NOT DB_MT_Equipped_Wings(_Char, _Wings, _WTimer);
+	NOT DB_MT_NextSlot(_Char, _Next);
+	CharacterAddTalentPoint(_Char, _Refund);
+	PROC_MT_Reset_Progress(_Char);
+	PROC_MT_RemoveTalents_Custom(_Char);
+	ObjectClearFlag(_Char, "MT_RefundTalents");
+	ObjectClearFlag(_Char, "MT_CustomTalents");
+	ObjectClearFlag(_Char, "MT_SixTalents");
+	ItemTemplateAddTo("MT_Blank_Horns_b16e0d6b-4590-45f8-92e9-02d45cfe8004",_Char,1,0);
+	ItemTemplateAddTo("MT_Blank_Overhead_d5b1e6f6-d209-4dee-b65e-9cc6708d6d62",_Char,1,0);
+//	ItemTemplateAddTo("MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae",_Char,1,0);
+
+PROC
+	PROC_MT_RemoveTalents_Custom((CHARACTERGUID)_Char)
+AND
+	DB_MT_TalentFlags(_Flag, _, _Talent, _, _)
+AND
+	ObjectGetFlag(_Char,_Flag,1)
+THEN
+	ObjectClearFlag(_Char, _Flag);
+	CharacterRemoveTalent(_Char, _Talent);
+
+PROC
+	PROC_MT_Reset_Progress((CHARACTERGUID)_Char)
+AND
+	DB_MT_RuneProgress(_Char, _Item,_Counter,_Slot)
+THEN
+	NOT DB_MT_RuneProgress(_Char, _Item,_Counter,_Slot);
+
+IF
+	ObjectFlagSet("MT_PointCheck", (CHARACTERGUID)_Char, _)
+AND
+	DB_MT_TalentFlags(_, _, _, _Req, _ReqFlag)
+AND 
+	CharacterGetBaseAbility(_Char,(STRING)_Req,(INTEGER)_Score)
+AND
+	_Score >= 1
+THEN 	
+	ObjectSetFlag(_Char,(STRING)_ReqFlag);
+
+IF
+	CharacterCreationFinished((CHARACTERGUID)_Char)
+AND
+	QRY_MT_ShouldRespec(_Char)
+THEN
+	CharacterStatusText(_Char,"Required abilities not found! Raw Talent refunded!");
+	ObjectSetFlag(_Char, "MT_RefundTalents");
+
+QRY
+	QRY_MT_ShouldRespec((CHARACTERGUID)_Char)
+AND
+	DB_MT_TalentFlags(_, _, _Talent, _Req, _ReqFlag)
+AND
+	CharacterHasTalent(_Char, (STRING)_Talent, 1)
+AND 
+	CharacterGetBaseAbility(_Char,(STRING)_Req,(INTEGER)_Score)
+AND
+	_Score == 0
+THEN 	
+	DB_NOOP(1);
+
+//===========================================================//
+//                  Respec Vanilla Talents                  *//
+//===========================================================//
+
+IF
+	ObjectFlagSet("MT_PointCheck", (CHARACTERGUID)_Char, _)	// Sets the Has Vanilla Talent Flag
+AND
+	DB_MT_VanillaTalents(_Talent)
+AND
+	CharacterHasTalent(_Char, _Talent, 1)
+AND
+	ObjectGetFlag(_Char, "MT_HasVanillaTalent", 0)
+THEN
+	ObjectSetFlag(_Char, "MT_HasVanillaTalent");
+
+IF
+	ObjectFlagSet("MT_ClearAbilityFlags", _Char, _)	// Clears the Has Vanilla Talent Flag on Dialog Ending
+AND
+	ObjectGetFlag(_Char, "MT_HasVanillaTalent", 1)
+THEN
+	ObjectClearFlag(_Char, "MT_HasVanillaTalent");
+
+IF
+	ObjectFlagSet("MT_RefundTalents_Vanilla", (CHARACTERGUID)_Char, _ID)
+THEN
+	PROC_MT_RemoveTalents_Vanilla(_Char);
+
+PROC
+	PROC_MT_RemoveTalents_Vanilla((CHARACTERGUID)_Char)	// Gives back Talent Points and Remove Vanilla Talents
+AND
+	DB_MT_VanillaTalents(_Talent)
+AND
+	CharacterHasTalent(_Char, _Talent, 1)
+THEN
+	CharacterRemoveTalent(_Char, _Talent);
+	CharacterAddTalentPoint(_Char, 1);
+	ObjectClearFlag(_Char, "MT_RefundTalents_Vanilla");
+
+//===========================================================//
+//                      Item Timers                         *//
+//===========================================================//
+
+IF
+	TimerFinished(_TimerName)
+AND
+	DB_MT_Equipped_Horns(_Char,_Horns,_TimerName)
+THEN
+	CharacterEquipItem(_Char,_Horns);
+
+IF
+	TimerFinished(_TimerName)
+AND
+	DB_MT_Equipped_Overhead(_Char,_Overhead,_TimerName)
+THEN
+	CharacterEquipItem(_Char,_Overhead);
+
+//IF
+//	TimerFinished(_TimerName)
+//AND
+//	DB_MT_Equipped_Wings(_Char,_Wings,_TimerName)
+//THEN
+//	CharacterEquipItem(_Char,_Wings);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "MoreTalents"

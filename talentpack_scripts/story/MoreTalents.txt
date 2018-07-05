@@ -1,0 +1,33 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+MT_Start_Internal_CompleteIfStarted();
+
+KBSECTION
+PROC
+	MT_Internal_StartMoreTalents()
+THEN
+	GoalCompleted;
+
+IF
+	GameEventSet("GAMEEVENT_GameStarted")
+THEN
+	MT_Internal_StartMoreTalents();
+
+PROC
+	MT_Start_Internal_CompleteIfStarted()
+AND
+	DB_StoryStarted(_)
+THEN
+	MT_Internal_StartMoreTalents();
+
+IF
+	SavegameLoaded(_,_,_,_)
+AND
+	DB_StoryStarted(_)
+THEN
+	MT_Internal_StartMoreTalents();
+EXITSECTION
+
+
+ENDEXITSECTION

@@ -4,17 +4,143 @@ INITSECTION
 
 KBSECTION
 //===========================================================//
-//                      Reactionary                         *//
+//                   Unruly Visitors (Beastmaster)          *//
 //===========================================================//
 
-IF 
-CharacterCharacterEvent((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker,"ChanceToHitMeleeEvent")
+IF
+	CharacterStatusApplied((CHARACTERGUID)_Char,"SUMMONING_ABILITY",_)
+AND
+	CharacterIsSummon(_Char,1)
+AND
+	CharacterIsPlayer(_Char, 1)
+AND
+	CharacterGetOwner(_Char,_Owner)
+AND
+	CharacterHasTalent(_Owner,"Beastmaster",1)
 THEN
-CharacterAttack((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker);
+	SetVarObject(_Char,"BeastmasterLeader",_Owner);
+	SetStoryEvent(_Char,"BeastmasterReapply");
 
 //===========================================================//
-//                      Perforator                          *//
+//                   Generous Host (Charm)                  *//
 //===========================================================//
+
+IF
+	CharacterStatusApplied(_Summon, "SUMMONING_ABILITY", _)
+AND
+	CharacterIsSummon(_Summon, 1)
+AND
+	CharacterIsPlayer(_Summon, 1)
+AND
+	CharacterGetOwner(_Summon, _Owner)
+AND
+	CharacterHasTalent(_Owner, "Charm", 1)
+AND
+	GetUUID(_Owner, _UUID)
+AND
+	StringConcatenate("MT_GenerousHostTimer_", _UUID, _GHTimer)
+THEN
+	DB_MT_GH_SummonControl(_Owner, _Summon);
+	PROC_MT_SummonSpawnControl(_Owner);
+	DB_MT_GH_Timer(_Owner, _GHTimer);
+	TimerLaunch(_GHTimer, 500);
+
+IF
+	TimerFinished(_GHTimer)
+AND
+	DB_MT_GH_Timer(_Owner, _GHTimer)
+THEN
+	PROC_MT_ApplySummonStatus(_Owner);
+	NOT DB_MT_GH_Timer(_Owner, _GHTimer);
+
+PROC
+	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	IntegerSum(_Number, 1, _Sum)
+THEN
+	NOT DB_MT_MaxSummonControl(_Owner, _Number);
+	DB_MT_MaxSummonControl(_Owner, _Sum);
+
+PROC
+	PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
+AND
+	NOT DB_MT_MaxSummonControl(_Owner, _)
+THEN
+	DB_MT_MaxSummonControl(_Owner, 1);
+
+IF
+	CharacterDied(_Summon)
+AND
+	DB_MT_GH_SummonControl(_Owner, _Summon)
+AND
+	GetUUID(_Owner, _UUID)
+AND
+	StringConcatenate("MT_GenerousHostTimer_", _UUID, _GHTimer)
+THEN
+	NOT DB_MT_GH_SummonControl(_Owner, _Summon);
+	PROC_MT_SummonDieControl(_Owner);
+	DB_MT_GH_Timer(_Owner, _GHTimer);
+	TimerLaunch(_GHTimer, 500);
+
+PROC
+	PROC_MT_SummonDieControl((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	IntegerSubtract(_Number, 1, _Subtraction)
+THEN
+	NOT DB_MT_MaxSummonControl(_Owner, _Number);
+	DB_MT_MaxSummonControl(_Owner, _Subtraction);
+
+PROC
+	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	_Number >= 2
+AND
+	HasActiveStatus(_Owner, "GENEROUS_HOST", 0)
+THEN
+	ApplyStatus(_Owner, "GENEROUS_HOST", -1.0, 1);
+
+PROC
+	PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
+AND
+	DB_MT_MaxSummonControl(_Owner, _Number)
+AND
+	_Number < 2
+AND
+	HasActiveStatus(_Owner, "GENEROUS_HOST", 1)
+THEN
+	RemoveStatus(_Owner, "GENEROUS_HOST");
+
+IF
+	ObjectFlagSet("MT_RefundTalents", (CHARACTERGUID)_Char, _)
+AND
+	DB_MT_MaxSummonControl(_Char, _Number)
+THEN
+	NOT DB_MT_MaxSummonControl(_Char, _Number);
+	RemoveStatus(_Char, "GENEROUS_HOST");
+
+//===========================================================//
+//              Invasive Species (ResistKnockdown)          *//
+//===========================================================//
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"StorySpawn")
+AND
+GetVarFloat3(_Char,"SpawnPoint",_X, _Y, _Z)
+AND
+CharacterCreateAtPosition(_X, _Y, _Z, "MT_CorpsePlant_653f533f-d9f3-40df-a3b1-fa2594547f87",0,(CHARACTERGUID)_Spawn)
+THEN
+CharacterAddSourcePoints(_Spawn,-1);
+SetVarObject(_Char,"Blight1",_Spawn);
+
+//===========================================================//
+//                    Perforator (Backstab)                 *//
+//===========================================================//	
 
 IF
 StoryEvent((CHARACTERGUID)_Char,"BackstabTimer")
@@ -30,134 +156,52 @@ THEN
 SetStoryEvent((CHARACTERGUID)_Char,"BackstabEvent");
 
 //===========================================================//
-//                      Generous Host                       *//
+//                 Reactionary (ChanceToHitMelee)           *//
+//===========================================================//	
+
+IF 
+CharacterCharacterEvent((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker,"ChanceToHitMeleeEvent")
+THEN
+CharacterLookAt(_Char,_Attacker);
+PROC_MT_CanSeeReactionary(_Char,_Attacker);
+
+PROC 
+PROC_MT_CanSeeReactionary((CHARACTERGUID)_Char,(CHARACTERGUID)_Attacker)
+AND
+CharacterCanSee(_Char,_Attacker,1)
+THEN
+CharacterAttack(_Char,_Attacker);
+
+//===========================================================//
+//                   Voltage Spike (SpillNoBlood)           *//
 //===========================================================//
 
 IF
-CharacterStatusApplied(_Summon, "SUMMONING_ABILITY", _)
+CharacterStatusAttempt((CHARACTERGUID)_Char,"SHOCKED",_)
 AND
-CharacterIsSummon(_Summon, 1)
+CharacterHasTalent(_Char,"SpillNoBlood",1)
 AND
-CharacterGetOwner(_Summon, _Owner)
+CharacterGetMagicArmorPercentage(_Char,(INTEGER)_MagicArmor)
 AND
-CharacterHasTalent(_Owner, "Charm", 1)
+_MagicArmor > 0
 THEN
-CharacterStatusText(_Summon, "Summon");
-CharacterStatusText(_Owner, "Owner");
-PROC_MT_SummonSpawnControl(_Owner);
-PROC_MT_ApplySummonStatus(_Owner);
-
-PROC
-PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
-AND
-DB_MT_MaxSummonControl(_Owner, _Number)
-AND
-IntegerSum(_Number, 1, _Sum)
-THEN
-NOT DB_MT_MaxSummonControl(_Owner, _Number);
-DB_MT_MaxSummonControl(_Owner, _Sum);
-
-PROC
-PROC_MT_SummonSpawnControl((CHARACTERGUID)_Owner)
-AND
-NOT DB_MT_MaxSummonControl(_Owner, _)
-THEN
-DB_MT_MaxSummonControl(_Owner, 1);
+SetStoryEvent(_Char,"VoltageHit");
 
 IF
-CharacterDied(_Summon)
+CharacterStatusAttempt((CHARACTERGUID)_Char,"STUNNED",_)
 AND
-CharacterIsSummon(_Summon, 1)
+CharacterHasTalent(_Char,"SpillNoBlood",1)
 AND
-CharacterGetOwner(_Summon, _Owner)
+CharacterGetMagicArmorPercentage(_Char,(INTEGER)_MagicArmor)
 AND
-CharacterHasTalent(_Owner, "Charm", 1)
+_MagicArmor > 0
 THEN
-CharacterStatusText(_Summon, "Summon");
-CharacterStatusText(_Owner, "Owner");
-PROC_MT_SummonDieControl(_Owner);
-PROC_MT_ApplySummonStatus(_Owner);
-
-PROC
-PROC_MT_SummonDieControl((CHARACTERGUID)_Owner)
-AND
-DB_MT_MaxSummonControl(_Owner, _Number)
-AND
-IntegerSubtract(_Number, 1, _Sum)
-THEN
-NOT DB_MT_MaxSummonControl(_Owner, _Number);
-DB_MT_MaxSummonControl(_Owner, _Sum);
-
-PROC
-PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
-AND
-DB_MT_MaxSummonControl(_Owner, _Number)
-AND
-_Number >= 2
-AND
-HasActiveStatus(_Owner, "MT_SUMMONFATIGUE", 0)
-THEN
-ApplyStatus(_Owner, "MT_SUMMONFATIGUE", -1.0, 1);
-
-PROC
-PROC_MT_ApplySummonStatus((CHARACTERGUID)_Owner)
-AND
-DB_MT_MaxSummonControl(_Owner, _Number)
-AND
-_Number < 2
-AND
-HasActiveStatus(_Owner, "MT_SUMMONFATIGUE", 1)
-THEN
-RemoveStatus(_Owner, "MT_SUMMONFATIGUE");
-
-//===========================================================//
-//                      Unruly Visitors                     *//
-//===========================================================//
+SetStoryEvent(_Char,"VoltageHit");
 
 IF
-CharacterStatusApplied(_Char,"SUMMONING_ABILITY",_)
-AND
-CharacterGetOwner(_Char,_Owner)
-AND
-CharacterHasTalent(_Owner,"Beastmaster",1)
+CharacterStatusRemoved((CHARACTERGUID)_Char,"OVERCHARGED",_)
 THEN
-DB_MT_Beastmaster_Summon(_Char);
-TimerLaunch("BeastmasterTicker",100);
-
-IF
-StoryEvent((CHARACTERGUID)_Char,"BeastmasterReapply")	
-AND
-CharacterGetOwner(_Char,_Owner)
-AND
-CharacterHasTalent(_Owner,"Beastmaster",1)
-THEN
-DB_MT_Beastmaster_Summon(_Char);
-TimerLaunch("BeastmasterTicker",100);			
-
-IF
-TimerFinished("BeastmasterTicker")
-AND
-DB_MT_Beastmaster_Summon(_Char)
-AND
-CharacterGetOwner(_Char,_Owner)
-THEN
-SetVarObject(_Char,"BeastmasterLeader",_Owner);
-SetStoryEvent(_Char,"BeastmasterSummoned");
-NOT DB_MT_Beastmaster_Summon(_Char);
-
-IF
-StoryEvent((CHARACTERGUID)_Char,"BeastmasterLossTurn")	
-THEN
-DB_MT_Beastmaster_SummonTurn(_Char);
-TimerLaunch("BeastmasterTurnTicker",2000);			
-
-IF
-TimerFinished("BeastmasterTurnTicker")
-AND
-DB_MT_Beastmaster_SummonTurn(_Char)
-THEN
-SetStoryEvent(_Char,"BeastmasterTurnMadness");
-NOT DB_MT_Beastmaster_SummonTurn(_Char);
+CharacterSetMagicArmorPercentage(_Char,0);
 EXITSECTION
 
 ENDEXITSECTION
