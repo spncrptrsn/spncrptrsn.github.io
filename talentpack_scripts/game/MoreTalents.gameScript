@@ -1,36 +1,80 @@
 INIT
-CHARACTER:%Char
+INT64:%effectHandle = null
+INT:%SummonCounter=0
+LIST<ITEMTEMPLATE>:%MT_ScrollList1
+LIST<ITEMTEMPLATE>:%MT_ScrollList2
+LIST<ITEMTEMPLATE>:%MT_ScrollList3
+LIST<ITEMTEMPLATE>:%MT_ScrollList4
+LIST<ITEMTEMPLATE>:%MT_ScrollList5
+LIST<ITEMTEMPLATE>:%MT_ScrollList6
+ITEM:%Scroll
 LIST<CHARACTER>:%BlightSpawnList
+CHARACTER:%Summoner
 EVENTS
+
+//===========================================================//
+//                   Character Extensions                   *//
+//===========================================================//
 
 EVENT MTOnTurn
 VARS
 CHARACTER:_Char
 CHARACTER:_Owner
-FIXEDSTRING:_Scroll
+ITEMTEMPLATE:_Scroll
 CHARACTER:_Poisoner
-INT:_ScrollMarker
 CHARACTER:_BlightSpawnTarget
 FLOAT3:_SpawnPoint	
+ITEM:_FinalScroll
+INT:_Lore
+LIST<ITEMTEMPLATE>:_ScrollList
 ON
 	OnTurn(_Char,_)
 ACTIONS
+	IF "c1&c2"
+		CharacterHasTalent(_Char,ItemCreation)
+		CharacterGetAbility(_Lore,_Char,Loremaster)		
+	THEN
+		IF "c1"
+			IsGreaterThen(_Lore,5)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList6)
+		ELIF "c1"
+			IsEqual(_Lore,5)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList5)
+		ELIF "c1"
+			IsEqual(_Lore,4)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList4)
+		ELIF "c1"
+			IsEqual(_Lore,3)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList3)
+		ELIF "c1"
+			IsEqual(_Lore,2)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList2)
+		ELIF "c1"
+			IsEqual(_Lore,1)
+		THEN	
+			Set(_ScrollList,%MT_ScrollList1)
+		ENDIF	
+		IF "c1"
+			ListGetRandom(_ScrollList,_Scroll)
+		THEN	
+			SpawnItem(_Scroll,_Char,_FinalScroll)
+			ItemToInventory(_FinalScroll,_Char)
+			Set(%Scroll,_FinalScroll)
+		ENDIF
+	ENDIF
 	IF "c1"
 		CharacterHasTalent(_Char,ResistKnockdown)	
 	THEN
 		ListClear(%BlightSpawnList)
-		IterateHostilesFor(_Char,"GetBlightSpawn")
-		IF "c1&c2"
-			ListGetRandom(%BlightSpawnList,_BlightSpawnTarget)
-			GetPosition(_BlightSpawnTarget,_SpawnPoint)
-		THEN
-			SpawnCharacter(_,MT_CorpsePlant_653f533f-d9f3-40df-a3b1-fa2594547f87,_SpawnPoint,0)
-		ENDIF
+		IterateHostilesFor(_Char,"GetBlightSpawn")	
+		CharacterEvent(_Char,"BlightSpawner")
 	ENDIF
-	IF "!c1"
-		CharacterHasStatus(_Char,MADNESS)
-	THEN	
- 	IF "c1&c2&c3&!c4"
+	IF "c1&c2&c3&!c4"
 		CharacterHasStatus(_Char,POISONED)
 		CharacterGetStatusSourceCharacter(_Char,POISONED,_Poisoner)
 		HasFlag(_Poisoner,"MT_ExtraWandCharge")
@@ -38,15 +82,13 @@ ACTIONS
 	THEN
 		CharacterApplyStatus(_Char,MT_UNTREATED1,1)
 	ENDIF 	 
-	IF "c1&!c2&c3"
-		CharacterHasStatus(_Char,MT_AGITATED)
-		CharacterHasStatus(_Char,LEADERSHIP)
-		GetVar(_Owner,_Char,"BeastmasterLeader")		
+	IF	"c1"
+		CharacterHasTalent(_Char,BeastMaster)
 	THEN
-		CharacterRemoveStatus(_Char,MT_AGITATED,null,0)	
-		CharacterApplyStatus(_Char,MADNESS,-1,1,_Owner)
-	ENDIF
-	ENDIF
+		Set(%Summoner,_Char)
+		IterateCharactersInCombat(_Char,"MyChillSummons")
+	ENDIF		
+//	CharacterRemoveStatus(_Char,MT_BEASTTURN)
 
 EVENT MTOnTurnEnd
 VARS
@@ -55,21 +97,40 @@ CHARACTER:_Owner
 ON
   OnTurnEnded(_Char,_)
 ACTIONS
-	IF "c1&!c2"
+	IF "c1&!c2&c3"
 		CharacterHasTalent(_Char,FolkDancer)
 		CharacterHasStatus(_Char,SNEAKING)
+		IsInCombat(_Char)
 	THEN
 		CharacterApplyStatus(_Char,SNEAKING)
+	ENDIF
+	IF	"c1&c2"
+		IsInCombat(_Char)
+		CharacterHasTalent(_Char,BeastMaster)
+	THEN
+		Set(%Summoner,_Char)
+		IterateCharactersInCombat(_Char,"MyMadSummons")
 	ENDIF	
-	IF "c1&c2&c3&!c4"
+	ItemDestroy(%Scroll)
+	
+
+EVENT MTOnCombatEnd
+VARS
+CHARACTER:_Char
+CHARACTER:_Owner
+ON
+	OnLeftCombat(_Char,_)
+ACTIONS
+	IF "c1&c2"
 		CharacterHasStatus(_Char,MADNESS)
 		GetVar(_Owner,_Char,"BeastmasterLeader")
-		CharacterGetStatusSourceCharacter(_Char,MADNESS,_Owner)
-		CharacterHasStatus(_Char,MT_TURNEXTENDER)
 	THEN	
-		CharacterRemoveStatus(_Char,MADNESS,null,0)
-		CharacterEvent(_Char,"BeastmasterReapply")		
+		CharacterRemoveStatus(_Char,MADNESS)
 	ENDIF	
+	
+//===========================================================//
+//              Unruly Visitors (Beastmaster)               *//
+//===========================================================//
 
 EVENT BeastmasterSummonedEvent
 VARS
@@ -77,17 +138,29 @@ CHARACTER:_Summon
 CHARACTER:_Owner
 CHARACTER:_Leader
 ON
-	OnCharacterEvent(_Summon,"BeastmasterSummoned")
+	OnCharacterEvent(_Summon,"BeastmasterReapply")
+	OnIterateCharacter(_Summon,"MyLostSummons")	
 ACTIONS	
-	IF "c1&c2&c3&c4"
+	IF "c1"
 		GetVar(_Owner,_Summon,"BeastmasterLeader")
-		CharacterHasStatus(_Summon,LEADERSHIP)
-		CharacterGetStatusSourceCharacter(_Summon,LEADERSHIP,_Leader)
-		IsEqual(_Owner,_Leader)
 	THEN
-		CharacterApplyStatus(_Summon,MT_UNRULY,-1)
-	ELSE	
-		CharacterApplyStatus(_Summon,MT_AGITATED,-1)
+		IF "c1&c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&!c10&!c11"
+			CharacterHasStatus(_Summon,LEADERSHIP)
+			CharacterGetStatusSourceCharacter(_Summon,LEADERSHIP,_Leader)
+			IsEqual(_Owner,_Leader)
+			CharacterHasStatus(_Leader,KNOCKED_DOWN)
+			CharacterHasStatus(_Leader,CHICKEN)
+			CharacterHasStatus(_Leader,FROZEN)
+			CharacterHasStatus(_Leader,STUNNED)
+			CharacterHasStatus(_Leader,CHARMED)
+			CharacterHasStatus(_Leader,MADNESS)
+			CharacterHasStatus(_Leader,PETRIFIED)
+			CharacterHasStatus(_Leader,FEAR)		
+		THEN
+			CharacterApplyStatus(_Summon,MT_UNRULY,-1)
+		ELSE	
+			CharacterApplyStatus(_Summon,MT_AGITATED,-1)
+		ENDIF
 	ENDIF
 
 EVENT BeastmasterLeaderChange
@@ -95,66 +168,328 @@ VARS
 CHARACTER:_Char
 ON
 	OnCharacterStatusRemoved(_Char,LEADERSHIP)
-	OnCharacterStatusApplied(_Char,LEADERSHIP)
+	OnCharacterStatusApplied(_Char,LEADERSHIP)	
 ACTIONS		
 	IF "c1|c2"
 		CharacterHasStatus(_Char,MT_UNRULY)
-		CharacterHasStatus(_Char,MT_AGITATED)
+		CharacterHasStatus(_Char,MT_AGITATED)		
 	THEN	
-		CharacterEvent(_Char,"BeastmasterSummoned")
-		IF "c1"
-			IsInActiveTurn(_Char)
-		THEN	
-			CharacterEvent(_Char,"BeastmasterLossTurn")
-		ENDIF
+		CharacterEvent(_Char,"BeastmasterReapply")
 	ENDIF
 		
+EVENT UnrulySummonIterator
+VARS
+CHARACTER:_Summon
+CHARACTER:_Owner
+ON
+  OnIterateCharacter(_Summon,"MyMadSummons")
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterHasStatus(_Summon,MT_AGITATED)		
+		GetVar(_Owner,_Summon,"BeastmasterLeader")		
+		IsEqual(_Owner,%Summoner)
+	THEN
+		CharacterApplyStatus(_Summon,MADNESS,-1,1,_Owner)
+	ENDIF
 
-EVENT MTOnTurnMadness
+EVENT ChillSummonIterator
+VARS
+CHARACTER:_Summon
+CHARACTER:_Owner
+ON
+  OnIterateCharacter(_Summon,"MyChillSummons")
+ACTIONS
+	IF "c1&c2&c3&c4"
+		CharacterHasStatus(_Summon,MADNESS)		
+		GetVar(_Owner,_Summon,"BeastmasterLeader")		
+		CharacterGetStatusSourceCharacter(_Summon,MADNESS,_Owner)
+		IsEqual(_Owner,%Summoner)
+	THEN
+		CharacterRemoveStatus(_Summon,MADNESS,null,0)
+	ENDIF
+
+EVENT BeastmasterMadnessChange
 VARS
 CHARACTER:_Char
 CHARACTER:_Owner
 ON
-	OnCharacterEvent(_Char,"BeastmasterTurnMadness")		
-ACTIONS
-	IF "c1&!c2&c3"
-		CharacterHasStatus(_Char,MT_AGITATED)
-		CharacterHasStatus(_Char,LEADERSHIP)
-		GetVar(_Owner,_Char,"BeastmasterLeader")		
+	OnCharacterStatusRemoved(_Char,MADNESS)
+ACTIONS		
+	IF "c1&!c2"
+		GetVar(_Owner,_Char,"BeastmasterLeader")
+		IsEqual(_Owner,null)
 	THEN
-		CharacterRemoveStatus(_Char,MT_AGITATED,null,0)
-		CharacterApplyStatus(_Char,MT_TURNEXTENDER,1,1,_Owner)		
-		CharacterApplyStatus(_Char,MADNESS,-1,1,_Owner)
-	ENDIF		
-		
-EVENT ChanceToHitMeleeCheck
-VARS
-CHARACTER:_Char
-CHARACTER:_Attacker
-ON
-	OnMiss(_Attacker,_,_Char,_)
-	OnBlock(_Attacker,_,_Char,_)
-ACTIONS
-	IF "c1&c2"
-		CharacterHasTalent(_Char,ChanceToHitMelee)
-		CharacterInWeaponRange(_Char,_Attacker)
-	THEN	
-		CharacterCharacterEvent(_Char,_Attacker,"ChanceToHitMeleeEvent")
+		CharacterEvent(_Char,"BeastmasterReapply")
 	ENDIF
 	
-EVENT AirSpellsRemoveStunned
+EVENT BeastmasterOwnerCCed
 VARS
-	CHARACTER:_Char
-ON 
-	OnCharacterStatusRemoved(_Char, STUNNED)
-	OnCharacterStatusRemoved(_Char, SHOCKED)	
+CHARACTER:_Char
+ON
+		OnCharacterStatusApplied(_Char,KNOCKED_DOWN)
+		OnCharacterStatusApplied(_Char,CHICKEN)
+		OnCharacterStatusApplied(_Char,FROZEN)
+		OnCharacterStatusApplied(_Char,STUNNED)
+		OnCharacterStatusApplied(_Char,CHARMED)
+		OnCharacterStatusApplied(_Char,MADNESS)
+		OnCharacterStatusApplied(_Char,PETRIFIED)
+		OnCharacterStatusApplied(_Char,FEAR)
+		OnCharacterStatusRemoved(_Char,KNOCKED_DOWN)
+		OnCharacterStatusRemoved(_Char,CHICKEN)
+		OnCharacterStatusRemoved(_Char,FROZEN)
+		OnCharacterStatusRemoved(_Char,STUNNED)
+		OnCharacterStatusRemoved(_Char,CHARMED)
+		OnCharacterStatusRemoved(_Char,MADNESS)
+		OnCharacterStatusRemoved(_Char,PETRIFIED)
+		OnCharacterStatusRemoved(_Char,FEAR)
 ACTIONS
 	IF "c1"
-		CharacterHasTalent(_Char,AirSpells)
-	THEN
-		CharacterApplyStatus(_Char, OVERCHARGED, 1)
+		CharacterHasTalent(_Char,BeastMaster)
+	THEN	
+		IterateCharactersInCombat(_Char,"MyLostSummons")
 	ENDIF
+	
+//===========================================================//
+//              Bitter Tinctures (ExtraWandCharge)          *//
+//===========================================================//	
+	
+EVENT ResistUntreatedPoison
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+ON
+	FetchCharacterApplyStatusData(_Character, MT_UNTREATED1)
+ACTIONS
+	ListClear(_RemoveList)
+	Set(_Result, MT_UNTREATED1)	
+	IF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED1)
+	THEN
+		Set(_Result, MT_UNTREATED2)
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED2)
+	THEN
+		Set(_Result, MT_UNTREATED3)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED3)
+	THEN
+		Set(_Result, MT_UNTREATED4)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED4)
+	THEN
+		Set(_Result, MT_UNTREATED5)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED6)
+	THEN
+		Set(_Result, MT_UNTREATED7)
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED7)
+	THEN
+		Set(_Result, MT_UNTREATED8)			
+	ELIF "c1"
+		CharacterHasStatus(_Character,MT_UNTREATED8)
+	THEN
+		Set(_Result, MT_UNTREATED8)		
+	ENDIF
+	RETURN(_RemoveList,_Result,1)		
 
+//===========================================================//
+//                Dog-Eared Copy (ItemCreation)             *//
+//===========================================================//	
+
+EVENT GenerateScrollList
+VARS
+CHARACTER:_Char
+ON
+	OnGlobalFlagSet("MT_Initialized")
+ACTIONS
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Shout_Ignition_MT_8e50a0eb-a751-4436-a464-2b13a892e927)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Summon_TotemFromSurface_MT_d8edca03-6fe7-4def-8158-b78ce4ea8270)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_Cannibalize_MT_4d253e17-0521-48b0-9c06-54a2ec7184fd)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_ChickenTouch_MT_7bbf75af-0fba-4288-8ca4-583e0ab92dd1)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Summon_Incarnate_MT_ad8ef3fe-7fbf-4a15-a429-db46f32eab00)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_DecayingTouch_MT_44c210c6-9ced-4ed6-b875-5c7b79388c87)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Earth_Fortify_MT_ee65f2ac-ede4-4a15-8d05-a50d7e712508)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Earth_PoisonDartStart_MT_c668785f-0467-4eaf-830f-b9999ccff113)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_MosquitoSwarm_MT_b8fe5fde-86fa-4a87-be2c-339d4a585785)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_TentacleLash_MT_c0d35e33-1862-4267-be13-e580d50e9e8e)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Water_Rain_MT_4ed24c8e-7835-4c19-af4e-bda343315812)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Water_Restoration_MT_276855f3-259f-47ff-b984-9fa531b03ef1)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_ShockingTouch_MT_33411c01-846a-4ae9-9a9a-e251965de842)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_PowerInfusion_MT_315fea37-5b80-46ec-860f-219f6d9d1ac2)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_RangedInfusion_MT_9c235fb9-c8c8-44d7-8dde-83beb6f091ad)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Water_LightningBolt_MT_d291b057-ffc3-4213-b2fc-16888a22ce5e)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_BurnMyEyes_MT_76f62510-56b3-458e-a116-c0cae60e158d)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Target_FrostyShell_MT_e21e0100-ccfe-49f0-b312-aedaed9ed0ae)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Shout_BullHorns_MT_5729bd39-6263-4697-b274-6b9cb0d80766)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Earth_PyroclasticRock_MT_b3053994-a75d-499e-886d-16144fd00e37)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Air_Teleportation_MT_2bb620ab-48d4-4ddc-8df7-21f0b7be221f)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Air_Tornado_MT_2aaf5fce-5ab1-4785-8b6f-c3db4390c7aa)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Fire_FlamingDaggers_MT_77af5719-3e17-4a43-8401-c91baa0f342a)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Fire_Haste_MT_8a3d7f2d-8945-4a5b-b720-c37f76a6fd2a)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Projectile_DimensionalBolt_MT_b7785b63-8b67-4f37-bc29-8b7208f65f88)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Shout_FavourableWind_MT_b519e1a0-7fbe-498d-8d38-9f058d7780cc)
+	ListAdd(%MT_ScrollList1,Scroll_Skill_Shout_Contamination_MT_71f06a0d-7e94-4013-8a7c-ed9324ca1c57)
+	Set(%MT_ScrollList2,%MT_ScrollList1)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_FrostAura_MT_6bdc3606-5c6f-4943-a89a-fe08f2fe01e2)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_GlobalCooling_MT_8a80d894-1902-4e2c-adc8-be7445a1ba47)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_MendMetal_MT_a0f6996c-8263-474a-aba8-e681934e07fb)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_Wings_MT_363baeb7-5fd5-4d5c-9bb0-f9b2baaf656d)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_Windwalker_MT_ce6822fa-380e-4947-9e7c-8aa7ea5083f2)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_SpontaneousCombustion_MT_842c528d-14d4-48f4-bd1a-dc18f9fd2054)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Water_HailStrike_MT_8b82daa5-a105-4141-868f-f89e06458691)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_WaterInfusion_MT_2f2ef45c-1800-41f0-9347-90b19ef1801c)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_PoisonInfusion_MT_5626abc5-0d39-4112-b94c-2deb1ed282c6)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Fire_Fireball_MT_c2f540dd-5870-4125-85bc-ff2a0cef6b8d)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Projectile_DustBlast_MT_040b7723-0276-4b15-8a5b-575f270c7308)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Projectile_IceFan_MT_55affdcb-0b93-4c25-9c84-63daba257255)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Projectile_InfectiousFlame_MT_3810c61b-074e-4fc5-b414-bbd8959f799d)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Projectile_LaunchExplosiveTrap_MT_fe0eb587-378a-484f-a402-1bb967e76683)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Projectile_LaunchOilBlob_MT_f3f4d0d0-d168-42ec-a87b-19402ce1a194)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_BlindingRadiance_MT_50391e4d-7896-47dd-832a-23f734523e41)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_BoneCage_MT_57a31e6b-0388-4c75-8c42-26e92f08d869)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_ChameleonSkin_MT_ca8fb5cc-f0ed-4038-bf1f-92b7139d39d3)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Shout_SpiderLegs_MT_09128630-b72e-435e-a2bf-d11a646760c6)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_BloatedCorpse_MT_a7c43b02-bc2f-416f-a0db-0ee591c18332)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_BloodBubble_MT_c853efd6-5d5f-48a2-bf66-5ebc88a4d9bc)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_Apportation_MT_ceb21cc8-583a-4d0d-9cb0-b71dda5dd89e)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Target_FireWhip_MT_88a68676-f2a9-4e10-b5d8-b75839c76627)
+	ListAdd(%MT_ScrollList2,Scroll_Skill_Source_Bless_MT_b02f585a-525b-4fc8-8a82-0d5586f5d3b2)
+	Set(%MT_ScrollList3,%MT_ScrollList2)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_FireInfusion_MT_9e5d8d91-84bf-4d4c-97df-8c7366ac1cad)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_ElectricInfusion_MT_ecde9a9c-dcc0-4cc7-bd62-b727245053cd)	
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Witchcraft_RainOfBlood_MT_8ebf2b7f-bf0a-467c-9961-610d62e9704a)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Summon_BonePile_MT_3df4deea-451b-40c0-afdf-da127cd6e484)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Supercharge_MT_6571a548-b0af-495f-84a6-1aba87641f0e)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_PressureSpike_MT_1c164274-6c35-491a-a3a2-3f5bad406758)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_WinterBlast_MT_6ad7b3b3-605c-42c9-8d9f-0e33e26a3a95)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_WormTremor_MT_8d6d9a03-1fba-4668-b098-cc93b7a22f2f)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Fireblood_MT_852f6f1f-31d5-4851-a3c9-4260943a903e)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Teleportation_SwapGround_MT_9e5b87f3-c399-4d0e-9675-c592c9de5ff6)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Teleportation_Netherswap_MT_0a6aa026-b70f-4a8a-9b68-a88bd8a13788)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Wall_LivingWall_MT_35e00427-af5e-4487-86a9-1644e6dad812)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_ShadowInfusion_MT_43ea58f4-53ea-4626-ade7-40b35e61b67a)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Cone_CorrosiveSpray_MT_5a4d61b2-4ff7-4e8e-b145-e823b630b3b4)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Cone_Shatter_MT_3d0bafcd-97ab-4a0f-b1f5-db0a0cd21f7f)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Cone_SilencingStare_MT_b828df3c-20c1-4f8a-999a-6f11cbc997cd)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Cone_SteamLance_MT_01c42209-fc79-47c1-a1be-0152975c9ecf)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_ProjectileStrike_DazingBolt_MT_6aeb14de-9411-486f-9e12-7f83906c4131)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Projectile_ChainHeal_MT_258b1320-ac35-48bd-a858-03422d5ff2b0)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Projectile_ChainLightning_MT_46bf6634-7e28-4374-98f2-4347d906f09f)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Projectile_PyroclasticEruption_MT_182e817c-0679-4e84-8818-f300a07a157d)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Projectile_Superconductor_MT_18f91c9d-9257-4c01-8528-bca3ce8ddc48)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Summon_FireSlug_MT_58011b5f-2c8c-4fe1-808c-c00b69e7f7e5)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Summon_PlanarGateway_MT_f84cd5c0-ae76-4f58-a78b-ae9eb871915f)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_FlamingCrescendo_MT_806d51b5-4de0-4667-a1fb-a9fb13828262)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Harmony_MT_52aa2153-18b5-4fda-af88-b73d468c0e37)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_ShacklesOfPain_MT_f48c199e-9522-4543-8bf2-0db738aa7054)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_RockSpikes_MT_ca263a23-d13e-4c3f-bc65-e58fda9e7ec7)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_SoulMate_MT_45c13a88-fbf9-4f2a-85f9-e54433e66c11)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_StripResistance_MT_32d7f341-3089-47b9-846a-c62a9d28f24c)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_VacuumTouch_MT_3d6fa91e-0a72-491a-90c0-7b0876393375)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Vaporize_MT_b7121e7c-7f78-4862-952b-eb7bd54f7b5f)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Infect_MT_8017db5f-ff07-43ac-b44f-f16fce36c229)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_Condense_MT_096e0b0d-82e0-4e4f-9819-8f3b428a0ed9)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_CorpseExplosion_MT_cfeb225e-e419-4f74-9794-bb2aaab2e4a8)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_CorrosiveTouch_MT_1c0a4e76-4fd4-4a19-bd27-ec17f1386f12)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Target_CryogenicStasis_MT_103d782d-6ede-4f9b-8e34-7a722a6d338e)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Source_Charm_MT_1b2a9999-8cd9-4300-ad85-cd85fab9bdff)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Source_Curse_MT_2c9715bb-59f6-4299-a10f-2993ae8ffaa4)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_FireBrand_MT_6a9e8343-b314-495e-bd6c-625969599ff2)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_FlamingSkin_MT_e8da9811-1e41-42ac-958c-6453b4451f1b)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_FlamingTongues_MT_2211a8ec-f1c0-4188-966e-961b03deddbd)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_HealingTears_MT_4d7a3710-b5d1-4484-b0d1-99ed95ee14b2)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_IceBreaker_MT_1fc22f0c-930b-4d4b-a595-6b7c974e9bb9)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_MedusaHead_MT_85b5cfc1-f2b0-4e9b-b5f4-11bd27bbea70)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_PoisonousSkin_MT_49401d05-140a-4f62-bdc2-e25b0c06b0d2)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_ReactiveArmor_MT_4a05f79d-5944-4a2f-a3f1-5e2912a83214)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_SiphonPoison_MT_2ff32d11-979f-4444-8d5a-a9dd78e92dd5)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_SteelSkin_MT_5e0a678a-7c39-45a6-b7a3-96a276ec2479)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Source_Resurrect_MT_1a4b7e0a-044a-4e13-aae4-aa24c28e4cbe)
+	ListAdd(%MT_ScrollList3,Scroll_Skill_Shout_PoisonWave_MT_ed8d5d62-e6cf-4b39-b01f-f246d79bd89f)
+	Set(%MT_ScrollList4,%MT_ScrollList3)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Shout_IceSkin_MT_b5d6a972-aa00-4f5a-9486-d57f82749ea5)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_WarpInfusion_MT_bfbe6814-c0a2-4c94-b566-e2b48acded26)	
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Projectile_DeployMassTraps_MT_9aa8a746-7f26-4da5-b42c-3a4fd7ec9d2e)	
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_DeathWish_MT_b945eeab-a500-4a3b-82ba-ed1d93e4ee4b)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_DemonicBargain_MT_5f1dc770-0cf9-4571-ac05-4422bd06805a)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_Equalize_MT_75064567-e066-4519-8769-1d2c81b96f3b)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_BlackShroud_MT_bfc98184-11b1-4351-bbbc-70ff03bafe11)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_GraspOfTheStarved_MT_4506bc07-a7c7-4555-8b7f-94dc1f24e0f8)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_AcidInfusion_MT_921d7f70-2afa-4cf0-9583-f720411b9a69)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Target_NecrofireInfusion_MT_9dd24adb-e61d-4403-bb8f-11fec2632dff)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Shout_Supernova_MT_2bda7f65-7782-46a5-ab97-e527f082eb32)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Shout_VacuumAura_MT_b6bf78e1-f08f-41f1-a63c-25f1dc354b88)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Source_AcidSpores_MT_1404871c-cdec-4796-a82c-b28a3eb4b497)
+	ListAdd(%MT_ScrollList4,Scroll_Skill_Summon_ArtilleryPlant_MT_54708b97-fae0-48ca-9cc2-f429f594cb68)
+	Set(%MT_ScrollList5,%MT_ScrollList4)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Shout_JellyfishSkin_MT_f5e71b46-cf25-47ce-8640-24b897145de6)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Target_IceInfusion_MT_287ae82b-bdff-4865-b151-91afeefaade3)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Target_CursedElectricInfusion_MT_f9d57929-2561-479d-890c-7c5c2d5bf2e0)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Zone_LaserRay_MT_7b56707d-2eca-44ee-a300-c1333c71a142)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Target_DeathsDoor_MT_f9f0785f-31c6-4c1c-978f-10a6f44c50e8)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Target_ArcaneStitch_MT_878e9a86-2f8d-410f-b7d0-0342164beba1)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Shout_ShedSkin_MT_1f837831-f11c-432c-bd29-a46ed72df6bf)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Source_ElectricFence_MT_0a055592-b1bf-432e-a325-09a0ebd7903c)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Shout_MassCorpseExplosion_MT_f45baf12-630e-43ed-9b65-f34de1ee23b8)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Quake_Earthquake_MT_00279172-fab1-4c81-b4ac-6059b5547f3c)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Shout_CloseTheDoor_MT_27d32561-066e-4079-add2-7a0642f992a0)
+	ListAdd(%MT_ScrollList5,Scroll_Skill_Shout_NecromancerTotems_MT_bdfa9204-5cde-490f-805d-4d8291476bce)
+	Set(%MT_ScrollList6,%MT_ScrollList5)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Source_HailStorm_MT_d24a5ace-3508-49df-9100-9606de6ca391)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Source_MeteorShower_MT_d844c383-7b1d-4b71-871b-5b6390e60b3e)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Shout_BloodStorm_MT_d6a2b103-e7ed-4d50-93d1-09c87c2c70cd)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Shout_Apotheosis_MT_0ca005f7-4a16-4669-9102-4330d8495f7d)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Storm_Ethereal_MT_cf10cf27-78c6-41bf-a2d3-45dbc9d00ab8)
+	ListAdd(%MT_ScrollList6,Scroll_Skill_Storm_Lightning_MT_b8fc6aef-7d19-41fc-867d-9d30b24465a7)
+	
+//===========================================================//
+//              Invasive Species (ResistKnockdown)          *//
+//===========================================================//	
+
+EVENT BlightSpawnFunction
+VARS
+CHARACTER:_Char
+CHARACTER:_OldBlight
+CHARACTER:_DeadBlight
+CHARACTER:_NewBlight
+CHARACTER:_BlightSpawnTarget
+FLOAT3:_SpawnPoint
+ON
+	OnCharacterEvent(_Char,"BlightSpawner")
+ACTIONS
+		IF "c1"
+			GetVar(_DeadBlight,_Char,"Blight2")
+		THEN
+			CharacterDestroy(_DeadBlight)
+		ENDIF
+		IF "c1"
+			GetVar(_OldBlight,_Char,"Blight1")
+		THEN
+			CharacterPlayLoopEffect(%effectHandle,_OldBlight,"RS3_FX_GP_Status_Decaying_01","Dummy_BodyFX")
+			SetVar(_Char,"Blight2",_OldBlight)
+		ENDIF
+		IF "c1&c2"
+			ListGetRandom(%BlightSpawnList,_BlightSpawnTarget)
+			FindPosition(_SpawnPoint, _BlightSpawnTarget, 1, 0, .5, 2, 3, _BlightSpawnTarget, -1, -1, -1, -1)
+		THEN
+			SetVar(_Char,"SpawnPoint",_SpawnPoint)
+			CharacterEvent(_Char,"StorySpawn")
+		ENDIF
+		
+EVENT BlightSpawnIterator
+VARS
+CHARACTER:_Hostile
+ON
+  OnIterateCharacter(_Hostile,"GetBlightSpawn")
+ACTIONS
+  ListAdd(%BlightSpawnList,_Hostile)
+	
+//===========================================================//
+//                    Perforator (Backstab)                 *//
+//===========================================================//	
+	
 EVENT BackstabSkillReviser
 VARS
 CHARACTER:_Char
@@ -231,66 +566,97 @@ ACTIONS
 		CharacterRemoveSkill(_Char,Target_PiercingHeavyAttack)
 		CharacterAddSkill(_Char,Target_HeavyAttack)
 	ENDIF	
+	
+//===========================================================//
+//               Reactionary (ChanceToHitMelee)             *//
+//===========================================================//		
+		
+EVENT ChanceToHitMeleeCheck
+VARS
+CHARACTER:_Char
+CHARACTER:_Attacker
+FLOAT:_Distance
+ON
+	OnMiss(_Attacker,_,_Char,_)
+ACTIONS
+	IF "c1&c2&c3&c4&!c5&!c6&!c7&!c8&!c9"
+		CharacterHasTalent(_Char,ChanceToHitMelee)
+		CharacterInWeaponRange(_Char,_Attacker)
+		GetDistance(_Distance,_Char,_Attacker)
+		IsLessThen(_Distance,1.5)
+		CharacterHasStatus(_Char,SLEEPING)
+		CharacterHasStatus(_Char,KNOCKED_DOWN)
+		CharacterHasStatus(_Char,FROZEN)
+		CharacterHasStatus(_Char,STUNNED)
+		CharacterHasStatus(_Char,PETRIFIED)
+	THEN	
+		CharacterCharacterEvent(_Char,_Attacker,"ChanceToHitMeleeEvent")
+	ENDIF	
+	
+//===========================================================//
+//                  Voltage Spike (SpillNoBlood)            *//
+//===========================================================//	
+	
+EVENT VoltageSpikeDamage
+VARS
+	CHARACTER:_Char
+	INT:_Int
+ON 
+	OnCharacterEvent(_Char,"VoltageHit")
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(_Char,OVERCHARGED)
+	THEN	
+		CharacterApplyStatus(_Char, OVERCHARGED, 1)
+	ENDIF
 
-EVENT BlightSpawnIterator
+//===========================================================//
+//                Drunken Master (ResistSilence)            *//
+//===========================================================//	
+	
+//EVENT DrunkenMasterApplied
+//VARS
+//	CHARACTER:_Char
+//	INT:_Turns
+//ON
+//	OnCharacterStatusApplied(_Char,DRUNK)
+//ACTIONS	
+//	IF "c1"
+//		GetStatusTurns(_Char,DRUNK,_Turns)
+//	THEN
+//		IF "c1"
+//			IsEqual(_Turns,1)
+//		THEN
+//			CharacterApplyStatus(_Char,MT_MASTER,1)
+//		ELSE
+//			CharacterApplyStatus(_Char,MT_MASTER,2)
+//		ENDIF
+//	ENDIF
+
+//EVENT DrunkenMasterRemoved
+//VARS
+//	CHARACTER:_Char
+//ON
+//	OnCharacterStatusRemoved(_Char,DRUNK)
+//ACTIONS	
+//	CharacterRemoveStatus(_Char,MT_MASTER)
+
+//===========================================================//
+//                      Respec Functions                    *//
+//===========================================================//	
+
+EVENT ClearAbilityScoreFlags
 VARS
 CHARACTER:_Char
 ON
-  OnIterateCharacter(_Char,"GetBlightSpawn")
+	OnCharacterFlagSet("MT_ClearAbilityFlags",_Char)
+	OnCharacterFlagCleared("MT_HasPoint",_Char)
 ACTIONS
-  ListAdd(%BlightSpawnList,_Char)
-
-EVENT BlightSpawner
-VARS
-CHARACTER:_BlightSpawnTarget
-FLOAT3:_SpawnPoint
-ON
-	OnTimer("BlightSpawnTimer")
-ACTIONS
-	IF "c1&c2"
-		ListGetRandom(%BlightSpawnList,_BlightSpawnTarget)
-		GetPosition(_BlightSpawnTarget,_SpawnPoint)
-	THEN
-		SpawnCharacter(_,MT_CorpsePlant_653f533f-d9f3-40df-a3b1-fa2594547f87,_SpawnPoint,0)
-	ENDIF	
+	ClearFlag(_Char,"MT_HasLeadership")
+	ClearFlag(_Char,"MT_HasSneaking")
+	ClearFlag(_Char,"MT_HasLoremaster")
+	ClearFlag(_Char,"MT_HasAirSpecialist")
+	ClearFlag(_Char,"MT_HasNecromancy")
+	ClearFlag(_Char,"MT_HasSummoning")
+	ClearFlag(_Char,"MT_ClearAbilityFlags")
 	
-EVENT ResistUntreatedPoison
-VARS
-	CHARACTER:_Character
-	LIST<STATUS>:_RemoveList
-	STATUS:_Result
-ON
-	FetchCharacterApplyStatusData(_Character, MT_UNTREATED1)
-ACTIONS
-	ListClear(_RemoveList)
-	Set(_Result, MT_UNTREATED1)	
-	IF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED1)
-	THEN
-		Set(_Result, MT_UNTREATED2)
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED2)
-	THEN
-		Set(_Result, MT_UNTREATED3)			
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED3)
-	THEN
-		Set(_Result, MT_UNTREATED4)			
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED4)
-	THEN
-		Set(_Result, MT_UNTREATED5)			
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED6)
-	THEN
-		Set(_Result, MT_UNTREATED7)
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED7)
-	THEN
-		Set(_Result, MT_UNTREATED8)			
-	ELIF "c1"
-		CharacterHasStatus(_Character,MT_UNTREATED8)
-	THEN
-		Set(_Result, MT_UNTREATED8)		
-	ENDIF
-	RETURN(_RemoveList,_Result,1)
