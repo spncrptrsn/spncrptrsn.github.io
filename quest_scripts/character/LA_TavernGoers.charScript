@@ -1,0 +1,23 @@
+INIT 
+	CHARACTER:__Me
+
+// Taken from the drunk elf in Driftwood
+	
+BEHAVIOUR
+REACTION Tavern_Drink, 10000
+USAGE PEACE
+CHECK "!c1"
+	CharacterHasStatus(__Me,"DRUNK")
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterPlayAnimation("Sit_Drink_01")
+	ELSE
+		CharacterPlayAnimation("use_drink")
+	ENDIF
+	CharacterConsume(__Me,GLO_DrunkScript)
+	Sleep(3)
+INTERRUPT
+ACTIONS
+Reset()

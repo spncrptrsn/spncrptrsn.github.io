@@ -1,0 +1,22 @@
+INIT
+	CHARACTER:__Me	
+
+EVENTS
+EVENT OnInitAggro
+ON
+	OnInit()
+ACTIONS
+	CharacterSetFightMode(__Me, 1)
+	
+EVENT SheathWeapon
+ON	
+	OnGlobalFlagSet("LA_GLO_MercsStandDown")
+ACTIONS
+	CharacterSetFightMode(__Me, 0)	
+	
+EVENT GlobalMercsReturn
+ON
+	OnGlobalFlagSet("LA_GLO_MercsReturn")
+ACTIONS
+	CharacterEvent(__Me,"LA_EventMoveTurn")
+	ClearGlobalFlag("LA_GLO_MercsReturn")

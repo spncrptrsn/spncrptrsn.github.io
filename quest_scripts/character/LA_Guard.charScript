@@ -1,0 +1,47 @@
+INIT
+	CHARACTER:__Me	
+EXTERN FLOAT:%Seconds = .5
+
+EVENTS
+EVENT OnInitAggro
+ON
+	OnInit()
+ACTIONS
+	CharacterSetFightMode(__Me, 1)
+	
+EVENT SheathWeapon
+ON	
+	OnGlobalFlagSet("LA_GLO_GuardsStandDown")
+ACTIONS
+	CharacterSetFightMode(__Me, 0)
+	
+EVENT GlobalGuardsFollow
+ON
+	OnGlobalFlagSet("LA_GLO_GuardsFollow")
+ACTIONS
+	SetFlag(__Me,"LA_GuardFollow")
+	ClearGlobalFlag("LA_GLO_GuardsFollow")
+	
+EVENT ResumePost	
+ON	
+	OnTriggerEnter(__Me,_,"LA_AtBarracks")
+ACTIONS
+	ClearFlag(__Me,"LA_GuardFollow")
+	CharacterEvent(__Me,"LA_EventMoveTurn")
+	
+BEHAVIOUR
+REACTION Follow,10
+VARS
+	FLOAT:_Dist
+USAGE PEACE
+ACTIONS
+	IF "c1&c2&c3"
+		HasFlag(__Me,"LA_GuardFollow")
+		GetDistance(_Dist,__Me,CHARACTER:S_LA_Captain_Liam_9fed8cce-5ff6-4525-bf8c-54f7b1e59cef)
+		IsGreaterThen(_Dist,4.0)
+	THEN
+		CharacterFollow(CHARACTER:S_LA_Captain_Liam_9fed8cce-5ff6-4525-bf8c-54f7b1e59cef,%Seconds)
+	ENDIF
+INTERRUPT
+ACTIONS
+	Reset()

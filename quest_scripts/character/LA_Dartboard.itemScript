@@ -1,0 +1,13 @@
+INIT
+
+ITEM:__Me
+
+EVENTS
+
+EVENT HitTarget
+VARS
+CHARACTER:_Char
+ON
+	OnCharacterUsedSkillOnMe(_Char,Projectile_LA_ThrowDagger)
+ACTIONS
+	CharacterItemEvent(_Char,__Me,"LA_DartboardHit")

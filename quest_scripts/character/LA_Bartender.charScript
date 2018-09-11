@@ -1,0 +1,105 @@
+#INCLUDE State_Manager
+
+// Repurposed from the Driftwood tavernkeeper
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	
+	FLOAT: %waitTimer
+	
+	TRIGGER: %currentTrigger = S_LA_BarTriggerB_d52b3139-1b33-41f6-bd85-67ff01d4dbf7
+
+BEHAVIOUR
+REACTION State_Default, 0
+USAGE PEACE
+ACTIONS
+
+	GetWeightedRandom(%currentAction,"Action_WalkToPoint",INT:1,"Action_DoAnimation",INT:2,"Action_TapBeer",INT:1)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_WalkToPoint, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentTrigger,S_LA_BarTriggerB_d52b3139-1b33-41f6-bd85-67ff01d4dbf7,S_LA_BarTriggerA_bedc2e99-56c5-4ebd-913e-17cd080640a3,S_LA_BarTriggerC_8c997f66-b2c6-445b-a1ab-0e5ff8a82ee5)
+	
+	//Move to and look at trigger
+	IF "!c1"
+		IsEqual(%currentTrigger,null)
+	THEN
+		CharacterMoveTo(%currentTrigger)
+		CharacterLookFrom(%currentTrigger)
+	ELSE
+		DebugText(__Me,"Trigger not valid")
+	ENDIF
+	
+	//Wait
+	GetRandomBetween(%waitTimer,FLOAT:5,FLOAT:15)
+	Sleep(%waitTimer)
+	
+	SetPriority(%currentAction,0)
+	
+		
+//Do Random animation
+REACTION Action_DoAnimation, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING: _animationToUse
+	
+ACTIONS
+	//Move to and look at trigger
+	IF "!c1"
+		IsEqual(%currentTrigger,null)
+	THEN
+		CharacterMoveTo(%currentTrigger)
+		CharacterLookFrom(%currentTrigger)
+	ELSE
+		DebugText(__Me,"Trigger not valid")
+	ENDIF
+
+	//Random Animation
+	GetRandom(_animationToUse,"Yawn_01","Tired_01","Think_02","Fidget_Low_01")
+	
+	//Play animation
+	CharacterPlayAnimation(_animationToUse,1,1)
+	
+	//Wait
+	GetRandomBetween(%waitTimer,FLOAT:5,FLOAT:15)
+	Sleep(%waitTimer)
+	
+	SetPriority(%currentAction,0)
+	
+//Tap beer
+REACTION Action_TapBeer, 0
+USAGE PEACE
+VARS
+	ITEM: _beerBarrel = S_LA_BeerKeg_9a3077ac-9223-4f4b-be9a-8984a23ba9da
+	TRIGGER: _taplocation = S_LA_KegTrigger_87e7da74-b8c7-4749-8ddb-d33b7f40b21b
+	FIXEDSTRING: _animationToUse
+ACTIONS
+	IF "!c1&!c2"
+		IsEqual(_beerBarrel,null)
+		IsEqual(_taplocation,null)
+	THEN
+		CharacterMoveTo(_taplocation)
+		CharacterLookFrom(_taplocation)
+		
+		//Random tap
+		GetRandom(_animationToUse,"Tapping_Beer_01","Tapping_Beer_02")
+		CharacterPlayAnimation(_animationToUse,1,1)
+	ENDIF
+
+	//Get new random location
+	GetRandom(%currentTrigger,S_LA_BarTriggerB_d52b3139-1b33-41f6-bd85-67ff01d4dbf7,S_LA_BarTriggerA_bedc2e99-56c5-4ebd-913e-17cd080640a3,S_LA_BarTriggerC_8c997f66-b2c6-445b-a1ab-0e5ff8a82ee5)
+
+	//Move to and look at trigger
+	IF "!c1"
+		IsEqual(%currentTrigger,null)
+	THEN
+		CharacterMoveTo(%currentTrigger)
+		CharacterLookFrom(%currentTrigger)
+	ELSE
+		DebugText(__Me,"Trigger not valid")
+	ENDIF
+
+	SetPriority(%currentAction,0)

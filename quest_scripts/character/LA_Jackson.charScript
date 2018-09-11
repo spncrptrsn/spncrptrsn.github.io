@@ -1,0 +1,16 @@
+INIT
+	CHARACTER:__Me	
+
+EVENTS
+	
+EVENT SheathWeapon
+ON	
+	OnCharacterFlagSet("LA_JacksonStandDown",__Me)
+ACTIONS
+	CharacterSetFightMode(__Me, 0)	
+	
+EVENT UnsheathWeapon
+ON	
+	OnCharacterFlagSet("LA_JacksonDraw",__Me)
+ACTIONS
+	CharacterSetFightMode(__Me, 1)		

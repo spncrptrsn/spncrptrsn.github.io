@@ -1,0 +1,31 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+LA_Start_Internal_CompleteIfStarted();
+KBSECTION
+PROC
+	LA_Internal_StartLoveAffair()
+THEN
+	GoalCompleted;
+
+IF
+	GameEventSet("GAMEEVENT_GameStarted")
+THEN
+	LA_Internal_StartLoveAffair();
+
+PROC
+	LA_Start_Internal_CompleteIfStarted()
+AND
+	DB_StoryStarted(_)
+THEN
+	LA_Internal_StartLoveAffair();
+
+IF
+	SavegameLoaded(_,_,_,_)
+AND
+	DB_StoryStarted(_)
+THEN
+	LA_Internal_StartLoveAffair();
+EXITSECTION
+
+ENDEXITSECTION

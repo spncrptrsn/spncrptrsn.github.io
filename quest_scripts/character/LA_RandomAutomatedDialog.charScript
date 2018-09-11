@@ -1,0 +1,154 @@
+#INCLUDE State_Manager
+// Repurposed from Origins
+
+INIT
+USING State_Manager
+
+CHARACTER:__Me
+EXTERN CHARACTER:%Partner = null
+EXTERN STRING:%Dialog = null
+EXTERN FLOAT:%Sleep = 3.0
+EXTERN TRIGGER:%LookAtTrig = null
+EXTERN TRIGGER:%Wander = null
+
+BEHAVIOUR
+REACTION Default, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"TalkTo","DoNothing")
+	SetPriority(%currentAction, 1100)
+	
+REACTION DoNothing, 0
+USAGE PEACE
+ACTIONS
+	Sleep(%Sleep)
+	SetPriority(%currentAction, 0)
+	
+REACTION TalkTo, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1&!c2&!c3&c4"
+		IsEqual(%Partner,null)
+		IsInDialog(%Partner)
+		CharacterIsDead(%Partner,0)
+		CanSee(__Me,%Partner)
+	THEN
+		IF "c1"
+			IsEqual(%LookAtTrig,null)
+		THEN
+			CharacterLookAt(%Partner)
+		ELSE
+			CharacterLookAt(%LookAtTrig)
+		ENDIF
+
+		DialogStart(_,%Dialog,__Me,%Partner)
+	ENDIF
+	Sleep(%Sleep)
+	SetPriority(%currentAction, 0)
+
+REACTION TalkToSelf, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		IsEqual(%Dialog,null)
+	THEN
+		IF "!c1"
+			IsEqual(%LookAtTrig,null)
+		THEN
+			CharacterLookAt(%LookAtTrig)
+		ENDIF
+
+		DialogStart(_,%Dialog,__Me)
+
+	ELSE
+		DebugText(__Me,"My AD dialog for script GEN_RandomAutomatedDialog is not filled in")
+	ENDIF
+	Sleep(%Sleep)
+	SetPriority(%currentAction, 0)
+
+//---Glenrock additions
+
+
+REACTION DefaultTalkToSelf, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1&!c2"
+		HasFlag(__Me,"LA_ShutUp")
+		HasGlobalFlag("LA_GLO_Endgame")
+	THEN
+		GetRandom(%currentAction,"TalkToSelf","DoNothing")
+		SetPriority(%currentAction, 1100)
+	ENDIF
+
+REACTION DelayedTalkToSelf, 0
+USAGE PEACE
+ACTIONS
+	IF "c1&!c2"
+		HasFlag(__Me,"LA_ChatterFlag")
+		HasGlobalFlag("LA_GLO_Endgame")
+	THEN
+		GetRandom(%currentAction,"TalkToSelf","DoNothing")
+		SetPriority(%currentAction, 1100)
+	ENDIF
+
+REACTION WanderTalkToSelf, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+			HasGlobalFlag("LA_GLO_Endgame")
+	THEN
+		GetRandom(%currentAction,"TalkToSelf","DoNothing","LayDown","BeggarWander")
+		SetPriority(%currentAction, 1100)
+	ENDIF
+
+REACTION BeggarWander, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+			HasGlobalFlag("LA_GLO_Endgame")
+	THEN
+		CharacterWander(%Wander,4.0)
+		SetPriority(%currentAction, 0)
+	ENDIF
+
+REACTION LayDown, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+			HasGlobalFlag("LA_GLO_Endgame")
+	THEN
+		Sleep(1.0)
+		CharacterSetAnimationOverride(__Me,"Lie_Wounded_02_Loop")
+		Sleep(5.0)
+		DialogStart(_,%Dialog,__Me)
+		Sleep(5.0)	
+		CharacterSetAnimationOverride(__Me,"")	
+		SetPriority(%currentAction, 0)
+	ENDIF
+
+REACTION SearchTalkToSelf, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("LA_GLO_LizardSearching")
+	THEN	
+		GetRandom(%currentAction,"TalkToSelf","BeggarWander")
+		SetPriority(%currentAction, 1100)
+	ENDIF
+
+REACTION Withdrawal, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		HasGlobalFlag("LA_GLO_MercSick")
+	THEN	
+		CharacterSetAnimationOverride(__Me,"Sad_01_Loop")		
+		AddStatusInfluence(__Me,WEAK,20)
+		ClearGlobalFlag("LA_GLO_MercSick")
+	ELIF "c1"
+		HasFlag(__Me,"LA_MercBetter")
+	THEN	
+		CharacterSetAnimationOverride(__Me,"")	
+		RemoveStatusInfluence(__Me,WEAK,20)
+		ClearFlag(__Me,"LA_MercBetter")
+	ENDIF

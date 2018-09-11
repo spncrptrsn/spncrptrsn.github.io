@@ -1,0 +1,40 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+// Transferred from Origins for help with a certain quest item...
+
+IF
+CharacterDied(_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+IsTagged(_Player,"BLOCK_RESURRECTION",0)
+AND
+ItemTemplateIsInCharacterInventory(_Player,"LA_Resurrection_Idol_fe477ab0-d01e-446f-83d8-f1fbb670a1d7",_Amount)
+AND
+_Amount > 0
+THEN
+ProcObjectTimer(_Player,"ResurrectionIdol",1000);
+
+PROC
+ProcObjectTimerFinished(_Player,"ResurrectionIdol")
+AND
+IsTagged(_Player,"BLOCK_RESURRECTION",0)
+AND
+CharacterIsDead((CHARACTERGUID)_Player,1)
+AND
+ItemTemplateIsInCharacterInventory(_Player,"LA_Resurrection_Idol_fe477ab0-d01e-446f-83d8-f1fbb670a1d7",_Amount)
+AND
+_Amount > 0
+AND
+GetPosition(_Player,_x,_y,_z)
+THEN
+CharacterResurrect(_Player);
+PlayEffectAtPosition("RS3_FX_GP_Combat_Resurrect_Idol_01",_x,_y,_z);
+ItemTemplateRemoveFrom("LA_Resurrection_Idol_fe477ab0-d01e-446f-83d8-f1fbb670a1d7",_Player,1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LoveAffair"
