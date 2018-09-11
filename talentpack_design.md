@@ -2,7 +2,7 @@
 
 ### Using story scripting to introduce custom talents to Divinity: Original Sin 2
 
-Here's how I use story scripting to implement custom talents for my upcoming talent pack, getting around hardcoded limitations that modders have lived with since D:OS1. (As of this writing, the mod is being playtested by a few other members of the community before release next week with an initial batch of 12 new talents.)
+Here's how I use story scripting to implement custom talents for my [talent pack](https://steamcommunity.com/sharedfiles/filedetails/?id=1508979975), getting around hardcoded limitations that modders have lived with since D:OS1.
 
 ![Image](https://i.imgur.com/qgeJl1t.jpg)
 
@@ -63,7 +63,7 @@ NOT DB_MT_TalentToAdd(_Char, _Talent, _ItemTimer);
 I used this method to implement new talents with the following limitations:
 
  * Because these talents were still prevented from being displayed on the character's list of greyed-out potential talents, they would have to be selected from a dialogue menu.
- * Players can choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots I had to work with.
+ * Players can choose a maximum of three custom talents, limited by the number of non-gear 'armor' slots I had to work with. (Update: Once we discovered that talents can be attached to runes, that number went up to 9.)
  
 ![Image](https://i.imgur.com/miAt51k.jpg)
 
