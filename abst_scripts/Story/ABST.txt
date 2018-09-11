@@ -1,0 +1,31 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ABST_Start_Internal_CompleteIfStarted();
+KBSECTION
+PROC
+	ABST_Internal_StartArmorBasedSavingThrows()
+THEN
+	GoalCompleted;
+
+IF
+	GameEventSet("GAMEEVENT_GameStarted")
+THEN
+	ABST_Internal_StartArmorBasedSavingThrows();
+
+PROC
+	ABST_Start_Internal_CompleteIfStarted()
+AND
+	DB_StoryStarted(_)
+THEN
+	ABST_Internal_StartArmorBasedSavingThrows();
+
+IF
+	SavegameLoaded(_,_,_,_)
+AND
+	DB_StoryStarted(_)
+THEN
+	ABST_Internal_StartArmorBasedSavingThrows();
+EXITSECTION
+
+ENDEXITSECTION
