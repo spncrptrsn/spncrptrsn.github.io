@@ -137,19 +137,19 @@ THEN
 	DB_MT_Equipped_Overhead(_Char,_Overhead, _ItemTimer);
 	TimerLaunch(_ItemTimer,500);
 
-IF
-	ItemTemplateAddedToCharacter(MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae,(ITEMGUID)_Wings,(CHARACTERGUID)_Char)
-AND
-	GetUUID(_Char, _UUID)
-AND
-	StringConcatenate("EquipWings_", _UUID, _ItemTimer)
-THEN
-	DB_MT_NextSlot(_Char, 1);
-	DB_MT_RuneProgress(_Wings,1,0);
-	DB_MT_RuneProgress(_Wings,2,1);
-	DB_MT_RuneProgress(_Wings,3,2);
-	DB_MT_Equipped_Wings(_Char, _Wings, _ItemTimer);
-	TimerLaunch(_ItemTimer,500);
+//IF
+//	ItemTemplateAddedToCharacter(MT_Blank_Wings_79bfe894-c4c2-4872-8a4f-deb5cd885cae,(ITEMGUID)_Wings,(CHARACTERGUID)_Char)
+//AND
+//	GetUUID(_Char, _UUID)
+//AND
+//	StringConcatenate("EquipWings_", _UUID, _ItemTimer)
+//THEN
+//	DB_MT_NextSlot(_Char, 1);
+//	DB_MT_RuneProgress(_Wings,1,0);
+//	DB_MT_RuneProgress(_Wings,2,1);
+//	DB_MT_RuneProgress(_Wings,3,2);
+//	DB_MT_Equipped_Wings(_Char, _Wings, _ItemTimer);
+//	TimerLaunch(_ItemTimer,500);
 
 IF 
 	ObjectFlagSet("MT_PointCheck",(CHARACTERGUID)_Char,_)

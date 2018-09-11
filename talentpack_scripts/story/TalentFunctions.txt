@@ -181,9 +181,9 @@ CharacterStatusAttempt((CHARACTERGUID)_Char,"SHOCKED",_)
 AND
 CharacterHasTalent(_Char,"SpillNoBlood",1)
 AND
-CharacterGetMagicArmorPercentage(_Char,(INTEGER)_MagicArmor)
+CharacterGetMagicArmorPercentage(_Char,(REAL)_MagicArmor)
 AND
-_MagicArmor > 0
+_MagicArmor > 1.0
 THEN
 SetStoryEvent(_Char,"VoltageHit");
 
@@ -192,16 +192,37 @@ CharacterStatusAttempt((CHARACTERGUID)_Char,"STUNNED",_)
 AND
 CharacterHasTalent(_Char,"SpillNoBlood",1)
 AND
-CharacterGetMagicArmorPercentage(_Char,(INTEGER)_MagicArmor)
+CharacterGetMagicArmorPercentage(_Char,(REAL)_MagicArmor)
 AND
-_MagicArmor > 0
+_MagicArmor > 1.0
 THEN
 SetStoryEvent(_Char,"VoltageHit");
 
 IF
 CharacterStatusRemoved((CHARACTERGUID)_Char,"OVERCHARGED",_)
 THEN
-CharacterSetMagicArmorPercentage(_Char,0);
+CharacterSetMagicArmorPercentage(_Char,0.0);
+
+IF
+CharacterStatusApplied((CHARACTERGUID)_Char,"DEF_SHOCKED",_)
+AND
+CharacterHasTalent(_Char,"SpillNoBlood",1)
+THEN
+SetStoryEvent(_Char,"VoltageHit");
+
+IF
+CharacterStatusApplied((CHARACTERGUID)_Char,"DEF_STUNNED",_)
+AND
+CharacterHasTalent(_Char,"SpillNoBlood",1)
+THEN
+SetStoryEvent(_Char,"VoltageHit");
+
+//IF
+//StoryEvent((CHARACTERGUID)_Char,"VoltageHit")
+//AND
+//HasActiveStatus(_Char,"OVERCHARGED",0)
+//THEN
+//ApplyStatus(_Char,"OVERCHARGED",6.0,1,NULL_00000000-0000-0000-0000-000000000000);
 EXITSECTION
 
 ENDEXITSECTION
