@@ -1,0 +1,147 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+// Initialization
+
+IF
+GameStarted(_Level, _)
+AND
+IsCharacterCreationLevel(_Level, 0)
+AND
+NOT GlobalGetFlag("ABST_Initialized", 1)
+THEN
+TimerLaunch("ABST_InitializationDelay", 100);
+
+IF
+TimerFinished("ABST_InitializationDelay")
+THEN
+IterateParties("ABST_EditorChecks");
+
+IF
+StoryEvent((CHARACTERGUID)_Char, "ABST_EditorChecks")
+THEN
+//PROC_ABST_AddSkill(_Char);
+GlobalSetFlag("ABST_Initialized");
+
+//IF
+//CharacterJoinedParty(_Char)
+//AND
+//DB_IsPlayer(_Char)
+//AND
+//CharacterIsSummon(_Char, 0)
+//THEN
+//PROC_ABST_AddSkill(_Char);
+
+//PROC
+//PROC_ABST_AddSkill((CHARACTERGUID)_Char)
+//AND
+//CharacterHasSkill(_Char,"Target_DeflectPreview",0)
+//THEN
+//CharacterAddSkill(_Char,"Target_DeflectPreview");
+//CharacterAddTalentPoint(_Char,2);
+//CharacterAddAbilityPoint(_Char,5);
+//CharacterAddSkill(_Char,"Shout_InspireStart");
+
+// Naming Function
+
+IF 
+ObjectEnteredCombat((CHARACTERGUID)_Char,_)
+AND
+NOT GetVarString(_Char,"NameString",_)
+THEN
+SetStoryEvent(_Char,"ABST_NameMe");
+
+IF 
+StoryEvent((CHARACTERGUID)_Char,"ABST_NameMe")
+AND
+CharacterGetDisplayName(_Char,_,(STRING)_Name)
+THEN
+SetVarString(_Char,"NameString",_Name);
+
+// Status Removal Timer
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"CharacterRemoveStatus")
+AND
+GetVarFixedString(_Char,"ScrubbedStatus",(STRING)_Status)
+AND
+GetUUID(_Char,(STRING)_UUID)
+AND
+StringConcatenate(_UUID,_Status,(STRING)_Timer)
+THEN
+DB_ABST_RemoveStatus(_Timer,_Char,_Status);
+TimerLaunch(_Timer,2000);
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"SurfaceRemoval")
+AND
+GetVarString(_Char,"ScrubbedStatus",(STRING)_Status)
+AND
+GetUUID(_Char,(STRING)_UUID)
+AND
+StringConcatenate(_UUID,_Status,(STRING)_Timer)
+THEN
+DB_ABST_RemoveStatus(_Timer,_Char,_Status);
+TimerLaunch(_Timer,400);
+
+IF
+TimerFinished((STRING)_Timer)
+AND
+DB_ABST_RemoveStatus(_Timer,_Char,_Status)
+THEN
+NOT DB_ABST_RemoveStatus(_Timer,_Char,_Status);
+RemoveStatus((CHARACTERGUID)_Char,(STRING)_Status);
+
+// Turn Helpers
+
+IF
+StoryEvent((CHARACTERGUID)_Char,"RemoveTalentStuff")
+THEN
+DB_ABST_RemoveStatuses(_Char);
+TimerLaunch("RemoveTalentTimer",1500);
+
+IF
+TimerFinished("RemoveTalentTimer")
+AND
+DB_ABST_RemoveStatuses(_Char)
+THEN
+NOT DB_ABST_RemoveStatuses(_Char);
+RemoveStatus(_Char,"ABST_GUERILLA");
+RemoveStatus(_Char,"ABST_EXEC");
+RemoveStatus(_Char,"ABST_RUSH");
+RemoveStatus(_Char,"ABST_DUAL5");
+RemoveStatus(_Char,"ABST_DUAL10");
+RemoveStatus(_Char,"ABST_DUAL15");
+RemoveStatus(_Char,"ABST_DUAL20");
+RemoveStatus(_Char,"ABST_DUAL25");	
+
+// Shackles
+
+IF
+CharacterStatusApplied((CHARACTERGUID)_Char,"OVR_SHACKLES_OF_PAIN",(CHARACTERGUID)_Caster)
+THEN
+RemoveStatus(_Char,"OVR_SHACKLES_OF_PAIN");
+ApplyStatus(_Caster,"SHACKLES_OF_PAIN_CASTER",18.0,1,_Caster);
+ApplyStatus(_Char,"SHACKLES_OF_PAIN",18.0,1,_Caster);
+
+// Bargain Fixer
+
+IF
+CharacterStatusApplied((CHARACTERGUID)_Char,"DEMONIC_BARGAIN",_)
+THEN
+DB_ABST_BargainFixer(_Char);
+TimerLaunch("BargainFixer",2000);
+
+IF
+TimerFinished("BargainFixer")
+AND
+DB_ABST_BargainFixer(_Char)
+THEN
+NOT DB_ABST_BargainFixer(_Char);
+RemoveStatus((CHARACTERGUID)_Char,"DEMONIC_BARGAIN");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "ABST"
