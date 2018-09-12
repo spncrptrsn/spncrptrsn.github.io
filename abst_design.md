@@ -4,64 +4,64 @@ Divinity: Original Sin 2's armor system took the guess-work out of setting statu
 
 [Armor-Based Saving Throws](https://steamcommunity.com/sharedfiles/filedetails/?id=1157299447) is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Implementing a fully stat-based saving throw system would have thrown out what was great about D:OS 2's 'health bar' armor: how it allows the player to point to a unit and know exactly how vulnerable it is; how it makes the player work for debuffs by softening up a target first. ABST retains these strengths, but turns a unit's percentage of armor remaining into their _chance_ to resist physical or magic debuffs. 
 
-This is accomplished with scripting, by altering instances of the FetchCharacterApplyStatusData event, which filters incoming status effects before they are resolved on targets. 
+This is accomplished with scripting, by creating a rule that triggers every time an incoming debuff is blocked by armor. An invisible 'dummy status' is then applied to that character.
 
 ```
-EVENT ABSTCharacterSetChilled
+IF
+CharacterStatusAttempt((CHARACTERGUID)_Char,(STRING)_Status,(CHARACTERGUID)_Caster)
+AND
+ObjectGetFlag(_Char,"ABST_StatusBypass",0)
+AND
+DB_ABST_PhysProcStatus(_Attempt,_Status,_)
+AND
+CharacterGetArmorPercentage(_Char,(REAL)_PhysArmor)
+AND
+_PhysArmor > 0
+AND
+NOT QRY_ABST_SurfaceConcern(_Char,_Status)
+//AND
+//QRY_ABST_SurfaceBoost(_Char,_Caster,_Status)
+THEN
+SetVarObject(_Char,"ABST_Caster",_Caster);
+ApplyStatus(_Char,(STRING)_Attempt,6.0,0,_Caster);
+```
+
+This 'dummy status' (in this case, OVR_CHICKEN) is then caught by a custom FetchCharacterApplyStatusData event, which filters incoming status effects before they are resolved on targets. 
+
+```
+EVENT ABSTCharacterSetChicken
 VARS
 	CHARACTER:_Character
 	LIST<STATUS>:_RemoveList
 	STATUS:_Result
-	INT:_Turns
+	STRING:_String
+	INT:_Saved
 ON
-	FetchCharacterApplyStatusData(_Character, OVR_CHILLED)
+	FetchCharacterApplyStatusData(_Character, OVR_CHICKEN)
 ACTIONS
-	ListClear(_RemoveList)
-	IF "c1"
-		CharacterHasStatus(_Character, BURNING)
+	IF "c1|c2"
+		CharacterHasStatus(_Character,ABST_AEGIS)
+		CharacterHasStatus(_Character,ABST_MORNING)
 	THEN
-		ListAdd(_RemoveList, BURNING)
-		Set(_Result, WARM)
-	ELIF "c1|c2|c3"
-		CharacterHasStatus(_Character, FROZEN)
-		CharacterHasStatus(_Character, NECROFIRE)
-		CharacterHasStatus(_Character, HOLY_FIRE)
-	THEN
-		Set(_Result,null)
-	ELIF "c1"
-		CharacterHasStatus(_Character, WARM)
-	THEN
-		ListAdd(_RemoveList, WARM)
-		Set(_Result,null)
-		ELIF "c1"
-			CharacterHasStatus(_Character, CHILLED)
-		THEN
-		Set(_Result, OVR_FROZEN)
-		Set(_Turns,1)
-	ELSE
-		Print(%StatusString,"<font color='#cfecff'>Chilled</font>")
-		Print(%StatusString2," was [1]", %StatusString)
-		Set(_Result,CHILLED)
-		Set(_Turns,null)
-		Set(%Char,_Character)
-		CallFunction("MagicArmorTally")
-		IF "c1"
-			IsEqual(%Saved,1)
-		THEN
-			Set(_Result,DEF_CHILLED)
-		ELIF "c1"
-			CharacterHasStatus(_Character, WET)
-		THEN
-			Set(_Result, OVR_FROZEN)
-			Set(_Turns,1)
-		ENDIF
+		SetFlag(_Character,"ABST_MorningFlag")
 	ENDIF
-	Set(%Surface,0)
-	Set(%DuckFlag,0)
-	RETURN(_RemoveList,_Result,null)
+	Print(%StatusString1,"<font color='#f7ba14'>Chicken Form</font>")
+	Print(%StatusString2," was turned into a <font color='#f7ba14'>Chicken</font>")		
+	Set(_Result, OVR_CHICKEN)
+	ListClear(_RemoveList)
+	Set(%Char,_Character)
+	CallFunction("PhysArmorTally")
+	Set(_Saved,%Saved)
+	IF "c1"
+		IsEqual(_Saved,1)
+	THEN
+		Set(_Result,null)
+	ENDIF
+	ClearFlag(_Character,"ABST_MorningFlag")
+	RETURN(_RemoveList,_Result,1)
   ```
   
-Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), nullifying the status if the target's score is greater. ([Full scripts here](https://github.com/spncrptrsn/spncrptrsn.github.io/tree/master/abst_scripts).)
+Each time this event fires, it now calls a custom function that 'rolls' a d100 (plus caster bonuses) against a target's armor percentage (plus target bonuses), forcing the original debuff through the target's remaining armor if they fail their save. ([Full scripts here](https://github.com/spncrptrsn/spncrptrsn.github.io/tree/master/abst_scripts).)
 
 ![Image](https://i.imgur.com/LREhPza.jpg)
 
