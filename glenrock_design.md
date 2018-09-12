@@ -8,7 +8,7 @@ My take on Glenrock (outlined in full in [this chart](https://www.lucidchart.com
 
 [![Image](https://i.imgur.com/PShGSCj.jpg)](https://youtu.be/h333WE04yDA)
 
-I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inquisitive players can begin to unravel the criminal conspiracy afoot in the town by learning that the tarot card reader in the town square is effectively the gatekeeper to the local drug trade. Interact with her without this knowledge and she'll gladly read your fortune:
+I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inquisitive players can begin to unravel the criminal conspiracy in a number of ways. One involves questioning the townsfolk to learn that the tarot card reader acts as the gatekeeper to the Drudanae trade. However, interact with her without this knowledge and she'll simply read your fortune for 5 gold.
 
 [![Image](https://i.imgur.com/u4f2gh5.jpg)](https://youtu.be/xiIFsEYd0Lk)
 
@@ -16,7 +16,7 @@ This basic reading is fully functional, powered by a dialog tree that randomly s
 
 ![Image](https://i.imgur.com/uBkqs1v.png)
 
-If the player hears from the beggar or one of the mercenaries how to get a special reading from the tarot reader, they can use that to solve a puzzle in the tavern opening the hatch to the undertavern.
+If the player discovers how to get a special reading from the tarot reader, they can use that to solve a puzzle in the tavern opening the hatch to the undertavern, where a Drudanae dealer and some substantive clues await.
 
 [![Image](https://i.imgur.com/3eKaEHo.jpg)](https://www.youtube.com/watch?v=tboJ14PlJnw)
 
