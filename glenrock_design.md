@@ -6,17 +6,19 @@ For this quest, I started with this relatively simple premise, provided by Laria
 
 My take on Glenrock (outlined in full in [this chart](https://www.lucidchart.com/documents/view/04bf2714-35b7-4376-a7ae-37b7e30ab1db/0#)) gave Richard and ulterior motive for presenting the player with this task. If the player follows mayor Richard and Sabrina's requests without deviating from them, they'll be framed for the murder of Liam, the captain of the guard.
 
-[![Image](https://i.imgur.com/WdaYQrO.jpg)](https://youtu.be/h333WE04yDA)
+[![Image](https://i.imgur.com/PShGSCj.jpg)](https://youtu.be/h333WE04yDA)
 
 I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inquisitive players can begin to unravel the criminal conspiracy afoot in the town by learning that the tarot card reader in the town square is effectively the gatekeeper to the local drug trade. Interact with her without this knowledge and she'll gladly read your fortune:
 
-[![Image](https://i.imgur.com/WORamUE.jpg)](https://youtu.be/xiIFsEYd0Lk)
+[![Image](https://i.imgur.com/u4f2gh5.jpg)](https://youtu.be/xiIFsEYd0Lk)
 
 This basic reading is fully functional, powered by a dialog tree that randomly selects different 'cards.'
 
 ![Image](https://i.imgur.com/uBkqs1v.png)
 
 If the player hears from the beggar or one of the mercenaries how to get a special reading from the tarot reader, they can use that to solve a puzzle in the tavern opening the hatch to the undertavern.
+
+[![Image](https://i.imgur.com/3eKaEHo.jpg)](https://www.youtube.com/watch?v=tboJ14PlJnw)
 
 This puzzle was implemented as a lore-friendly version of the lever puzzle aspect of Larian Studio's scripting test.
 
