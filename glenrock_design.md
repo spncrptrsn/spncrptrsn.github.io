@@ -14,4 +14,4 @@ I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inq
 
 This basic reading is fully functional, powered by a dialog tree that can give you different outcomes.
 
-[Image](https://i.imgur.com/uBkqs1v.png)
+![Image](https://i.imgur.com/uBkqs1v.png)
