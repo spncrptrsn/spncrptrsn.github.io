@@ -4,6 +4,8 @@ Divinity: Original Sin 2's armor system took the guess-work out of setting statu
 
 In D:OS 2, physical and magic defense aren't embodied in abstract armor class, saving throw, or damage reduction values. Each character has two extra health bars representing their phsyical and magic armor. Physical and magic damage degrade each of these, respectively, only biting into a character's health pool when their armor level is 0 for that damage type. Armor also works to block debuffs. Any amount of armor will block a status effect. If a character with 75/100 magic armor gets attacked by a 74-damage Electric Discharge, their remaining 1 magic armor will completely block the incoming Shocked status that is also part of that skill.
 
+![Image](https://i.imgur.com/9YKeMwi.jpg)
+
 [Armor-Based Saving Throws](https://steamcommunity.com/sharedfiles/filedetails/?id=1157299447) is my attempt to inject a little bit of D&D-style debuffing and XCOM-style risk management gameplay into D:OS 2. Implementing a fully stat-based saving throw system would have thrown out what was great about D:OS 2's 'health bar' armor: how it allows the player to point to a unit and know exactly how vulnerable it is; how it makes the player work for debuffs by softening up a target first. ABST retains these strengths, but turns a unit's percentage of armor remaining into their _chance_ to resist physical or magic debuffs. 
 
 This is accomplished with scripting, by creating a rule that triggers every time an incoming debuff is blocked by armor. An invisible 'dummy status' is then applied to that character.
