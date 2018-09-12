@@ -12,6 +12,8 @@ I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inq
 
 [![Image](https://i.imgur.com/WORamUE.jpg)](https://youtu.be/xiIFsEYd0Lk)
 
-This basic reading is fully functional, powered by a dialog tree that can give you different outcomes.
+This basic reading is fully functional, powered by a dialog tree that randomly selects different 'cards.'
 
 ![Image](https://i.imgur.com/uBkqs1v.png)
+
+If the player hears from the beggar or one of the mercenaries how to get a special reading from the tarot reader, they can use that to solve a puzzle in the tavern opening the hatch to the undertavern.
