@@ -1,4 +1,4 @@
-### Spencer's Scripting Hilights
+### Spencer's Scripting Highlights
 
 -Talent pack: Circumventing hardcoded elements with scripting to enable new character builds and styles of play. [Steam Workshop Link](https://steamcommunity.com/sharedfiles/filedetails/?id=1508979975) - [Design Overview](https://github.com/spncrptrsn/spncrptrsn.github.io/blob/master/talentpack_design.md)
 
