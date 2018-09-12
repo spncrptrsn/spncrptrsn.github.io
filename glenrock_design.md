@@ -10,4 +10,8 @@ My take on Glenrock (outlined in full in [this chart](https://www.lucidchart.com
 
 I planned this less as a 'bad ending' and more as an 'uninquisitive ending.' Inquisitive players can begin to unravel the criminal conspiracy afoot in the town by learning that the tarot card reader in the town square is effectively the gatekeeper to the local drug trade. Interact with her without this knowledge and she'll gladly read your fortune:
 
+[![Image](https://i.imgur.com/WORamUE.jpg)](https://youtu.be/xiIFsEYd0Lk)
 
+This basic reading is fully functional, powered by a dialog tree that can give you different outcomes.
+
+[Image](https://i.imgur.com/uBkqs1v.png)
