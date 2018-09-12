@@ -24,7 +24,7 @@ This puzzle was implemented as a lore-friendly version of the lever puzzle aspec
 
 >There’re 3 levers/buttons somewhere in Glenrock. Pressing them in a specific order creates something positive for the player (e.g.: a >secret door unlocks, a useful item appears, ...). If the three levers are pulled in the wrong order, something negative happens (e.g.: >players get teleported, receive damage, ...). This should only happen after a 3rd lever is pulled.
 
-The Osiris code I wrote to power this puzzle is as follows. Each block of code below is what's referred to as a 'Rule,' consisting of a trigger conditions (IF), optional extra conditions (AND), and actions (THEN). Every action ends in a semi-colon. Actions beginning with DB_ add new database 'Facts' that can be checked as trigger or extra conditions. Removing database facts is done by prepending them with the NOT operator.
+The Osiris code I wrote to power this puzzle is as follows. Each block of code below is what's referred to as a 'Rule,' consisting of a trigger conditions (IF), optional extra conditions (AND), and actions (THEN). Every action ends in a semi-colon. Actions beginning with DB_ add new database 'Facts' that can be checked as extra conditions. Removing database facts is done by prepending them with the NOT operator.
 
 ```
 IF 
