@@ -1,4 +1,4 @@
-### Scripting a player-driven quest with varied solutions
+### Scripting a player-driven quest with varied outcomes
 
 For this quest, I started with this relatively simple premise, provided by Larian Studios as part of their scripting test. 
 
