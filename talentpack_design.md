@@ -2,7 +2,7 @@
 
 ### Using story scripting to introduce custom talents to Divinity: Original Sin 2
 
-Here's how I use story scripting to implement custom talents for my [talent pack](https://steamcommunity.com/sharedfiles/filedetails/?id=1508979975), getting around hardcoded limitations that modders have lived with since D:OS1.
+Here's how I used Osiris scripting to implement custom talents for my [talent pack](https://steamcommunity.com/sharedfiles/filedetails/?id=1508979975), getting around hardcoded limitations that modders have lived with since D:OS1.
 
 ![Image](https://i.imgur.com/qgeJl1t.jpg)
 
