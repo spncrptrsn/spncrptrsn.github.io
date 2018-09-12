@@ -1,12 +1,10 @@
-### Scripting a whodunnit where the witnesses are already dead
+### Scripting a player-driven quest with varied solutions
 
-This quest is based around two of my favorite mechanics from D:OS 2: ghosts and flesh memories—those accessible to Elves when they consume the limbs of the dead. If you were trying to solve a mystery in Rivellon, a ghost would still retain its subjectivity, and could potentially mislead you. Flesh memories don't lie, though, and I considered the dynamic between the two worth exploring.
+For this quest, I started with this relatively simple premise, provided by Larian Studios as part of their scripting test: 
 
-(This quest has yet to be published, but some early scenes and dialogues are included below.)
+>Richard the mayor of the human village of Glenrock has a letter that needs to be delivered to his mistress Sabrina who is drinking away >in the tavern. In this letter he states his love for her and that he wants to leave his wife Jane to spend the rest of his life with >Sabrina. Sabrina is at the tavern drinking because she can't stand Jackson her husband who works as a grocer at the local grocery >store. Jackson has been suspecting Sabrina of cheating on him for quite a while now, he keeps track of her whereabouts in his diary. He >can't say anything to Sabrina about her misbehavior because she knows about his dark life before he came to Glenrock. On many occasions >she has threatened to tell Liam, the guard captain, Jackson's secrets in order to lock him away for good if he didn't stop being so >jealous and suspicious of her.
 
-What if you heard one thing from a ghost, suspected you were being misled, and had the opportunity to test their word against the spirit'ss own memories? When I first considered this, it was clear why Corpse Eater asides were never central to a quest—not every party is going to include an elf. But what if an enterprising elven NPC was willing to nibble on these parts for you, and tell you about the experience for a reasonable fee? (Link to video in screenshot.)
-
-[![Image](https://i.imgur.com/S1zm6nt.jpg)](https://www.youtube.com/watch?v=Rh3ilkQX77U&feature=youtu.be)
+[![Image](https://imgur.com/a/Y5FZOoW)](https://youtu.be/h333WE04yDA)
 
 I set my quest outside Arx to take advantage of all the relatively empty real estate, and the premise emerged from the context: In the battle for control of Arx, a band of magisters had made it past the bridge with a stash of source artifacts pilfered from the vault of the white robes. Most were felled by voidwoken, but at least one made it out alive and disguised himself among the pilgrims. Can you find out who it is and claim the treasures they stole for yourself?
 
